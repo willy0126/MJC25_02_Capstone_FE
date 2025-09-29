@@ -1,0 +1,111 @@
+/* --- 네비게이션 바 전체 스타일 --- */
+.navbar {
+    position: fixed; /* 스크롤 시 상단에 고정 */
+    top: 0; /* 화면 맨 위에 붙도록 설정 */
+    z-index: 1000; /* 다른 요소들보다 위에 오도록 설정 */
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 0  240px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    transition: box-shadow 0.3s ease;
+}
+
+.navbar.scrolled {
+    max-width: 100%; /* 화면 전체 너비 사용 */
+    padding: 0 240px; /* 상하 패딩을 줄여 슬림하게, 좌우 240px 여백 유지 */
+    box-shadow: 0 3px 5px rgba(33, 33, 33, 0.25); /* 스크롤 시 그림자 추가 */
+}
+
+.nav-logo img {
+    height: 85px;
+    width: 100px;
+    padding: 10px;
+    transition: height 0.3s ease, width 0.3s ease;
+}
+
+.navbar.scrolled .nav-logo img {
+    height: 60px;
+    width: 75px;
+    transition: height 0.3s ease, width 0.3s ease;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 65px;
+}
+
+.nav-item {
+    position: relative;
+    padding: 20px 0;
+}
+
+.nav-item > a {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.nav-item:hover > a {
+    color: #00b493;
+}
+
+.dropdown-menu {
+    position: absolute;
+    text-align: center;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 130px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    padding-top: 0px;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.nav-item:hover .dropdown-menu,
+.dropdown-menu:hover {
+    opacity: 1;
+    visibility: visible;
+}
+
+.dropdown-menu li a {
+    display: block;
+    padding: 12px 20px;
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-menu li a:hover {
+    background-color: #00b493;
+    color: #ffffff;
+}
+
+.login-btn {
+    background-color: #00b493;
+    color: #ffffff;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    background-color: #04725e;
+    transition: background-color 0.2s ease;
+}

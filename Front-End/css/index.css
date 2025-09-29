@@ -1,0 +1,81 @@
+/* Front-End/css/index.css */
+
+body {
+    font-family: 'Paperlogy', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    /* 헤더 뒤로 콘텐츠가 들어갈 수 있도록 임시로 body 높이를 늘립니다. */
+    height: 1500px; /* 임시로 설정, 필요에 따라 조정 */
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul, li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+
+/* --- 메인 콘텐츠 스타일 --- */
+.main-content {
+    margin-top: 105px; /* navbar 높이만큼 여백 */
+    padding: 0 240px;
+}
+
+.main-content h1 {
+    margin: 0;
+}
+
+
+/* ▼▼▼ [추가] 반응형 웹을 위한 미디어 쿼리 ▼▼▼ */
+
+/* --- 화면 너비가 1280px 이하일 때 적용될 스타일 (태블릿) --- */
+@media (max-width: 1280px) {
+    .navbar,
+    .navbar.scrolled {
+        padding-left: 80px;  /* 좌우 여백을 줄입니다 */
+        padding-right: 80px;
+    }
+
+    .nav-menu {
+        gap: 40px; /* 메뉴 사이 간격을 줄입니다 */
+    }
+}
+
+
+/* --- 화면 너비가 768px 이하일 때 적용될 스타일 (모바일) --- */
+@media (max-width: 768px) {
+    .navbar,
+    .navbar.scrolled {
+        padding-left: 20px;  /* 좌우 여백을 더 줄입니다 */
+        padding-right: 20px;
+    }
+
+    .nav-menu {
+        gap: 20px; /* 메뉴 사이 간격을 더 줄입니다 */
+    }
+
+    .nav-item > a {
+        font-size: 16px; /* 메뉴 폰트 크기를 약간 줄입니다 */
+    }
+
+    .nav-logo img {
+        height: 60px;
+        width: 75px;
+    }
+
+    .navbar.scrolled .nav-logo img {
+        height: 50px;
+        width: 65px;
+    }
+
+    .login-btn {
+        padding: 5px 10px; /* 로그인 버튼 크기를 줄입니다 */
+        font-size: 10px;
+    }
+}
