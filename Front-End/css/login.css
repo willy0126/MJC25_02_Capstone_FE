@@ -1,0 +1,203 @@
+/* Login Page Styles */
+
+* {
+    box-sizing: border-box;
+}
+
+/* Login specific body styles - only apply when login container is present */
+body:has(.login-container) {
+    margin: 0;
+    padding: 0;
+    font-family: 'Paperlogy', sans-serif;
+    background: #fff;
+}
+
+/* Main Login Container */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 120px 240px 220px 240px;
+    box-sizing: border-box;
+}
+
+/* Logo Section */
+.logo {
+    margin-bottom: 30px;
+}
+
+.logo img {
+    width: 170px;
+    height: auto;
+}
+
+/* Form Container */
+.form-container {
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 26px;
+}
+
+/* Input Groups */
+.input-group {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #94d2c2;
+    padding-bottom: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.input-group:focus-within {
+    border-color: #21bfae;
+}
+
+.icon-small {
+    width: 25px;
+    height: 25px;
+    margin-right: 8px;
+    object-fit: contain;
+    display: inline-block;
+}
+
+.input-group input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 19px;
+    background: transparent;
+    font-family: inherit;
+}
+
+.input-group input::placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+/* Login Button */
+.login-button {
+    background: #21bfae;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    height: 48px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 18px;
+    font-family: inherit;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background: #1da89a;
+}
+
+.login-button:active {
+    background: #189085;
+}
+
+/* Links Section */
+.links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    font-size: 17px;
+    color: #222;
+    margin-bottom: 2px;
+}
+
+.link {
+    color: #222;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.link:hover {
+    color: #21bfae;
+}
+
+.separator {
+    color: #b4b4b4;
+}
+
+/* Signup Section */
+.signup {
+    margin-top: 5px;
+    font-size: 15px;
+    color: #222;
+}
+
+.signup-link {
+    color: #21bfae;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.signup-link:hover {
+    color: #1da89a;
+}
+
+/* Divider */
+.divider {
+    width: 80vw;
+    max-width: 900px;
+    border-bottom: 1px solid #94d2c2;
+    margin: 38px 0 12px 0;
+}
+
+/* Social Login Section */
+.social-login {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.social-title {
+    font-size: 15px;
+    color: #222;
+    margin: 0 0 13px 0;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 34px;
+}
+
+.social-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s ease;
+}
+
+.social-button:hover {
+    transform: scale(1.05);
+}
+
+.social-button:active {
+    transform: scale(0.95);
+}
+
+.icon {
+    display: block;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px #ddd;
+}
+
+/* Social Button Specific Styles */
+.social-button.kakao .icon {
+    background: #fee500;
+}
+
+.social-button.naver .icon {
+    background: #03c75a;
+}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - 책-이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main class="login-container">
+        <div class="logo">
+            <img src="assets/pics/chaek-ieum.png" alt="책-이음 로고">
+        </div>
+
+        <form class="form-container">
+            <div class="input-group">
+                <img class="icon-small" src="assets/pics/person.png" alt="사용자 아이콘">
+                <input type="text" placeholder="Email or Phone" required>
+            </div>
+
+            <div class="input-group">
+                <img class="icon-small" src="assets/pics/lock.png" alt="자물쇠 아이콘">
+                <input type="password" placeholder="Password" required>
+            </div>
+
+            <button type="submit" class="login-button">LOG IN</button>
+        </form>
+
+        <div class="links">
+            <a href="#" class="link">아이디 찾기</a>
+            <span class="separator">|</span>
+            <a href="#" class="link">비밀번호 찾기</a>
+        </div>
+
+        <div class="signup">
+            아직 계정이 없으신가요?
+            <a href="#" class="signup-link">회원가입</a>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="social-login">
+            <p class="social-title">소셜 계정으로 로그인 해보세요</p>
+            <div class="social-icons">
+                <button type="button" class="social-button kakao" aria-label="카카오 로그인">
+                    <img class="icon" src="assets/pics/kakao.png" alt="카카오">
+                </button>
+                <button type="button" class="social-button naver" aria-label="네이버 로그인">
+                    <img class="icon" src="assets/pics/naver.png" alt="네이버">
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="js/include.js"></script>
+</body>
+</html>
