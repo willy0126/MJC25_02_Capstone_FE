@@ -1,0 +1,95 @@
+body {
+    font-family: 'Paperlogy', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+/* <a> 태그 기본 스타일 제거 */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* <ul>, <li> 태그 기본 스타일 제거 */
+ul, li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* --- 네비게이션 바 전체 스타일 --- */
+.navbar {
+    display: flex; /* 메뉴 항목들을 가로로 정렬 */
+    justify-content: space-between; /* 양쪽 끝으로 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    width: 100%;
+    max-width: 1000px; /* 최대 너비 설정 */
+    margin: auto; /* 가운데 정렬 */
+    padding: 10px 20px;
+    background-color: #ffffff; /* 메뉴바 배경색 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 은은한 그림자 효과 */
+    border-radius: 8px; /* 모서리 둥글게 */
+    box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+}
+
+.nav-menu {
+    display: flex; /* 주 메뉴 항목들을 가로로 정렬 */
+    gap: 40px; /* 메뉴 사이 간격 */
+}
+
+/* --- 주 메뉴 항목 스타일 --- */
+.nav-item {
+    position: relative; /* 드롭다운 메뉴의 기준점이 됨 */
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* --- 드롭다운 메뉴 스타일 (처음엔 숨김) --- */
+.dropdown-menu {
+    position: absolute; /* .nav-item을 기준으로 위치 지정 */
+    top: 100%; /* 주 메뉴 바로 아래에 위치 */
+    left: 50%;
+    transform: translateX(-50%); /* 가로 중앙 정렬 */
+    padding-top: 15px; /* 주 메뉴와의 간격 */
+    display: none; /* 평소에는 보이지 않도록 숨김 */
+    white-space: nowrap; /* 메뉴 항목이 줄바꿈되지 않도록 설정 */
+}
+
+/* --- 주 메뉴에 마우스를 올렸을 때 드롭다운 메뉴 보이기 --- */
+.nav-item:hover .dropdown-menu {
+    display: block; /* 마우스를 올리면 보이도록 설정 */
+}
+
+/* 드롭다운 메뉴 안의 각 항목 스타일 */
+.dropdown-menu li a {
+    display: block;
+    padding: 10px 20px;
+    background-color: #e8f5e9; /* 이미지와 유사한 연두색 배경 */
+    color: #333;
+    font-size: 14px;
+    font-weight: normal;
+    border-radius: 5px; /* 모서리 둥글게 */
+    margin-bottom: 5px; /* 항목 사이 간격 */
+    transition: background-color 0.2s; /* 부드러운 색상 변경 효과 */
+}
+
+/* 드롭다운 항목에 마우스를 올렸을 때 스타일 */
+.dropdown-menu li a:hover {
+    background-color: #c8e6c9; /* 조금 더 진한 연두색 */
+}
+
+/* --- 로그인 버튼 스타일 --- */
+.login-btn {
+    background-color: #343a40; /* 어두운 배경색 */
+    color: #ffffff; /* 흰색 글자 */
+    padding: 8px 20px;
+    border-radius: 20px; /* 둥근 모서리 */
+    font-weight: bold;
+    transition: background-color 0.2s; /* 부드러운 색상 변경 효과 */
+}
+
+.login-btn:hover {
+    background-color: #495057; /* 마우스를 올렸을 때 약간 밝게 */
+}
