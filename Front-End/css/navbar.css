@@ -22,8 +22,8 @@
 }
 
 .nav-logo img {
-    height: 70px;
-    width: 82px;
+    height: 82px;
+    width: 90px;
     transition: height 0.4s ease, width 0.4s ease;
 }
 

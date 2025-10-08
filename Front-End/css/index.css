@@ -4,7 +4,7 @@ body {
     font-family: 'Paperlogy', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #fcf8f2;
     /* 헤더 뒤로 콘텐츠가 들어갈 수 있도록 임시로 body 높이를 늘립니다. */
     height: 1500px; /* 임시로 설정, 필요에 따라 조정 */
 }
@@ -31,6 +31,77 @@ ul, li {
     margin: 0 0 60px 0;
     text-align: center;
     color: #333;
+}
+
+/* --- Features Section --- */
+.features-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+    padding: 0 20px;
+}
+
+.feature-card {
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.feature-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.feature-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.feature-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.feature-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    font-size: 50px;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    color: #333;
+    margin: 15px 0;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.feature-card p {
+    color: #666;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* --- 카드 슬라이드 --- */
@@ -60,18 +131,18 @@ ul, li {
 }
 
 .card-container .slide .item {
-    width: 180px;
-    height: 280px;
+    width: 150px;
+    height: 150px;
     position: absolute;
     top: 50%;
-    transform: translate(0, -50%);
-    border-radius: 20px;
+    transform: translate(0, -25%);
+    border-radius: 25px;
     box-shadow: 0 5px 10px #9e9e9e;
     background-position: 50% 50%;
     background-size: cover;
     display: inline-block;
     transition: all 0.5s;
-    opacity: 0.8;
+    opacity: 0.7;
     cursor: pointer;
 }
 
@@ -120,11 +191,11 @@ ul, li {
     display: none;
     padding: 30px;
     background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     border-radius: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px 0 rgba(121, 127, 204, 0.37);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 50px 0 rgba(179, 236, 238, 0.5);
 }
 
 .slide .item:nth-child(2) .content {
