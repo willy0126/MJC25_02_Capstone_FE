@@ -1,11 +1,17 @@
-/* About Us Page Styles */
+/* ========================================
+   About Us 페이지 스타일
+======================================== */
+
+/* 전체 컨테이너 */
 .about-container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 80px 20px;
 }
 
-/* Hero Section */
+/* ========================================
+   히어로 섹션
+======================================== */
 .hero-section {
     min-height: 60vh;
     display: flex;
@@ -18,7 +24,7 @@
 
 .hero-section > div {
     will-change: opacity, filter, transform;
-    transition: opacity 0.1s ease-out, filter 0.1s ease-out;
+    transition: opacity 0.6s ease-out, filter 0.6 ease-out;
 }
 
 .hero-section h1 {
@@ -37,10 +43,12 @@
     line-height: 1.8;
 }
 
-/* Content Sections */
+/* ========================================
+   콘텐츠 섹션 공통
+======================================== */
 .content-section {
     padding: 100px 20px;
-    margin: 80px 0;
+    margin: 50px 0;
 }
 
 .content-section h2 {
@@ -51,10 +59,10 @@
 }
 
 .content-section p {
-    font-size: 1.2rem;
-    line-height: 1.9;
+    font-size: 1.1rem;
+    line-height: 1.8;
     color: #555;
-    max-width: 800px;
+    max-width: 900px;
 }
 
 .content-section.centered {
@@ -65,7 +73,99 @@
     margin: 0 auto;
 }
 
-/* Feature Grid */
+.content-section.centered p:not(.vision-inspiration) {
+    margin: 0 auto;
+}
+
+.content-section.centered .vision-inspiration {
+    margin: 50px auto 0;
+}
+
+/* ========================================
+   미션 섹션
+======================================== */
+.mission-section {
+    background: linear-gradient(180deg, #fffefe 0%, #f8ebda 100%);
+    padding: 80px 60px;
+    border-radius: 20px;
+    margin: 60px 0;
+}
+
+.mission-content {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.mission-text {
+    flex: 1;
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+}
+
+.mission-section.active .mission-text {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.mission-text h2 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+
+.mission-text p {
+    font-size: 1.2rem;
+    line-height: 1.9;
+    color: #555;
+}
+
+.mission-image {
+    flex: 0 0 300px;
+    position: relative;
+    opacity: 0;
+    transform: translateX(75px);
+    transition: opacity 1s ease 1s, transform 1s ease 1s;
+}
+
+.mission-section.active .mission-image {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.mission-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mission-image img:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   비전 영감 텍스트
+======================================== */
+.vision-inspiration {
+    padding: 15px 25px;
+    background: linear-gradient(145deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
+    border-left: 5px solid #667eea;
+    border-radius: 10px;
+    font-style: italic;
+    color: #333;
+    line-height: 1.8;
+}
+
+/* ========================================
+   주요 기능 그리드
+======================================== */
 .feature-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -97,94 +197,11 @@
     line-height: 1.7;
 }
 
-/* Scroll Reveal Animation */
-.reveal {
-    opacity: 0;
-    transform: translateY(50px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.reveal.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Staggered Animation for Grid Items */
-.reveal-stagger {
-    opacity: 0;
-    transform: translateY(50px);
-    transition: opacity 1s ease-out, transform 1s ease-out;
-}
-
-.reveal-stagger.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Delay classes for staggered effect */
-.reveal-stagger:nth-child(1) {
-    transition-delay: 0.1s;
-}
-
-.reveal-stagger:nth-child(2) {
-    transition-delay: 0.2s;
-}
-
-.reveal-stagger:nth-child(3) {
-    transition-delay: 0.3s;
-}
-
-.reveal-stagger:nth-child(4) {
-    transition-delay: 0.4s;
-}
-
-.reveal-stagger:nth-child(5) {
-    transition-delay: 0.5s;
-}
-
-.reveal-stagger:nth-child(6) {
-    transition-delay: 0.6s;
-}
-
-/* Fade In from Left */
-.reveal-left {
-    opacity: 0;
-    transform: translateX(-50px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.reveal-left.active {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-/* Fade In from Right */
-.reveal-right {
-    opacity: 0;
-    transform: translateX(50px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.reveal-right.active {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-/* Scale Effect */
-.reveal-scale {
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.reveal-scale.active {
-    opacity: 1;
-    transform: scale(1);
-}
-
-/* Stats Section */
+/* ========================================
+   통계 섹션
+======================================== */
 .stats-section {
-    background: repeating-linear-gradient(315deg, #00FFFF2E 92%, #073AFF00 100%),repeating-radial-gradient(75% 75% at 238% 218%, #00FFFF12 30%, #073AFF14 39%),radial-gradient(99% 99% at 109% 2%, #FBFBFBFF 0%, #073AFF00 100%),radial-gradient(99% 99% at 21% 78%, rgb(225, 198, 247) 0%, #073AFF00 100%),radial-gradient(160% 154% at 711px -303px, #BCB0FFFF 0%, #073AFFFF 100%);
+    background: linear-gradient(180deg,rgba(44, 62, 80, 0.5) 0%, #ddbd8d 100%);
     padding: 80px 20px;
     margin: 100px 0;
     border-radius: 20px;
@@ -199,7 +216,7 @@
 }
 
 .stat-item h3 {
-    color: #ffefcd;
+    color: #ffffff;
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 10px;
@@ -221,11 +238,80 @@
     margin: 0;
 }
 
-/* CTA Section */
+/* ========================================
+   북스타트 캐러셀 섹션
+======================================== */
+.bookstart-carousel-section {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    padding: 80px 0 100px 0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    overflow: visible;
+}
+
+.carousel-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    padding: 20px 0;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 30px;
+    animation: scroll 40s linear infinite;
+    width: fit-content;
+}
+
+.carousel-track:hover {
+    animation-play-state: paused;
+}
+
+.carousel-slide {
+    flex-shrink: 0;
+    width: 400px;
+    height: 280px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.carousel-slide:hover {
+    transform: translateY(-20px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* ========================================
+   CTA 섹션
+======================================== */
 .cta-section {
     text-align: center;
     padding: 100px 20px;
-    background: linear-gradient(90deg, rgb(210, 192, 221) 0%, rgb(164, 217, 255) 100%);
+    background: radial-gradient(circle,rgba(245, 223, 229, 1) 0%, rgba(215, 234, 247, 1) 100%);
     border-radius: 20px;
     margin: 100px 0;
 }
@@ -233,7 +319,7 @@
 .cta-section h2 {
     font-size: 2.5rem;
     margin-bottom: 20px;
-    color: #33495e;
+    color: #405a74;
 }
 
 .cta-section p {
@@ -259,7 +345,93 @@
     box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
 }
 
-/* Responsive Design */
+/* ========================================
+   스크롤 애니메이션
+======================================== */
+
+/* 기본 페이드인 */
+.reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 왼쪽에서 페이드인 */
+.reveal-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal-left.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 오른쪽에서 페이드인 */
+.reveal-right {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal-right.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 스케일 페이드인 */
+.reveal-scale {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal-scale.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* 순차적 애니메이션 */
+.reveal-stagger {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.reveal-stagger.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal-stagger:nth-child(1) { transition-delay: 0.1s; }
+.reveal-stagger:nth-child(2) { transition-delay: 0.2s; }
+.reveal-stagger:nth-child(3) { transition-delay: 0.3s; }
+.reveal-stagger:nth-child(4) { transition-delay: 0.4s; }
+.reveal-stagger:nth-child(5) { transition-delay: 0.5s; }
+.reveal-stagger:nth-child(6) { transition-delay: 0.6s; }
+
+/* ========================================
+   반응형 디자인
+======================================== */
+
+/* 태블릿 */
+@media (max-width: 1024px) {
+    .mission-content {
+        gap: 40px;
+    }
+
+    .mission-image {
+        flex: 0 0 350px;
+    }
+}
+
+/* 모바일 */
 @media (max-width: 768px) {
     .hero-section h1 {
         font-size: 2.5rem;
@@ -283,5 +455,39 @@
 
     .stats-grid {
         grid-template-columns: 1fr;
+    }
+
+    .mission-section {
+        padding: 60px 30px;
+    }
+
+    .mission-content {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .mission-image {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .vision-inspiration {
+        padding: 15px 20px;
+        font-size: 0.95rem;
+    }
+
+    .carousel-slide {
+        width: 300px;
+        height: 210px;
+    }
+
+    .bookstart-carousel-section {
+        padding: 30px 0;
+    }
+
+    .carousel-track {
+        gap: 20px;
+        animation: scroll 30s linear infinite;
     }
 }

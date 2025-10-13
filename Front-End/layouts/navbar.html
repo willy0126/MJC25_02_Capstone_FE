@@ -26,9 +26,9 @@
             </li>
 
             <li class="nav-item">
-                <a href="#">도서 관리</a>
+                <a href="#">독서 관리</a>
                 <ul class="dropdown-menu">
-                    <li><a href="#">나의 책장</a></li>
+                    <li><a href="bookcase.html">나의 책장</a></li>
                     <li><a href="#">독서 캘린더</a></li>
                     <li><a href="#">독후 활동</a></li>
                 </ul>
@@ -60,8 +60,24 @@
             </li>
         </ul>
 
-        <div class="nav-login">
-            <a href="login.html" class="login-btn">로그인</a>
+        <div class="nav-login" id="nav-login-section">
+            <!-- 비로그인 (default) -->
+            <a href="login.html" class="login-btn" id="login-btn">로그인</a>
+
+            <!-- 로그인 (hidden by default) -->
+            <div class="user-menu" id="user-menu" style="display: none;">
+                <button class="user-button" id="user-button">
+                    <span class="user-icon">👤</span>
+                    <span class="user-name" id="user-name">사용자</span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <ul class="user-dropdown" id="user-dropdown">
+                    <li><a href="#">마이페이지</a></li>
+                    <li><a href="#">설정</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" id="logout-btn">로그아웃</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
     <!-- End Header -->

@@ -11,15 +11,288 @@
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/aboutus.css">
+    <link rel="stylesheet" href="css/globals.css">
 </head>
 <body>
     <div id="navbar-placeholder"></div>
 
+    <!-- Main Content -->
+    <main class="globals-container">
+        <section class="globals-hero">
+            <h1>세계 속의 책 읽기 프로그램</h1>
+            <p>전 세계 곳곳에서 운영되는 독서 진흥 프로그램을 만나보세요</p>
+        </section>
+
+        <!-- Interactive Continent Selection -->
+        <section class="continent-selection">
+            <div class="continent-grid">
+                <div class="continent-card" data-continent="asia">
+                    <div class="continent-icon">🌏</div>
+                    <h3>아시아</h3>
+                    <p>Asia</p>
+                </div>
+                <div class="continent-card" data-continent="europe">
+                    <div class="continent-icon">🌍</div>
+                    <h3>유럽</h3>
+                    <p>Europe</p>
+                </div>
+                <div class="continent-card" data-continent="americas">
+                    <div class="continent-icon">🌎</div>
+                    <h3>아메리카</h3>
+                    <p>Americas</p>
+                </div>
+                <div class="continent-card" data-continent="oceania">
+                    <div class="continent-icon">🗺️</div>
+                    <h3>오세아니아</h3>
+                    <p>Oceania</p>
+                </div>
+                <div class="continent-card" data-continent="africa">
+                    <div class="continent-icon">🌍</div>
+                    <h3>아프리카</h3>
+                    <p>Africa</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Area -->
+        <section class="continent-content" id="continent-content">
+            <div class="content-placeholder">
+                <div class="placeholder-icon">🌐</div>
+                <p>대륙을 선택하여 해당 지역의 프로그램을 확인하세요</p>
+            </div>
+        </section>
+
+        <!-- Content Templates (Hidden) -->
+        <div id="content-templates" style="display: none;">
+            <!-- Asia Content -->
+            <div id="asia-content" class="continent-detail">
+                <div class="continent-header">
+                    <h2>아시아의 독서 프로그램</h2>
+                    <span class="continent-badge">Asia</span>
+                </div>
+                <div class="countries-grid">
+                    <div class="country-card">
+                        <h3>🇰🇷 대한민국 (South Korea)</h3>
+                        <h4>북스타트 코리아</h4>
+                        <p>2003년부터 시작된 북스타트 운동은 영유아에게 책과 함께하는 삶의 출발을 지원합니다. 전국 지방자치단체와 협력하여 6개월~만 5세 아이들에게 그림책을 선물하고 독서문화를 전파합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">영유아 대상</span>
+                            <span class="tag">그림책 선물</span>
+                            <span class="tag">가족 독서</span>
+                        </div>
+                    </div>
+                    <div class="country-card">
+                        <h3>🇯🇵 일본 (Japan)</h3>
+                        <h4>ブックスタート (Bookstart Japan)</h4>
+                        <p>2000년에 시작된 북스타트 일본은 0세 아기와 보호자를 대상으로 지역 도서관과 보건소에서 그림책을 나눠주는 활동을 펼치고 있습니다. 전국 1,000개 이상의 지역에서 시행되고 있습니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">0세부터</span>
+                            <span class="tag">지역 도서관 협력</span>
+                            <span class="tag">부모교육</span>
+                        </div>
+                    </div>
+                    <div class="country-card">
+                        <h3>🇹🇼 대만 (Taiwan)</h3>
+                        <h4>신생아 독서운동</h4>
+                        <p>대만에서는 신생아 건강검진 시 그림책을 배포하는 프로그램을 운영하며, 도서관과 병원이 협력하여 조기 독서의 중요성을 알리고 있습니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">신생아</span>
+                            <span class="tag">병원 협력</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Europe Content -->
+            <div id="europe-content" class="continent-detail">
+                <div class="continent-header">
+                    <h2>유럽의 독서 프로그램</h2>
+                    <span class="continent-badge">Europe</span>
+                </div>
+                <div class="countries-grid">
+                    <div class="country-card">
+                        <h3>🇬🇧 영국 (United Kingdom)</h3>
+                        <h4>Bookstart UK</h4>
+                        <p>1992년 버밍엄에서 시작된 세계 최초의 북스타트 프로그램입니다. BookTrust가 운영하며, 신생아부터 초등학교 입학 전 아동들에게 연령별 책꾸러미를 무료로 제공합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">세계 최초</span>
+                            <span class="tag">연령별 책꾸러미</span>
+                            <span class="tag">BookTrust 운영</span>
+                        </div>
+                    </div>
+                    <div class="country-card">
+                        <h3>🇸🇪 스웨덴 (Sweden)</h3>
+                        <h4>Bokstart Sverige</h4>
+                        <p>모든 신생아 가정에 그림책 꾸러미를 전달하며, 공공 도서관 네트워크를 통해 지속적인 독서 지원을 제공합니다. 다문화 가정을 위한 다국어 프로그램도 운영합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">전국민 대상</span>
+                            <span class="tag">다국어 지원</span>
+                            <span class="tag">도서관 네트워크</span>
+                        </div>
+                    </div>
+                    <div class="country-card">
+                        <h3>🇩🇪 독일 (Germany)</h3>
+                        <h4>Lesestart (Reading Start)</h4>
+                        <p>연방 교육연구부가 지원하는 국가 프로그램으로, 1세, 3세, 초등학교 입학 시 세 차례에 걸쳐 책 세트를 제공합니다. 교육 격차 해소를 목표로 합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">3단계 지원</span>
+                            <span class="tag">정부 주도</span>
+                            <span class="tag">교육 평등</span>
+                        </div>
+                    </div>
+                    <div class="country-card">
+                        <h3>🇮🇹 이탈리아 (Italy)</h3>
+                        <h4>Nati per Leggere</h4>
+                        <p>소아과 의사협회가 주도하는 프로그램으로, 건강검진 시 독서의 중요성을 알리고 책을 권장합니다. 의료와 문화의 만남을 통해 아동 발달을 지원합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">의료계 협력</span>
+                            <span class="tag">소아과 주도</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Americas Content -->
+            <div id="americas-content" class="continent-detail">
+                <div class="continent-header">
+                    <h2>아메리카의 독서 프로그램</h2>
+                    <span class="continent-badge">Americas</span>
+                </div>
+                <div class="countries-grid">
+                    <div class="country-card">
+                        <h3>🇺🇸 미국 (United States)</h3>
+                        <h4>Reach Out and Read</h4>
+                        <p>1989년 보스턴에서 시작된 프로그램으로, 소아과 건강검진 시 의사가 직접 책을 처방하고 읽기의 중요성을 상담합니다. 5,000개 이상의 의료기관에서 시행 중입니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">의료기관 기반</span>
+                            <span class="tag">책 처방</span>
+                            <span class="tag">5,000+ 기관</span>
+                        </div>
+                    </div>
+                    <div class="country-card">
+                        <h3>🇨🇦 캐나다 (Canada)</h3>
+                        <h4>Read to Me!</h4>
+                        <p>공공 도서관 시스템을 통해 영유아 가정에 책꾸러미를 제공하며, 원주민 언어와 불어를 포함한 다문화 자료를 함께 배포합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">다문화</span>
+                            <span class="tag">원주민 언어</span>
+                            <span class="tag">공공 도서관</span>
+                        </div>
+                    </div>
+                    <div class="country-card">
+                        <h3>🇧🇷 브라질 (Brazil)</h3>
+                        <h4>Leia Para Uma Criança</h4>
+                        <p>이따우 은행이 후원하는 대규모 독서 캠페인으로, 매년 수백만 권의 책을 무료로 배포하고 부모와 자녀가 함께 읽는 문화를 조성합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">기업 후원</span>
+                            <span class="tag">대규모 배포</span>
+                            <span class="tag">가족 독서</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Oceania Content -->
+            <div id="oceania-content" class="continent-detail">
+                <div class="continent-header">
+                    <h2>오세아니아의 독서 프로그램</h2>
+                    <span class="continent-badge">Oceania</span>
+                </div>
+                <div class="countries-grid">
+                    <div class="country-card">
+                        <h3>🇦🇺 호주 (Australia)</h3>
+                        <h4>Books for Babies</h4>
+                        <p>주 정부와 지역 도서관이 협력하여 신생아 가정에 책 팩을 제공합니다. 원주민 공동체를 위한 특별 프로그램도 운영하며, 조기 문해력 향상에 집중합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">주 정부 지원</span>
+                            <span class="tag">원주민 프로그램</span>
+                            <span class="tag">문해력 향상</span>
+                        </div>
+                    </div>
+                    <div class="country-card">
+                        <h3>🇳🇿 뉴질랜드 (New Zealand)</h3>
+                        <h4>Books in Homes</h4>
+                        <p>저소득층 가정의 아이들에게 자신만의 책을 소유할 기회를 제공하는 프로그램입니다. 마오리어 책도 포함하여 문화적 정체성을 존중합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">취약계층 지원</span>
+                            <span class="tag">마오리어 책</span>
+                            <span class="tag">책 소유권</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Africa Content -->
+            <div id="africa-content" class="continent-detail">
+                <div class="continent-header">
+                    <h2>아프리카의 독서 프로그램</h2>
+                    <span class="continent-badge">Africa</span>
+                </div>
+                <div class="countries-grid">
+                    <div class="country-card">
+                        <h3>🇿🇦 남아프리카공화국 (South Africa)</h3>
+                        <h4>Bookstart South Africa</h4>
+                        <p>2000년대 초반 시작된 프로그램으로, 도서관과 보건소를 통해 영유아에게 책을 배포합니다. 다양한 공용어로 된 책을 제공하여 언어적 다양성을 존중합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">다언어 지원</span>
+                            <span class="tag">보건소 협력</span>
+                            <span class="tag">11개 공용어</span>
+                        </div>
+                    </div>
+                    <div class="country-card">
+                        <h3>🇰🇪 케냐 (Kenya)</h3>
+                        <h4>Book Bunk</h4>
+                        <p>이동 도서관 프로그램으로 농촌 지역 아이들에게 책을 제공합니다. 지역 작가들의 스와힐리어와 영어 그림책을 중심으로 운영됩니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">이동 도서관</span>
+                            <span class="tag">농촌 지원</span>
+                            <span class="tag">현지 작가</span>
+                        </div>
+                    </div>
+                    <div class="country-card">
+                        <h3>🌍 범아프리카</h3>
+                        <h4>African Storybook Initiative</h4>
+                        <p>디지털 플랫폼을 통해 아프리카 어린이들에게 현지 언어로 된 이야기를 제공합니다. 100개 이상의 아프리카 언어로 번역된 무료 그림책을 온라인으로 배포합니다.</p>
+                        <div class="program-tags">
+                            <span class="tag">디지털 플랫폼</span>
+                            <span class="tag">100+ 언어</span>
+                            <span class="tag">무료 배포</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Impact Section -->
+        <section class="global-impact">
+            <h2>전 세계로 확산되는 독서 문화</h2>
+            <div class="impact-stats">
+                <div class="stat-card">
+                    <div class="stat-number">70+</div>
+                    <div class="stat-label">참여 국가</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">수백만</div>
+                    <div class="stat-label">수혜 가정</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">30+</div>
+                    <div class="stat-label">년의 역사</div>
+                </div>
+            </div>
+            <p class="impact-description">
+                1992년 영국에서 시작된 북스타트 운동은 전 세계로 확산되어 수많은 아이들에게
+                책과 함께하는 인생의 시작을 선물하고 있습니다. 각 나라의 문화와 상황에 맞게
+                발전하며, 독서를 통한 교육 평등과 가족 유대 강화에 기여하고 있습니다.
+            </p>
+        </section>
+    </main>
+
     <div id="footer-placeholder"></div>
 
+    <script src="js/auth.js"></script>
     <script src="js/include.js"></script>
     <script src="js/cursor.js"></script>
-    <script src="js/aboutus.js"></script>
+    <script src="js/globals.js"></script>
 </body>
 </html>

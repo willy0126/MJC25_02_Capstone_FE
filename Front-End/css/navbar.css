@@ -100,9 +100,119 @@
     font-weight: 600;
     font-size: 16px;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
 }
 
 .login-btn:hover {
     background-color: #02725d;
-    transition: background-color 0.7s ease;
+}
+
+/* User Menu Styles */
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.user-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 50px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Paperlogy', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+}
+
+.user-button:hover {
+    background-color: #e9ecef;
+    border-color: #009e9e;
+}
+
+.user-icon {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.user-name {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+.user-button:hover .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* User Dropdown Menu */
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 180px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    padding: 8px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.user-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-dropdown li {
+    list-style: none;
+}
+
+.user-dropdown li a {
+    display: block;
+    padding: 12px 20px;
+    color: #333;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.user-dropdown li a:hover {
+    background-color: #f8f9fa;
+    color: #009e9e;
+    padding-left: 25px;
+}
+
+.user-dropdown li.divider {
+    height: 1px;
+    background-color: #e9ecef;
+    margin: 8px 0;
+}
+
+.user-dropdown li:last-child a {
+    color: #dc3545;
+}
+
+.user-dropdown li:last-child a:hover {
+    background-color: #fff5f5;
+    color: #c82333;
 }

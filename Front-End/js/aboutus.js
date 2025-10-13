@@ -1,59 +1,88 @@
-// Intersection Observer for Scroll Animations
+/* ========================================
+   페이지 초기화
+======================================== */
 document.addEventListener('DOMContentLoaded', function() {
-    // Configuration for the observer - full visibility for most elements
-    const observerOptions = {
-        root: null, // viewport
-        rootMargin: '0px',
-        threshold: 1.0 // Trigger when 100% of the element is visible (fully in viewport)
-    };
+    initCTAButton();
+    initScrollAnimations();
+    initStatsCounter();
+    initHeroParallax();
+    initBookstartCarousel();
+});
 
-    // Configuration for large sections that may not fit in viewport
-    const partialObserverOptions = {
+/* ========================================
+   CTA 버튼 초기화 및 로그인 상태 처리
+======================================== */
+function initCTAButton() {
+    const ctaButton = document.getElementById('cta-start-btn');
+    if (!ctaButton) return;
+
+    updateCTAButton(ctaButton);
+
+    ctaButton.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        if (isLoggedIn()) {
+            window.location.href = 'bookcase.html';
+        } else {
+            localStorage.setItem('returnUrl', 'bookcase.html');
+            window.location.href = 'login.html';
+        }
+    });
+
+    window.addEventListener('loginStateChanged', function() {
+        updateCTAButton(ctaButton);
+    });
+}
+
+function updateCTAButton(button) {
+    if (isLoggedIn()) {
+        button.setAttribute('href', 'bookcase.html');
+        button.textContent = '나의 책장으로';
+    } else {
+        button.setAttribute('href', 'login.html');
+        button.textContent = '시작하기';
+    }
+}
+
+/* ========================================
+   스크롤 애니메이션 초기화
+======================================== */
+function initScrollAnimations() {
+    const observerOptions = {
         root: null,
         rootMargin: '0px',
-        threshold: 0.3 // Trigger when 30% of the element is visible
+        threshold: 0.25
     };
 
-    // Callback function for the observer
     const observerCallback = (entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                // Add 'active' class when element enters viewport
                 entry.target.classList.add('active');
-
-                // Optional: Stop observing after animation (one-time animation)
-                // observer.unobserve(entry.target);
             }
         });
     };
 
-    // Create the observer
     const observer = new IntersectionObserver(observerCallback, observerOptions);
 
-    // Create partial observer for large sections
-    const partialObserver = new IntersectionObserver(observerCallback, partialObserverOptions);
-
-    // Select elements with reveal classes (excluding large sections)
     const revealElements = document.querySelectorAll(
-        '.reveal:not(.content-section):not(.cta-section), .reveal-left, .reveal-right, .reveal-stagger'
+        '.reveal, .reveal-left, .reveal-right, .reveal-stagger, .reveal-scale, .content-section.reveal-left, .content-section.reveal-right, .content-section.centered'
     );
 
-    // Select large sections that need partial visibility threshold
-    const largeSections = document.querySelectorAll(
-        '.content-section.reveal, .content-section.reveal-scale, .cta-section.reveal, .stats-section.reveal-scale'
-    );
-
-    // Observe each small element with full visibility requirement
     revealElements.forEach(element => {
         observer.observe(element);
     });
 
-    // Observe large sections with partial visibility requirement
-    largeSections.forEach(element => {
-        partialObserver.observe(element);
-    });
+    setTimeout(() => {
+        revealElements.forEach(element => {
+            const rect = element.getBoundingClientRect();
+            const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
 
-    // Optional: Smooth scroll behavior for anchor links
+            if (isInViewport) {
+                element.classList.add('active');
+            }
+        });
+    }, 100);
+
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
@@ -66,31 +95,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+}
 
-    // Optional: Counter animation for stats section with easing
-    const animateCounter = (element, target, duration = 4000) => {
-        const startTime = performance.now();
-
-        const updateCounter = (currentTime) => {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            // Apply ease-in-cubic effect (slow start, fast end)
-            const easedProgress = progress * progress * progress;
-            const currentValue = Math.floor(easedProgress * target);
-
-            if (progress < 1) {
-                element.textContent = currentValue.toLocaleString() + '+';
-                requestAnimationFrame(updateCounter);
-            } else {
-                element.textContent = target.toLocaleString() + '+';
-            }
-        };
-
-        requestAnimationFrame(updateCounter);
+/* ========================================
+   통계 카운터 애니메이션
+======================================== */
+function initStatsCounter() {
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.25
     };
 
-    // Stats counter animation
     const statsObserverCallback = (entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -99,10 +115,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const text = item.textContent;
                     const number = parseInt(text.replace(/\D/g, ''));
 
-                    // Animate the counter
                     setTimeout(() => {
-                        animateCounter(item, number, 4000);
-                    }, index * 100); // Stagger the animations
+                        animateCounter(item, number, 2000);
+                    }, index * 100);
                 });
 
                 observer.unobserve(entry.target);
@@ -116,8 +131,33 @@ document.addEventListener('DOMContentLoaded', function() {
     if (statsSection) {
         statsObserver.observe(statsSection);
     }
+}
 
-    // Enhanced scroll effects for hero section
+function animateCounter(element, target, duration = 2000) {
+    const startTime = performance.now();
+
+    const updateCounter = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const easedProgress = progress * progress * progress;
+        const currentValue = Math.floor(easedProgress * target);
+
+        if (progress < 1) {
+            element.textContent = currentValue.toLocaleString() + '+';
+            requestAnimationFrame(updateCounter);
+        } else {
+            element.textContent = target.toLocaleString() + '+';
+        }
+    };
+
+    requestAnimationFrame(updateCounter);
+}
+
+/* ========================================
+   히어로 섹션 패럴랙스 효과
+======================================== */
+function initHeroParallax() {
     const heroSection = document.querySelector('.hero-section');
     const heroContent = heroSection ? heroSection.querySelector('div') : null;
 
@@ -126,20 +166,43 @@ document.addEventListener('DOMContentLoaded', function() {
             const scrolled = window.pageYOffset;
             const heroHeight = heroSection.offsetHeight;
 
-            // Faster parallax effect (increased from 0.5 to 0.7)
             const parallax = scrolled * 0.7;
             heroSection.style.transform = `translateY(${parallax}px)`;
 
-            // Calculate opacity and blur based on scroll position
-            // Starts fading when scrolling begins, fully faded at hero section end
             const fadeProgress = Math.min(scrolled / heroHeight, 1);
             const opacity = 1 - fadeProgress;
-            const blurAmount = fadeProgress * 2; // Max 2px blur
+            const blurAmount = fadeProgress * 2;
 
-            // Apply opacity and blur to hero content
             heroContent.style.opacity = opacity;
             heroContent.style.filter = `blur(${blurAmount}px)`;
             heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
         });
     }
-});
+}
+
+/* ========================================
+   북스타트 캐러셀 초기화
+======================================== */
+function initBookstartCarousel() {
+    const carouselTrack = document.getElementById('carousel-track');
+    if (!carouselTrack) return;
+
+    const slides = carouselTrack.querySelectorAll('.carousel-slide');
+
+    slides.forEach(slide => {
+        slide.addEventListener('click', function() {
+            const img = this.querySelector('img');
+            if (img) {
+                console.log('Image clicked:', img.alt);
+            }
+        });
+    });
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            carouselTrack.style.animationPlayState = 'paused';
+        } else {
+            carouselTrack.style.animationPlayState = 'running';
+        }
+    });
+}
