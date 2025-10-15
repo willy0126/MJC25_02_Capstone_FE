@@ -9,9 +9,9 @@
             <li class="nav-item">
                 <a href="#">사이트 소개</a>
                 <ul class="dropdown-menu">
-                    <li><a href="#">책-이음 이란?</a></li>
+                    <li><a href="aboutus.html">책-이음 이란?</a></li>
                     <li><a href="#">프로그램 소개</a></li>
-                    <li><a href="#">해외 사례</a></li>
+                    <li><a href="globals.html">해외 사례</a></li>
                     <li><a href="#">만든 사람들</a></li>
                 </ul>
             </li>
@@ -26,9 +26,26 @@
             </li>
 
             <li class="nav-item">
+                <a href="#">독서 관리</a>
+                <ul class="dropdown-menu">
+                    <li><a href="bookcase.html">나의 책장</a></li>
+                    <li><a href="#">독서 캘린더</a></li>
+                    <li><a href="#">독후 활동</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a href="#">창작 놀이</a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">대회 목록</a></li>
+                    <li><a href="#">결과물 관리</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
                 <a href="#">커뮤니티</a>
                 <ul class="dropdown-menu">
-                    <li><a href="#">중고 나눔</a></li>
+                    <li><a href="#">도서 나눔</a></li>
                     <li><a href="#">자유 게시판</a></li>
                 </ul>
             </li>
@@ -36,15 +53,31 @@
             <li class="nav-item">
                 <a href="#">고객센터</a>
                 <ul class="dropdown-menu">
-                    <li><a href="#">FAQ</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
                     <li><a href="#">공지사항</a></li>
                     <li><a href="#">문의하기</a></li>
                 </ul>
             </li>
         </ul>
 
-        <div class="nav-login">
-            <a href="#" class="login-btn">로그인</a>
+        <div class="nav-login" id="nav-login-section">
+            <!-- 비로그인 (default) -->
+            <a href="login.html" class="login-btn" id="login-btn">로그인</a>
+
+            <!-- 로그인 (hidden by default) -->
+            <div class="user-menu" id="user-menu" style="display: none;">
+                <button class="user-button" id="user-button">
+                    <span class="user-icon">👤</span>
+                    <span class="user-name" id="user-name">사용자</span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <ul class="user-dropdown" id="user-dropdown">
+                    <li><a href="#">마이페이지</a></li>
+                    <li><a href="#">설정</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" id="logout-btn">로그아웃</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
     <!-- End Header -->

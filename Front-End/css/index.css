@@ -1,12 +1,11 @@
 /* Front-End/css/index.css */
 
+/* --- 기본 스타일 --- */
 body {
     font-family: 'Paperlogy', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-    /* 헤더 뒤로 콘텐츠가 들어갈 수 있도록 임시로 body 높이를 늘립니다. */
-    height: 1500px; /* 임시로 설정, 필요에 따라 조정 */
+    height: 1500px;
 }
 
 a {
@@ -20,48 +19,783 @@ ul, li {
     margin: 0;
 }
 
-
-/* --- 메인 콘텐츠 스타일 --- */
-.main-content {
-    margin-top: 105px; /* navbar 높이만큼 여백 */
-    padding: 0 240px;
+/* --- 커스텀 마우스 커서 --- */
+html {
+    cursor: none;
 }
 
-.main-content h1 {
+html * {
+    cursor: none !important;
+}
+
+.cursor-dot, .cursor-outline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    z-index: 99999;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.cursor-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #7cb342;
+}
+
+.cursor-outline {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #3b3242;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease;
+}
+
+.cursor-outline.cursor-hover {
+    transform: translate(-50%, -50%) scale(1.125);
+    background-color: rgba(124, 179, 66, 0.1);
+}
+
+/* --- 메인 피처 섹션 --- */
+.main-feature {
+    padding: 40px 240px;
+    min-height: 500px;
+    background-color: #f1ebeb;
+}
+
+.main-feature h1 {
+    margin: 0 0 60px 0;
+    text-align: center;
+    color: #222;
+}
+
+.main-feature h3 {
+    margin: 0 0 40px 0;
+    text-align: center;
+    color: #333;
+    font-weight: 500;
+    font-size: 20px;
+}
+
+/* --- 피처 카드 --- */
+.features-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+    padding: 0 20px;
+}
+
+.feature-card {
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease-out forwards;
+    position: relative;
+}
+
+.feature-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.feature-card:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.feature-card:nth-child(3) {
+    animation-delay: 0.5s;
+}
+
+.feature-card:nth-child(4) {
+    animation-delay: 0.7s;
+}
+
+.feature-card:hover {
+    transform: translateY(-20px) scale(1.03);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.feature-icon {
+    font-size: 50px;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    color: #222;
+    margin: 15px 0;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.feature-card p {
+    color: #444;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+/* --- 카드 슬라이드 --- */
+.card-container {
+    position: relative;
+    width: 100%;
+    max-width: 1920px;
+    height: 700px;
+    margin: 0 auto;
+    background: #f5f5f5;
+    box-shadow: 0 30px 50px #dbdbdb;
+    opacity: 0;
+    animation: fadeInContainer 0.5s ease-in-out forwards;
+}
+
+.card-container .slide {
+    height: 100%;
+}
+
+.card-container .slide .item {
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -25%);
+    border-radius: 25px;
+    box-shadow: 0 5px 10px #adadad;
+    background-position: 50% 50%;
+    background-size: cover;
+    display: inline-block;
+    transition: all 0.5s;
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+.slide .item:nth-child(1),
+.slide .item:nth-child(2) {
+    top: 0;
+    left: 0;
+    transform: translate(0, 0);
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    transition: all 0.5s;
+    opacity: 1;
+}
+
+.slide .item:nth-child(3) {
+    top : 70%;
+    left: 70%;
+}
+
+.slide .item:nth-child(4) {
+    top : 70%;
+    left: calc(70% + 200px);
+}
+
+.slide .item:nth-child(5) {
+    top : 70%;
+    left: calc(70% + 400px);
+}
+
+.slide .item:nth-child(n + 6) {
+    top : 70%;
+    left: calc(70px + 660px);
+    opacity: 0;
+}
+
+.item .content {
+    position: absolute;
+    top: 50%;
+    left: 100px;
+    width: 300px;
+    text-align: left;
+    color: #eeeeee;
+    transform: translate(0, -50%);
+    font-family: 'Paperlogy', sans-serif;
+    display: none;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 25px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 50px 0 rgba(179, 236, 238, 0.5);
+}
+
+.slide .item:nth-child(2) .content {
+    display: block;
+}
+
+.content .name {
+    font-size: 40px;
+    text-transform: uppercase;
+    font-weight: bold;
+    opacity: 0;
+    animation: animate 0.7s ease-in-out 1 forwards;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.content .des {
+    font-size: 17px;
+    margin-top: 70px;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: animate 0.7s ease-in-out 0.6s 1 forwards;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.content button {
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 10px;
+    padding: 10px 18px;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    border-radius: 15px;
+    background-color: #cccccc;
+    transition: all 0.5s;
+    animation: animate 0.7s ease-in-out 0.8s 1 forwards;
+}
+
+.content button:hover {
+    background-color: #ffffff;
+}
+
+.button {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    left: 45%;
+    right: 50%;
+    width: 100%;
+    align-items: center;
+    text-align: center;
+    position: absolute;
+    bottom: 20px;
+}
+
+.button button {
+    width: 40px;
+    height: 35px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    margin: 0 5px;
+    transition: 0.3s;
+    background: rgba(255, 255, 255, 0.578);
+}
+
+.button button:hover {
+    color: #000000;
+    transform: scale(1.08);
+}
+
+.button button:focus {
+    transform: scale(1.08);
+    background: #ffffff;
+    border: 2px solid #999;
+}
+
+.button button:active {
+    transform: scale(1.1);
+}
+
+.next {
+    padding: 0 0 0 3px;
+}
+
+.prev {
+    padding: 0 3px 0 0;
+}
+
+/* --- 스크롤 애니메이션 성장 섹션 --- */
+.reading-growth-section {
+    min-height: 700vh;
+    padding: 100px 240px;
+    background: linear-gradient(180deg, #f1ebeb 0%, #fcf8f2 100%);
+    position: relative;
+}
+
+.growth-title {
+    text-align: center;
+    font-size: 42px;
+    color: #333;
+    margin-bottom: 100px;
+    font-weight: 700;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out 0.2s forwards;
+}
+
+.growth-animation-container {
+    position: sticky;
+    top: 20vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+}
+
+.growth-stage {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    opacity: 0;
+}
+
+.growth-svg-wrapper {
+    width: 650px;
+    height: 650px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 새싹(500x500)과 선물상자(400x400)를 위한 개별 크기 조정 */
+#stage-1 .growth-svg-wrapper {
+    width: 400px;
+    height: 400px;
+}
+
+#stage-2 .growth-svg-wrapper {
+    width: 500px;
+    height: 500px;
+}
+
+#stage-3 .growth-svg-wrapper {
+    width: 650px;
+    height: 650px;
+}
+
+.growth-text {
+    text-align: center;
+}
+
+.growth-text p {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.6;
     margin: 0;
 }
 
+/* 시퀀스별 텍스트 색상 - 점점 밝아짐 */
+#stage-1 .growth-text p {
+    color: #666;
+}
 
-/* ▼▼▼ [추가] 반응형 웹을 위한 미디어 쿼리 ▼▼▼ */
+#stage-2 .growth-text p {
+    color: #444;
+}
 
-/* --- 화면 너비가 1280px 이하일 때 적용될 스타일 (태블릿) --- */
+#stage-3 .growth-text p {
+    color: #222;
+    font-weight: 600;
+}
+
+/* --- 인기 도서 섹션 --- */
+.trending-books-section {
+    padding: 100px 240px;
+    background-color: #fcf8f2;
+}
+
+.trending-books-section h2 {
+    text-align: center;
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 50px;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.trending-books-section h2.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.trending-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 50px;
+}
+
+.tab-btn {
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab-btn:hover {
+    border-color: #999;
+    transform: translateY(-2px);
+}
+
+.tab-btn.active {
+    color: #fff;
+    background: #333;
+    border-color: #333;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.masonry-grid {
+    column-count: 3;
+    column-gap: 30px;
+}
+
+.book-card {
+    break-inside: avoid;
+    margin-bottom: 30px;
+    background: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.book-card.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.book-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.book-card.rank-1 {
+    position: relative;
+}
+
+.book-card.rank-1::before {
+    content: '1';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(255, 215, 0, 0.4);
+}
+
+.book-card.rank-2::before {
+    content: '2';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(192, 192, 192, 0.4);
+}
+
+.book-card.rank-3::before {
+    content: '3';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #CD7F32, #B87333);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(205, 127, 50, 0.4);
+}
+
+.book-cover {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+}
+
+.book-info {
+    padding: 20px;
+}
+
+.book-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.book-author {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 12px;
+}
+
+.book-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.book-category {
+    font-size: 12px;
+    color: #666;
+    background: #f5f5f5;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.book-stats {
+    font-size: 13px;
+    color: #7cb342;
+    font-weight: 600;
+}
+
+/* --- 후기 섹션 --- */
+.testimonial-section {
+    padding: 100px 240px;
+    background-color: #fff;
+}
+
+.testimonial-section h2 {
+    text-align: center;
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 80px;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.testimonial-section h2.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.testimonial-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+}
+
+.testimonial-card {
+    background: #fcf8f2;
+    padding: 40px 35px;
+    border-radius: 20px;
+    position: relative;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(40px);
+    border: 2px solid transparent;
+}
+
+.testimonial-card.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.testimonial-card:hover {
+    border-color: #e0e0e0;
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial-quote {
+    font-family: 'Paperlogy', sans-serif;
+    font-size: 72px;
+    color: #e0e0e0;
+    line-height: 0.5;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.testimonial-card p {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.testimonial-author {
+    border-top: 2px solid #e0e0e0;
+    padding-top: 20px;
+}
+
+.author-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.author-role {
+    font-size: 14px;
+    color: #999;
+}
+
+.disclaimer-text {
+    margin-top: 40px;
+    font-size: 12px;
+    color: #666666;
+    text-align: left;
+}
+
+/* --- 스크롤 애니메이션 유틸리티 --- */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-on-scroll.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- 애니메이션 키프레임 --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInContainer {
+    from {
+        opacity: 0.2;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes animate {
+    from {
+        opacity: 0;
+        transform: translate(0, 100px);
+        filter: blur(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(0);
+        filter: blur(0);
+    }
+}
+
+/* --- 반응형 미디어 쿼리 (태블릿) --- */
 @media (max-width: 1280px) {
     .navbar,
     .navbar.scrolled {
-        padding-left: 80px;  /* 좌우 여백을 줄입니다 */
+        padding-left: 80px;
         padding-right: 80px;
     }
 
     .nav-menu {
-        gap: 40px; /* 메뉴 사이 간격을 줄입니다 */
+        gap: 40px;
+    }
+
+    .testimonial-section {
+        padding-left: 80px;
+        padding-right: 80px;
     }
 }
 
+/* --- 반응형 미디어 쿼리 (태블릿) - 인기 도서 --- */
+@media (max-width: 1280px) {
+    .trending-books-section {
+        padding-left: 80px;
+        padding-right: 80px;
+    }
 
-/* --- 화면 너비가 768px 이하일 때 적용될 스타일 (모바일) --- */
+    .masonry-grid {
+        column-count: 2;
+    }
+}
+
+/* --- 반응형 미디어 쿼리 (모바일) --- */
 @media (max-width: 768px) {
+    .trending-books-section {
+        padding: 60px 20px;
+    }
+
+    .trending-books-section h2 {
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
+
+    .trending-tabs {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .tab-btn {
+        width: 100%;
+    }
+
+    .masonry-grid {
+        column-count: 1;
+    }
     .navbar,
     .navbar.scrolled {
-        padding-left: 20px;  /* 좌우 여백을 더 줄입니다 */
+        padding-left: 20px;
         padding-right: 20px;
     }
 
     .nav-menu {
-        gap: 20px; /* 메뉴 사이 간격을 더 줄입니다 */
+        gap: 20px;
     }
 
     .nav-item > a {
-        font-size: 16px; /* 메뉴 폰트 크기를 약간 줄입니다 */
+        font-size: 16px;
     }
 
     .nav-logo img {
@@ -75,7 +809,29 @@ ul, li {
     }
 
     .login-btn {
-        padding: 5px 10px; /* 로그인 버튼 크기를 줄입니다 */
+        padding: 5px 10px;
         font-size: 10px;
+    }
+
+    .testimonial-section {
+        padding: 60px 20px;
+    }
+
+    .testimonial-section h2 {
+        font-size: 28px;
+        margin-bottom: 50px;
+    }
+
+    .testimonial-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    html, html * {
+        cursor: auto !important;
+    }
+
+    .cursor-dot, .cursor-outline {
+        display: none;
     }
 }

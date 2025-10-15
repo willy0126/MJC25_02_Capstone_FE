@@ -1,0 +1,488 @@
+/* Globals Page Styles */
+
+/* Container */
+.globals-container {
+    min-height: 100vh;
+    padding-top: 80px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* Hero Section */
+.globals-hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin-bottom: 60px;
+}
+
+.globals-hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.globals-hero p {
+    font-size: 20px;
+    font-weight: 400;
+    opacity: 0.95;
+}
+
+/* Continent Selection */
+.continent-selection {
+    max-width: 1200px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+}
+
+.continent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    justify-items: center;
+}
+
+.continent-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 220px;
+    position: relative;
+    overflow: hidden;
+}
+
+.continent-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.continent-card:hover::before {
+    left: 100%;
+}
+
+.continent-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+}
+
+.continent-card.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+.continent-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.continent-card:hover .continent-icon {
+    transform: rotate(10deg) scale(1.1);
+}
+
+.continent-card.active .continent-icon {
+    animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.continent-card h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 15px 0 5px;
+}
+
+.continent-card p {
+    font-size: 14px;
+    opacity: 0.7;
+    font-weight: 500;
+    margin: 0;
+}
+
+.continent-card.active p {
+    opacity: 0.9;
+}
+
+/* Continent Content Area */
+.continent-content {
+    max-width: 1400px;
+    margin: 0 auto 80px;
+    padding: 0 40px;
+    min-height: 400px;
+}
+
+.content-placeholder {
+    text-align: center;
+    padding: 80px 20px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    border: 2px dashed #c3cfe2;
+}
+
+.placeholder-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.content-placeholder p {
+    font-size: 20px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Continent Detail */
+.continent-detail {
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.continent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 30px 40px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.continent-header h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+}
+
+.continent-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Countries Grid */
+.countries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+}
+
+.country-card {
+    background: white;
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border-left: 5px solid transparent;
+}
+
+.country-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-left-color: #667eea;
+}
+
+.country-card h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.country-card h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.country-card p {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #4a5568;
+    margin-bottom: 20px;
+}
+
+/* Program Tags */
+.program-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.tag {
+    background: linear-gradient(135deg, #e0e7ff 0%, #cfd9ff 100%);
+    color: #4c51bf;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.tag:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Global Impact Section */
+.global-impact {
+    max-width: 1200px;
+    margin: 80px auto 0;
+    padding: 60px 40px;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.global-impact h2 {
+    font-size: 40px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 50px;
+    position: relative;
+    display: inline-block;
+}
+
+.global-impact h2::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+}
+
+.impact-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.stat-card {
+    padding: 30px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.stat-number {
+    font-size: 48px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.impact-description {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #4a5568;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .globals-hero h1 {
+        font-size: 36px;
+    }
+
+    .continent-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+    }
+
+    .continent-card {
+        padding: 30px 20px;
+    }
+
+    .countries-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .continent-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .continent-header h2 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .globals-container {
+        padding-top: 60px;
+    }
+
+    .globals-hero {
+        padding: 40px 20px 30px;
+        margin-bottom: 40px;
+    }
+
+    .globals-hero h1 {
+        font-size: 28px;
+    }
+
+    .globals-hero p {
+        font-size: 16px;
+    }
+
+    .continent-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .continent-card {
+        padding: 25px 15px;
+        max-width: none;
+    }
+
+    .continent-icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .continent-card h3 {
+        font-size: 18px;
+    }
+
+    .continent-card p {
+        font-size: 12px;
+    }
+
+    .continent-content {
+        padding: 0 20px;
+    }
+
+    .continent-header {
+        padding: 20px;
+    }
+
+    .continent-header h2 {
+        font-size: 24px;
+    }
+
+    .country-card {
+        padding: 25px;
+    }
+
+    .country-card h3 {
+        font-size: 18px;
+    }
+
+    .country-card h4 {
+        font-size: 16px;
+    }
+
+    .country-card p {
+        font-size: 14px;
+    }
+
+    .global-impact {
+        padding: 40px 20px;
+        margin-top: 60px;
+    }
+
+    .global-impact h2 {
+        font-size: 28px;
+        margin-bottom: 40px;
+    }
+
+    .impact-stats {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .stat-number {
+        font-size: 36px;
+    }
+
+    .stat-label {
+        font-size: 16px;
+    }
+
+    .impact-description {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .continent-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .countries-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .program-tags {
+        gap: 8px;
+    }
+
+    .tag {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+}
