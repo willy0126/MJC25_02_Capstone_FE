@@ -48,40 +48,79 @@ function updateCTAButton(button) {
    스크롤 애니메이션 초기화
 ======================================== */
 function initScrollAnimations() {
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.25
-    };
-
-    const observerCallback = (entries, observer) => {
+    // feature-card 등 작은 요소들을 위한 observer (완전히 보일 때)
+    const fullVisibilityCallback = (entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
+            // 완전히 보일 때만 (intersectionRatio가 1.0일 때)
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.99) {
                 entry.target.classList.add('active');
             }
         });
     };
 
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-    const revealElements = document.querySelectorAll(
-        '.reveal, .reveal-left, .reveal-right, .reveal-stagger, .reveal-scale, .content-section.reveal-left, .content-section.reveal-right, .content-section.centered'
-    );
-
-    revealElements.forEach(element => {
-        observer.observe(element);
-    });
-
-    setTimeout(() => {
-        revealElements.forEach(element => {
-            const rect = element.getBoundingClientRect();
-            const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
-
-            if (isInViewport) {
-                element.classList.add('active');
+    // 큰 섹션을 위한 observer (80% 정도 보일 때)
+    const partialVisibilityCallback = (entries) => {
+        entries.forEach(entry => {
+            // 80% 이상 보일 때
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.8) {
+                entry.target.classList.add('active');
             }
         });
-    }, 100);
+    };
+
+    const fullVisibilityOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: [0, 0.25, 0.5, 0.75, 0.99, 1.0]
+    };
+
+    const partialVisibilityOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: [0, 0.25, 0.5, 0.75, 0.8, 1.0]
+    };
+
+    const fullObserver = new IntersectionObserver(fullVisibilityCallback, fullVisibilityOptions);
+    const partialObserver = new IntersectionObserver(partialVisibilityCallback, partialVisibilityOptions);
+
+    // feature-card와 작은 요소들은 완전히 보일 때 애니메이션
+    const smallElements = document.querySelectorAll('.reveal-stagger');
+    smallElements.forEach(element => {
+        fullObserver.observe(element);
+    });
+
+    // 큰 섹션들은 80% 정도 보일 때 애니메이션
+    const largeElements = document.querySelectorAll(
+        '.reveal, .reveal-left, .reveal-right, .reveal-scale, .content-section.reveal-left, .content-section.reveal-right, .content-section.centered'
+    );
+    largeElements.forEach(element => {
+        partialObserver.observe(element);
+    });
+
+    // mission-section과 values-section을 위한 별도 observer
+    const missionSection = document.querySelector('.mission-section');
+    const valuesSection = document.querySelector('.values-section');
+
+    const sectionObserverOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.3
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, sectionObserverOptions);
+
+    if (missionSection) {
+        sectionObserver.observe(missionSection);
+    }
+    if (valuesSection) {
+        sectionObserver.observe(valuesSection);
+    }
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {

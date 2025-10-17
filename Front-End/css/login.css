@@ -42,7 +42,7 @@ body:has(.login-container) {
     display: flex;
     min-height: 100vh;
     padding-top: 100px;
-    background-color: #e8f5f3;
+    background-color: #f7f1ff;
     overflow: hidden;
 }
 

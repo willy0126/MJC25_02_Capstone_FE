@@ -50,7 +50,7 @@
 }
 
 .nav-item:hover > a {
-    color: #009e81;
+    color: #7b3eb1;
 }
 
 .dropdown-menu {
@@ -87,13 +87,13 @@
 }
 
 .dropdown-menu li a:hover {
-    background-color: #047c66;
+    background-color: #bb90df;
     color: #ffffff;
 }
 
 .login-btn {
-    background-color: #009e9e;
-    color: #eeeeee;
+    background-color: #e9cfff;
+    color: #333;
     padding: 10px 25px;
     border: none;
     border-radius: 50px;
@@ -106,7 +106,8 @@
 }
 
 .login-btn:hover {
-    background-color: #02725d;
+    background-color: #9668bb;
+    color:#fff5f5
 }
 
 /* User Menu Styles */
@@ -134,7 +135,7 @@
 
 .user-button:hover {
     background-color: #e9ecef;
-    border-color: #009e9e;
+    border-color: #e9cfff;
 }
 
 .user-icon {

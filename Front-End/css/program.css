@@ -1,0 +1,378 @@
+
+/* ===================================
+   메인 컨테이너
+   =================================== */
+.program-container {
+    min-height: 100vh;
+    padding-top: 80px; /* 네비게이션 바 높이만큼 여백 */
+    background: linear-gradient(135deg, #f5f7fa 0%, #fef7ff 100%);
+}
+
+/* ===================================
+   히어로 섹션
+   =================================== */
+.program-hero {
+    text-align: center;
+    padding: 80px 20px 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 배경 이미지 레이어 (반투명) */
+.program-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../assets/pics/aboutus1.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.1; /* 배경 이미지 투명도 */
+    z-index: 0;
+}
+
+.program-hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1; /* 배경 이미지 위에 표시 */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.program-hero p {
+    font-size: 20px;
+    font-weight: 400;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1; /* 배경 이미지 위에 표시 */
+}
+
+/* ===================================
+   단계별 섹션
+   =================================== */
+.steps-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+}
+
+/* ===================================
+   단계 카드 스타일
+   =================================== */
+.step-card {
+    background: white;
+    border-radius: 30px;
+    padding: 50px;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 부드러운 호버 효과 */
+    opacity: 0; /* 초기 상태: 투명 */
+    transform: translateY(50px); /* 초기 상태: 아래에서 시작 */
+}
+
+/* 활성화 시 페이드인 애니메이션 적용 */
+.step-card.active {
+    animation: fadeInUp 1s ease forwards;
+}
+
+/* 페이드인 애니메이션 정의 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px); /* 아래에서 시작 */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); /* 원래 위치로 이동 */
+    }
+}
+
+/* 카드 호버 시 그라데이션 오버레이 */
+.step-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 0%, rgba(102, 126, 234, 0.03) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+}
+
+/* 카드 호버 효과 */
+.step-card:hover {
+    transform: translateY(-10px); /* 위로 올라감 */
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2); /* 그림자 강화 */
+}
+
+.step-card:hover::before {
+    opacity: 1; /* 그라데이션 오버레이 표시 */
+}
+
+/* ===================================
+   단계 번호 뱃지
+   =================================== */
+.step-number {
+    position: absolute;
+    top: -20px;
+    left: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 28px;
+    font-weight: 700;
+    padding: 15px 30px;
+    border-radius: 50px;
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+/* 카드 호버 시 뱃지 확대 */
+.step-card:hover .step-number {
+    transform: scale(1.1);
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+}
+
+/* ===================================
+   단계 콘텐츠
+   =================================== */
+.step-content {
+    position: relative;
+    z-index: 1;
+    margin-top: 20px;
+}
+
+/* 단계 아이콘 (이모지) */
+.step-icon {
+    font-size: 80px;
+    margin-bottom: 25px;
+    display: inline-block;
+    transition: transform 0.5s ease;
+}
+
+/* 카드 호버 시 아이콘 회전 및 확대 */
+.step-card:hover .step-icon {
+    transform: scale(1.2) rotate(5deg);
+}
+
+.step-content h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 20px;
+}
+
+.step-content p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #4a5568;
+    margin-bottom: 25px;
+}
+
+/* ===================================
+   단계별 특징 리스트
+   =================================== */
+.step-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.step-features li {
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 15px;
+    font-size: 15px;
+    color: #2d3748;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* 체크마크 아이콘 (::before 가상 요소) */
+.step-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+/* 카드 호버 시 체크마크 확대 */
+.step-card:hover .step-features li::before {
+    transform: scale(1.2);
+}
+
+/* 리스트 항목 호버 시 색상 변경 및 이동 */
+.step-features li:hover {
+    color: #667eea;
+    transform: translateX(5px);
+}
+
+/* ===================================
+   단계별 색상 변형
+   =================================== */
+
+/* 단계 1: 보라색 그라데이션 */
+.step-card.step-1 .step-number {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 단계 2: 핑크색 그라데이션 */
+.step-card.step-2 .step-number {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* 단계 3: 파란색 그라데이션 */
+.step-card.step-3 .step-number {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* 단계 4: 초록색 그라데이션 */
+.step-card.step-4 .step-number {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+/* 단계 5: 주황색 그라데이션 */
+.step-card.step-5 .step-number {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+/* 각 단계별 체크마크 색상 매칭 */
+.step-card.step-2 .step-features li::before {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.step-card.step-3 .step-features li::before {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.step-card.step-4 .step-features li::before {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.step-card.step-5 .step-features li::before {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+/* ===================================
+   반응형 디자인 - 태블릿 (768px 이하)
+   =================================== */
+@media (max-width: 768px) {
+    .program-container {
+        padding-top: 60px;
+    }
+
+    .program-hero {
+        padding: 60px 20px 40px;
+        margin-bottom: 60px;
+    }
+
+    .program-hero h1 {
+        font-size: 32px;
+    }
+
+    .program-hero p {
+        font-size: 16px;
+    }
+
+    .steps-section {
+        padding: 0 15px 60px;
+    }
+
+    .step-card {
+        padding: 40px 25px;
+        margin-bottom: 30px;
+    }
+
+    .step-number {
+        top: -15px;
+        left: 25px;
+        font-size: 22px;
+        padding: 12px 24px;
+    }
+
+    .step-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+    }
+
+    .step-content h2 {
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+
+    .step-content p {
+        font-size: 14px;
+    }
+
+    .step-features li {
+        font-size: 14px;
+        padding-left: 30px;
+        margin-bottom: 12px;
+    }
+
+    .step-features li::before {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
+
+    /* 모바일에서 커스텀 커서 비활성화 */
+    html, html * {
+        cursor: auto !important;
+    }
+
+    .cursor-dot, .cursor-outline {
+        display: none;
+    }
+}
+
+/* ===================================
+   반응형 디자인 - 모바일 (480px 이하)
+   =================================== */
+@media (max-width: 480px) {
+    .program-hero h1 {
+        font-size: 26px;
+    }
+
+    .program-hero p {
+        font-size: 14px;
+    }
+
+    .step-card {
+        padding: 35px 20px;
+    }
+
+    .step-number {
+        font-size: 20px;
+        padding: 10px 20px;
+    }
+
+    .step-icon {
+        font-size: 50px;
+    }
+
+    .step-content h2 {
+        font-size: 20px;
+    }
+}
