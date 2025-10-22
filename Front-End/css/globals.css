@@ -9,6 +9,7 @@
 
 /* Hero Section */
 .globals-hero {
+    min-height: 200px;
     text-align: center;
     padding: 60px 20px 40px;
     background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../assets/pics/aboutus4.jpg');

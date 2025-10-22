@@ -9,6 +9,7 @@ let outlineY = 0;
 let cursorDot = null;
 let cursorOutline = null;
 let isInitialized = false;
+let firstMove = false; // 첫 마우스 이동 감지
 
 // 커스텀 마우스 커서 초기화
 function initCursor() {
@@ -26,8 +27,23 @@ function initCursor() {
 
   isInitialized = true;
 
+  // 초기에는 커서를 숨김
+  if (cursorDot && cursorOutline) {
+    cursorDot.style.opacity = '0';
+    cursorOutline.style.opacity = '0';
+  }
+
   // 마우스 위치 추적
   window.addEventListener('mousemove', (e) => {
+    // 첫 마우스 이동 시 커서를 표시
+    if (!firstMove) {
+      if (cursorDot && cursorOutline) {
+        cursorDot.style.opacity = '1';
+        cursorOutline.style.opacity = '1';
+      }
+      firstMove = true;
+    }
+
     mouseX = e.clientX;
     mouseY = e.clientY;
 
@@ -40,8 +56,8 @@ function initCursor() {
 
   // requestAnimationFrame을 사용한 부드러운 외곽선 애니메이션
   function animateCursorOutline() {
-    // 지연 효과 (0.15의 속도로 따라감)
-    const speed = 0.15;
+    // 지연 효과 (0.13의 속도로 따라감)
+    const speed = 0.13;
     outlineX += (mouseX - outlineX) * speed;
     outlineY += (mouseY - outlineY) * speed;
 
@@ -62,7 +78,7 @@ function initCursor() {
 
 // 호버 가능한 요소들에 hover 클래스 추가
 function initCursorHoverEffects() {
-  const hoverTargets = document.querySelectorAll('a, button, .feature-card, .testimonial-card, .nav-item, .login-btn');
+  const hoverTargets = document.querySelectorAll('a, button, .feature-card, .nav-item, .login-btn');
 
   hoverTargets.forEach(target => {
     target.addEventListener('mouseenter', () => {

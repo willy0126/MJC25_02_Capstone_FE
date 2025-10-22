@@ -28,7 +28,16 @@ function initCustomCursor() {
    Navbar 로드 및 초기화
 ======================================== */
 function loadNavbar() {
-    fetch('layouts/navbar.html')
+    // 현재 페이지 확인
+    const currentPage = window.location.pathname.split('/').pop();
+
+    // 비로그인용 navbar를 사용할 페이지 목록
+    const landingPages = ['login.html', 'aboutus.html', 'globals.html', 'program.html'];
+    const useLandingNavbar = landingPages.includes(currentPage);
+
+    const navbarFile = useLandingNavbar ? 'layouts/navbar-landing.html' : 'layouts/navbar.html';
+
+    fetch(navbarFile)
         .then(response => response.text())
         .then(data => {
             document.getElementById("navbar-placeholder").innerHTML = data;
@@ -42,11 +51,14 @@ function loadNavbar() {
                 }
             });
 
-            loadScript('js/navbar.js', function() {
-                if (typeof initNavbar === 'function') {
-                    initNavbar();
-                }
-            });
+            // landing navbar가 아닐 때만 navbar.js 로드
+            if (!useLandingNavbar) {
+                loadScript('js/navbar.js', function() {
+                    if (typeof initNavbar === 'function') {
+                        initNavbar();
+                    }
+                });
+            }
         });
 }
 

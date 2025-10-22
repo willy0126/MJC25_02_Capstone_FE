@@ -5,7 +5,6 @@ body {
     font-family: 'Paperlogy', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f9f4ff;
     height: 500px;
 }
 
@@ -681,96 +680,6 @@ html * {
     font-weight: 600;
 }
 
-/* --- 후기 섹션 --- */
-.testimonial-section {
-    padding: 100px 240px;
-    background-color: #f8f8f8;
-}
-
-.testimonial-section h2 {
-    text-align: center;
-    font-size: 36px;
-    color: #333;
-    margin-bottom: 80px;
-    font-weight: 700;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.testimonial-section h2.reveal-active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.testimonial-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 40px;
-}
-
-.testimonial-card {
-    background: #f8eddd;
-    padding: 40px 35px;
-    border-radius: 20px;
-    position: relative;
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    opacity: 0;
-    transform: translateY(40px);
-    border: 2px solid transparent;
-}
-
-.testimonial-card.reveal-active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.testimonial-card:hover {
-    border-color: #e0e0e0;
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-}
-
-.testimonial-quote {
-    font-family: 'Paperlogy', sans-serif;
-    font-size: 72px;
-    color: #e0e0e0;
-    line-height: 0.5;
-    margin-bottom: 20px;
-    font-weight: 700;
-}
-
-.testimonial-card p {
-    font-size: 16px;
-    color: #555;
-    line-height: 1.8;
-    margin-bottom: 30px;
-}
-
-.testimonial-author {
-    border-top: 2px solid #e0e0e0;
-    padding-top: 20px;
-}
-
-.author-name {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-.author-role {
-    font-size: 14px;
-    color: #999;
-}
-
-.disclaimer-text {
-    margin-top: 40px;
-    font-size: 12px;
-    color: #666666;
-    text-align: left;
-}
-
 /* --- 스크롤 애니메이션 유틸리티 --- */
 .reveal-on-scroll {
     opacity: 0;
@@ -827,11 +736,6 @@ html * {
 
     .nav-menu {
         gap: 40px;
-    }
-
-    .testimonial-section {
-        padding-left: 80px;
-        padding-right: 80px;
     }
 
     .hero-gallery-section {
@@ -936,20 +840,6 @@ html * {
     .login-btn {
         padding: 5px 10px;
         font-size: 10px;
-    }
-
-    .testimonial-section {
-        padding: 60px 20px;
-    }
-
-    .testimonial-section h2 {
-        font-size: 28px;
-        margin-bottom: 50px;
-    }
-
-    .testimonial-container {
-        grid-template-columns: 1fr;
-        gap: 30px;
     }
 
     html, html * {

@@ -55,13 +55,13 @@
     font-size: 2.5rem;
     font-weight: 600;
     color: #2c3e50;
-    margin-bottom: 30px;
+    margin-bottom: 75px;
 }
 
 .content-section p {
-    font-size: 1.1rem;
+    font-size: 1.125rem;
     line-height: 1.8;
-    color: #555;
+    color: #444;
     max-width: 900px;
 }
 
@@ -85,7 +85,7 @@
    미션 섹션
 ======================================== */
 .mission-section {
-    background: linear-gradient(180deg, #fffefe 0%, #f8ebda 100%);
+    background: linear-gradient(180deg, #fffefe 0%, #ffefd8 100%);
     padding: 80px 60px;
     border-radius: 20px;
     margin: 60px 0;
@@ -157,9 +157,9 @@
 ======================================== */
 .vision-inspiration {
     padding: 15px 25px;
-    background: linear-gradient(145deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
+    background: linear-gradient(145deg, rgba(169, 184, 255, 0.25) 0%, rgba(181, 133, 230, 0.25) 100%);
     border-left: 5px solid #667eea;
-    border-radius: 10px;
+    border-radius: 15px;
     font-style: italic;
     color: #333;
     line-height: 1.8;
@@ -279,7 +279,7 @@
    통계 섹션
 ======================================== */
 .stats-section {
-    background: linear-gradient(180deg,rgba(44, 62, 80, 0.5) 0%, #ddbd8d 100%);
+    background: linear-gradient(180deg,rgba(168, 208, 248, 0.5) 0%, #ffecd1 100%);
     padding: 80px 20px;
     margin: 100px 0;
     border-radius: 20px;
@@ -294,7 +294,7 @@
 }
 
 .stat-item h3 {
-    color: #ffffff;
+    color: #0e4a5c;
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 10px;

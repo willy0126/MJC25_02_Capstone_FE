@@ -35,11 +35,13 @@
 .nav-menu {
     display: flex;
     gap: 65px;
+    list-style: none;
 }
 
 .nav-item {
     position: relative;
     padding: 20px 0;
+    list-style: none;
 }
 
 .nav-item > a {
@@ -92,7 +94,7 @@
 }
 
 .login-btn {
-    background-color: #e9cfff;
+    background-color: #fff7e9;
     color: #333;
     padding: 10px 25px;
     border: none;
@@ -106,8 +108,8 @@
 }
 
 .login-btn:hover {
-    background-color: #9668bb;
-    color:#fff5f5
+    background-color: #ffe4b6;
+    color:#333;
 }
 
 /* User Menu Styles */
