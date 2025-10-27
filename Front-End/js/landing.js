@@ -20,15 +20,10 @@ function loadLandingNavbar() {
         .then(data => {
             document.getElementById("navbar-placeholder").innerHTML = data;
 
-            // 스크롤 이벤트로 navbar 스타일 변경
-            window.addEventListener('scroll', function() {
-                const navbar = document.querySelector('.navbar');
-                if (window.scrollY > 50) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
-                }
-            });
+            // utils.js의 공통 함수 사용
+            if (typeof initNavbarScrollEffect === 'function') {
+                initNavbarScrollEffect();
+            }
         })
         .catch(error => {
             console.error('Navbar 로드 실패:', error);

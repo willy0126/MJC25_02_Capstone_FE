@@ -122,18 +122,10 @@ function initScrollAnimations() {
         sectionObserver.observe(valuesSection);
     }
 
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
+    // utils.js의 공통 함수 사용
+    if (typeof initSmoothScrollLinks === 'function') {
+        initSmoothScrollLinks();
+    }
 }
 
 /* ========================================

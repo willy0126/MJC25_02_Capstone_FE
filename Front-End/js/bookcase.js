@@ -105,9 +105,19 @@ function performSearch(query) {
     }
 
     bookItems.forEach(book => {
-        const title = book.querySelector('.book-title').textContent.toLowerCase();
-        const meta = book.querySelector('.book-meta').textContent.toLowerCase();
-        const summary = book.querySelector('.book-summary').textContent.toLowerCase();
+        // null 안전성 체크 추가
+        const titleEl = book.querySelector('.book-title');
+        const metaEl = book.querySelector('.book-meta');
+        const summaryEl = book.querySelector('.book-summary');
+
+        // 필수 요소가 없으면 건너뛰기
+        if (!titleEl || !metaEl || !summaryEl) {
+            return;
+        }
+
+        const title = titleEl.textContent.toLowerCase();
+        const meta = metaEl.textContent.toLowerCase();
+        const summary = summaryEl.textContent.toLowerCase();
 
         if (title.includes(searchQuery) || meta.includes(searchQuery) || summary.includes(searchQuery)) {
             book.classList.remove('hidden');
@@ -128,7 +138,7 @@ function initAddBookButton() {
 
     if (addBookBtn) {
         addBookBtn.addEventListener('click', function() {
-            alert('도서 등록 기능은 추후 구현될 예정입니다.');
+            showToast('도서 등록 기능은 추후 구현될 예정입니다.', 'info');
             console.log('Add book button clicked');
         });
     }
@@ -143,7 +153,7 @@ function initBookClickEvent() {
         if (bookItem && !e.target.closest('.add-book-btn')) {
             const bookTitle = bookItem.querySelector('.book-title').textContent;
             console.log('Book clicked:', bookTitle);
-            alert(`"${bookTitle}" 상세 정보는 추후 구현될 예정입니다.`);
+            showToast(`"${bookTitle}" 상세 정보는 추후 구현될 예정입니다.`, 'info');
         }
     });
 }

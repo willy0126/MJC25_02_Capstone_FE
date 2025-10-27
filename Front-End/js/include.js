@@ -42,14 +42,10 @@ function loadNavbar() {
         .then(data => {
             document.getElementById("navbar-placeholder").innerHTML = data;
 
-            window.addEventListener('scroll', function() {
-                const navbar = document.querySelector('.navbar');
-                if (window.scrollY > 50) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
-                }
-            });
+            // utils.js의 공통 함수 사용
+            if (typeof initNavbarScrollEffect === 'function') {
+                initNavbarScrollEffect();
+            }
 
             // landing navbar가 아닐 때만 navbar.js 로드
             if (!useLandingNavbar) {

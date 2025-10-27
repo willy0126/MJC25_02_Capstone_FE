@@ -217,7 +217,7 @@ function searchNotices() {
 // 글쓰기 모달 열기
 function openWriteModal() {
     if (!isAdmin) {
-        alert('관리자만 글을 작성할 수 있습니다.');
+        showToast('관리자만 글을 작성할 수 있습니다.', 'warning');
         return;
     }
 
@@ -277,7 +277,7 @@ function handleSubmit(e) {
     e.preventDefault();
 
     if (!isAdmin) {
-        alert('관리자만 글을 작성/수정할 수 있습니다.');
+        showToast('관리자만 글을 작성/수정할 수 있습니다.', 'warning');
         return;
     }
 
@@ -286,7 +286,7 @@ function handleSubmit(e) {
     const content = document.getElementById('noticeContent').value.trim();
 
     if (!badge || !title || !content) {
-        alert('모든 항목을 입력해주세요.');
+        showToast('모든 항목을 입력해주세요.', 'warning');
         return;
     }
 
@@ -320,7 +320,7 @@ function handleSubmit(e) {
     currentPage = 1;
     renderNotices();
 
-    alert(editingNoticeId ? '공지사항이 수정되었습니다.' : '공지사항이 등록되었습니다.');
+    showToast(editingNoticeId ? '공지사항이 수정되었습니다.' : '공지사항이 등록되었습니다.', 'success');
 }
 
 // 수정 처리
@@ -354,5 +354,5 @@ function handleDelete() {
     currentPage = 1;
     renderNotices();
 
-    alert('공지사항이 삭제되었습니다.');
+    showToast('공지사항이 삭제되었습니다.', 'success');
 }

@@ -40,19 +40,19 @@ function initLoginForm() {
         const remember = rememberCheckbox ? rememberCheckbox.checked : false;
 
         if (!email) {
-            alert('이메일을 입력해주세요.');
+            showToast('이메일을 입력해주세요.', 'warning');
             emailInput.focus();
             return;
         }
 
         if (!validateEmail(email)) {
-            alert('올바른 이메일 형식을 입력해주세요.');
+            showToast('올바른 이메일 형식을 입력해주세요.', 'warning');
             emailInput.focus();
             return;
         }
 
         if (!password) {
-            alert('비밀번호를 입력해주세요.');
+            showToast('비밀번호를 입력해주세요.', 'warning');
             passwordInput.focus();
             return;
         }
@@ -80,27 +80,57 @@ function validateEmail(email) {
 /* ========================================
    로그인 처리
 ======================================== */
-function performLogin(email, password, remember) {
+async function performLogin(email, password, remember) {
     const loginButton = document.querySelector('.login-button');
     const originalText = loginButton.textContent;
     loginButton.textContent = '로그인 중...';
     loginButton.disabled = true;
 
-    setTimeout(() => {
+    try {
+        // 백엔드 로그인 API 호출
+        const response = await apiClient.login(email, password);
+
+        // 사용자 정보 가져오기
+        const userInfo = await apiClient.getUserInfo();
+
+        // 로그인 상태 저장
         const user = {
-            email: email,
-            name: email.split('@')[0],
+            email: userInfo.email,
+            name: userInfo.username,
+            nickname: userInfo.nickname,
+            profileImageUrl: userInfo.profileImageUrl,
+            themeColor: userInfo.themeColor,
             loginTime: new Date().toISOString(),
             remember: remember
         };
 
         setLoginState(user);
 
-        alert(`${user.name}님, 환영합니다!`);
+        showToast(`${user.nickname || user.name}님, 환영합니다!`, 'success');
 
-        const returnUrl = getReturnUrl() || 'bookcase.html';
-        window.location.href = returnUrl;
-    }, 800);
+        // 토스트가 보이도록 약간의 지연 후 페이지 이동
+        setTimeout(() => {
+            const returnUrl = getReturnUrl() || 'bookcase.html';
+            window.location.href = returnUrl;
+        }, 800);
+
+    } catch (error) {
+        console.error('로그인 실패:', error);
+
+        let errorMessage = '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.';
+
+        if (error.data && error.data.message) {
+            errorMessage = error.data.message;
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
+        showToast(errorMessage, 'error');
+
+        // 버튼 복원
+        loginButton.textContent = originalText;
+        loginButton.disabled = false;
+    }
 }
 
 /* ========================================
@@ -127,7 +157,7 @@ function initSocialLogin() {
    소셜 로그인 처리
 ======================================== */
 function performSocialLogin(provider) {
-    alert(`${provider} 소셜 로그인 기능은 추후 구현될 예정입니다.`);
+    showToast(`${provider} 소셜 로그인 기능은 추후 구현될 예정입니다.`, 'info');
 
     const user = {
         email: `user@${provider}.com`,
