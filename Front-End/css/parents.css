@@ -1,0 +1,700 @@
+
+/* ===================================
+   메인 컨테이너
+   =================================== */
+.parents-container {
+    min-height: 100vh;
+    padding-top: 80px;
+    background: linear-gradient(135deg, #fef5f0 0%, #fef7ff 100%);
+}
+
+/* ===================================
+   히어로 섹션
+   =================================== */
+.parents-hero {
+    position: relative;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+    padding: 120px 40px;
+    margin-bottom: 80px;
+    overflow: hidden;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../assets/pics/aboutus1.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.15;
+    z-index: 0;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 800px;
+}
+
+.hero-content h1 {
+    font-size: 52px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-subtitle {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    opacity: 0.95;
+}
+
+.hero-description {
+    font-size: 18px;
+    line-height: 1.8;
+    margin-bottom: 40px;
+    opacity: 0.9;
+}
+
+/* CTA 버튼 */
+.hero-cta {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.cta-btn {
+    padding: 16px 40px;
+    font-size: 18px;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cta-btn.primary {
+    background: white;
+    color: #fa709a;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.cta-btn.primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.cta-btn.secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.cta-btn.secondary:hover {
+    background: white;
+    color: #fa709a;
+}
+
+/* ===================================
+   섹션 공통 스타일
+   =================================== */
+section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 40px;
+}
+
+section h2 {
+    font-size: 40px;
+    font-weight: 700;
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 60px;
+}
+
+/* ===================================
+   중요성 섹션
+   =================================== */
+.importance {
+    background: transparent;
+}
+
+.importance-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+}
+
+.importance-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(250, 112, 154, 0.1);
+    transition: all 0.3s ease;
+}
+
+.importance-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(250, 112, 154, 0.2);
+}
+
+.importance-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+
+.importance-card h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 15px;
+}
+
+.importance-card p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #4a5568;
+    margin: 0;
+}
+
+/* ===================================
+   프로그램 특징 섹션
+   =================================== */
+.program-features {
+    background: white;
+    border-radius: 30px;
+    margin: 40px auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+}
+
+.features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.feature-item {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    padding: 30px;
+    background: linear-gradient(135deg, #fef5f0 0%, #fef7ff 100%);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+    transform: translateX(10px);
+    box-shadow: 0 10px 30px rgba(250, 112, 154, 0.15);
+}
+
+.feature-number {
+    font-size: 48px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    flex-shrink: 0;
+    width: 80px;
+}
+
+.feature-content h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.feature-content p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+.feature-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.feature-content li {
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 8px;
+    font-size: 15px;
+    color: #2d3748;
+}
+
+.feature-content li::before {
+    content: '•';
+    position: absolute;
+    left: 5px;
+    color: #fa709a;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+/* ===================================
+   테마 섹션
+   =================================== */
+.themes {
+    background: transparent;
+}
+
+.themes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+.theme-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border-top: 5px solid #fa709a;
+}
+
+.theme-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(250, 112, 154, 0.15);
+    border-top-width: 8px;
+}
+
+.theme-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+.theme-card h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 5px;
+}
+
+.theme-age {
+    font-size: 14px;
+    color: #fa709a;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.theme-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.theme-card li {
+    position: relative;
+    padding: 10px 0 10px 25px;
+    font-size: 15px;
+    color: #4a5568;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.theme-card li:last-child {
+    border-bottom: none;
+}
+
+.theme-card li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #fa709a;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* ===================================
+   월별 구성품 섹션
+   =================================== */
+.monthly-package {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    border-radius: 30px;
+    margin: 40px auto;
+    color: white;
+}
+
+.monthly-package h2 {
+    color: white;
+}
+
+.package-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+
+.package-item {
+    text-align: center;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.package-item:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-10px);
+}
+
+.package-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+.package-item h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.package-item p {
+    font-size: 14px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* ===================================
+   후기 섹션
+   =================================== */
+.reviews {
+    background: white;
+    border-radius: 30px;
+    margin: 40px auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+}
+
+.reviews h2 {
+    color: #2d3748;
+}
+
+.reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.review-card {
+    background: linear-gradient(135deg, #fef5f0 0%, #fef7ff 100%);
+    padding: 30px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    border-left: 4px solid #fa709a;
+}
+
+.review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(250, 112, 154, 0.15);
+    border-left-width: 6px;
+}
+
+.review-stars {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.review-text {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 15px;
+    color: #2d3748;
+    font-style: italic;
+}
+
+.review-author {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fa709a;
+    margin: 0;
+}
+
+/* ===================================
+   가격 및 구독 정보 섹션
+   =================================== */
+.pricing {
+    background: transparent;
+}
+
+.pricing-card {
+    background: white;
+    border-radius: 30px;
+    padding: 50px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.price-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 2px solid #fef5f0;
+}
+
+.price-header h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 20px;
+}
+
+.price {
+    margin-bottom: 10px;
+}
+
+.price-amount {
+    font-size: 42px;
+    font-weight: 700;
+    color: #fa709a;
+}
+
+.price-note {
+    font-size: 16px;
+    color: #fee140;
+    font-weight: 600;
+    margin: 0;
+}
+
+.price-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 40px 0;
+}
+
+.price-features li {
+    font-size: 16px;
+    color: #2d3748;
+    padding: 15px 0;
+    border-bottom: 1px solid #fef5f0;
+}
+
+.price-features li:last-child {
+    border-bottom: none;
+}
+
+.subscribe-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 18px 40px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(250, 112, 154, 0.3);
+}
+
+.subscribe-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(250, 112, 154, 0.4);
+}
+
+/* ===================================
+   FAQ 섹션
+   =================================== */
+.faq {
+    background: transparent;
+}
+
+.faq-list {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(250, 112, 154, 0.1);
+}
+
+.faq-item.highlighted {
+    background: linear-gradient(135deg, #fef5f0 0%, #fef7ff 100%);
+    border-left: 4px solid #fa709a;
+}
+
+.faq-item h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 15px;
+}
+
+.faq-item p {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #4a5568;
+    margin: 0;
+}
+
+/* ===================================
+   반응형 디자인 - 태블릿 (768px 이하)
+   =================================== */
+@media (max-width: 768px) {
+    .parents-container {
+        padding-top: 60px;
+    }
+
+    section {
+        padding: 60px 20px;
+    }
+
+    section h2 {
+        font-size: 32px;
+        margin-bottom: 40px;
+    }
+
+    .parents-hero {
+        min-height: 400px;
+        padding: 80px 20px;
+        margin-bottom: 60px;
+    }
+
+    .hero-content h1 {
+        font-size: 36px;
+    }
+
+    .hero-subtitle {
+        font-size: 20px;
+    }
+
+    .hero-description {
+        font-size: 16px;
+    }
+
+    .hero-cta {
+        flex-direction: column;
+    }
+
+    .cta-btn {
+        width: 100%;
+    }
+
+    .importance-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .feature-item {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .feature-number {
+        width: auto;
+    }
+
+    .themes-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .package-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .reviews-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .pricing-card {
+        padding: 40px 30px;
+    }
+
+    /* 모바일에서 커스텀 커서 비활성화 */
+    html, html * {
+        cursor: auto !important;
+    }
+
+    .cursor-dot, .cursor-outline {
+        display: none;
+    }
+}
+
+/* ===================================
+   반응형 디자인 - 모바일 (480px 이하)
+   =================================== */
+@media (max-width: 480px) {
+    section {
+        padding: 40px 15px;
+    }
+
+    section h2 {
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
+
+    .parents-hero {
+        min-height: 350px;
+        padding: 60px 15px;
+    }
+
+    .hero-content h1 {
+        font-size: 28px;
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+    }
+
+    .hero-description {
+        font-size: 14px;
+    }
+
+    .cta-btn {
+        font-size: 16px;
+        padding: 14px 30px;
+    }
+
+    .feature-item {
+        padding: 20px;
+    }
+
+    .feature-number {
+        font-size: 36px;
+    }
+
+    .package-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pricing-card {
+        padding: 30px 20px;
+    }
+
+    .price-amount {
+        font-size: 36px;
+    }
+
+    .subscribe-btn {
+        font-size: 16px;
+        padding: 15px 30px;
+    }
+}
