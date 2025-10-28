@@ -3,341 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>책·이음</title>
+        <title>책·이음 | 책으로 이어지는 우리 가족의 시간</title>
     <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
-    <style>
-        /* 전체 그라데이션 배경 */
-        body {
-            margin: 0;
-            font-family: 'Paperlogy', sans-serif;
-            background: linear-gradient(180deg, #f5e6cc 0%, #fff9f0 100%);
-            
-        }
- header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 50px;
-            background-color: rgba(255, 255, 255, 0.9);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        header .logo img {
-            height: 50px;
-        }
-         .nav-menu a {
-            margin-left: 25px;
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-        .nav-menu a:hover {
-            color: #4b7bec;
-        }
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        /* 카드 슬라이드 섹션 */
-        .card-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .slide {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-
-        .item {
-            min-width: 100%;
-            height: 400px;
-            position: relative;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .item .content {
-            position: absolute;
-            bottom: 30px;
-            left: 50px;
-            color: #fff;
-        }
-
-        .item .content .name {
-            font-size: 32px;
-            font-weight: 700;
-        }
-
-        .item .content .des {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-
-        .item button {
-            padding: 10px 20px;
-            background-color: #4b7bec;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-        }
-
-        /* 메인 피처 섹션 */
-        .main-feature {
-            padding: 60px 20px;
-            text-align: center;
-        }
-
-        .features-section {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-            margin-top: 40px;
-        }
-
-        .feature-card {
-            background-color: rgba(255, 255, 255, 0.7);
-            padding: 20px;
-            border-radius: 10px;
-            width: 250px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-icon {
-            font-size: 40px;
-        }
-
-        .feature-card h3 {
-            margin-top: 15px;
-            font-size: 20px;
-        }
-
-        .feature-card p {
-            margin-top: 10px;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        /* 인기 도서 & 진행중인 대회 & 공지사항 섹션 */
-        .section {
-            padding: 60px 20px;
-            text-align: center;
-        }
-
-        .section h2 {
-            font-size: 28px;
-            margin-bottom: 40px;
-        }
-
-        .masonry-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        .book-item {
-            width: 200px;
-            text-align: center;
-        }
-
-        .book-item img {
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .book-item img:hover {
-            transform: scale(1.05);
-        }
-
-        .book-title {
-            margin-top: 8px;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .tab-btn.active {
-            background-color: #4b7bec;
-            color: white;
-            font-weight: bold;
-        }
-
-        .tab-btn {
-            background-color: #eee;
-            border: none;
-            border-radius: 20px;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin: 0 5px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* 공지사항 */
-        .notice-list {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: left;
-        }
-
-        .notice-list ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .notice-list li {
-            background-color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 15px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            transition: transform 0.2s;
-        }
-
-        .notice-list li:hover {
-            transform: translateY(-3px);
-        }
-
-        .notice-list li span {
-            color: #4b7bec;
-            font-weight: bold;
-            margin-right: 10px;
-            header {
-    display: flex;
-    align-items: center; /* 수직 가운데 정렬 */
-    justify-content: space-between; /* 로고와 메뉴 사이 공간 확보 */
-    padding: 0 20px; /* 좌우 여백 */
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.nav-menu {
-    display: flex;
-    gap: 20px; /* 버튼 사이 간격 */
-}
-
-.nav-menu a {
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-    padding: 10px 15px;
-    transition: 0.3s;
-}
-
-.nav-menu a:hover {
-    background-color: #f0f0f0;
-    border-radius: 5px;
-}
-
-        }
-    </style>
+        <link rel="stylesheet" href="css/toast.css">
 </head>
-
 <body>
-    <!-- 헤더 -->
-<header class="header">
-    
-    <div class="logo">
-        <a href="#"><img src="assets/logo/tplogo.png" alt="책·이음 로고"></a>
-    </div>
-    <nav class="nav-menu">
-        <ul>
-            <li><a href="#">연령별 프로그램</a></li>
-            <li><a href="#">독서관리</a></li>
-            <li><a href="#">창작놀이</a></li>
-            <li><a href="#">커뮤니티</a></li>
-            <li><a href="#">마이페이지</a></li>
-            <li><a href="#">로그아웃</a></li>
-            
-        </ul>
-    </nav>
-</header>
-
-<style>
-/* 헤더 스타일 */
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: center; /* 메뉴 중앙 정렬 */
-    padding: 10px 30px;
-    width: 100%;
-    height: 60px; /* 헤더 높이 고정 */
-    position: fixed;
-    top: 0;
-    background: rgba(255,255,255,0.95);
-    z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.header .logo {
-    margin-right: auto; /* 로고를 왼쪽으로 붙이고 메뉴는 중앙 유지 */
-}
-
-.header .logo img {
-    height: 70px;
-}
-
-/* 메뉴를 헤더 중앙에 위치 */
-.nav-menu {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-10%);
-}
-
-
-.nav-menu ul {
-    list-style: none;
-    margin: 0;
-    padding: 0; /* 잘못된 padding 제거 */
-    display: flex;
-    gap: 30px;
-}
-
-
-.nav-menu ul li a {
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-    font-size: 16px;
-    transition: color 0.3s;
-}
-
-.nav-menu ul li a:hover {
-    color: #4b7bec;
-}
-
-/* 페이지 내용이 헤더 아래에서 시작하도록 여백 */
-body {
-    padding-top: 80px; 
-}
-</style>
-
-
     <!-- 네비게이션 섹션 -->
     <div id="navbar-placeholder"></div>
 
@@ -348,9 +24,10 @@ body {
                 <div class="content">
                     <div class="name">구독형 시스템</div>
                     <div class="des">어떤 책을 읽을 지 고민하지 마세요.</div>
-                    <button><a href="#">자세히 보기</a></button>
+                    <button><a href ="#"></a>자세히 보기</a></button>
                 </div>
             </div>
+
             <div class="item" style="background-image: url('assets/pics/main2.jpg');">
                 <div class="content">
                     <div class="name">프로그램 소개</div>
@@ -358,90 +35,304 @@ body {
                     <button><a href="program.html">자세히 보기</a></button>
                 </div>
             </div>
+
+            <div class="item" style="background-image: url('assets/pics/main3.jpg');">
+                <div class="content">
+                    <div class="name">커뮤니티</div>
+                    <div class="des">서로 소통하며 기쁨을 나누세요.</div>
+                    <button><a href ="program.html">자세히 보기</a></button>
+                </div>
+            </div>
+
+            <div class="item" style="background-image: url('assets/pics/main4.jpg');">
+                <div class="content">
+                    <div class="name">이벤트</div>
+                    <div class="des">다양한 챌린지가 준비되어 있습니다.</div>
+                    <button><a href ="program.html">자세히 보기</a></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="button">
+            <button class="prev">◁</button>
+            <button class="auto-toggle" title="자동 전환">⏸</button>
+            <button class="next">▷</button>
         </div>
     </div>
 
-    <!-- 메인 피처 섹션 -->
-    <div class="main-feature">
-        <h1>책·이음에 오신 것을 환영합니다!</h1>
-        <div class="features-section">
-            <div class="feature-card">
-                <div class="feature-icon">🎯</div>
-                <h3>독서 습관 형성</h3>
-                <p>독서 기록 및 일정 관리로<br>
-                    자연스럽게 독서 습관을 만들어갑니다.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">👥</div>
-                <h3>함께하는 커뮤니티</h3>
-                <p>같은 관심사를 가진 부모님들과<br> 
-                    소통하고 정보를 공유하세요.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🎁</div>
-                <h3>다양한 혜택</h3>
-                <p>독서 챌린지 참여로<br>
-                    특별한 리워드를 받아보세요.</p>
-            </div>
-        </div>
-    </div>
+    <style>
+    
+        /* 인기 도서 & 진행중인 대회 & 공지사항 섹션 */
+        .section {
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .section h2 {
+            font-size: 28px;
+            margin-bottom: 40px;
+        }
+        .masonry-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .book-item {
+            width: 200px;
+            text-align: center;
+        }
+        .book-item img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .book-item img:hover {
+            transform: scale(1.05);
+        }
+        .book-title {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+        .tab-btn.active {
+            background-color: #4b7bec;
+            color: white;
+            font-weight: bold;
+        }
+        .tab-btn {
+            background-color: #eee;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 0 5px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* 공지사항 */
+        .notice-list {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        .notice-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .notice-list li {
+            background-color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .notice-list li:hover {
+            transform: translateY(-3px);
+        }
+        .notice-list li span {
+            color: #4b7bec;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        /* 헤더 스타일 */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 30px;
+            width: 100%;
+            height: 60px;
+            position: fixed;
+            top: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header .logo {
+            margin-right: auto;
+        }
+        .header .logo img {
+            height: 70px;
+        }
+        .nav-menu {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-10%);
+        }
+        .nav-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 30px;
+        }
+        .nav-menu ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        .nav-menu ul li a:hover {
+            color: #4b7bec;
+        }
+        body {
+            padding-top: 80px; 
+        }
+        /* 공지사항 헤더 스타일 */
+        .notice-header, .notice-list {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .notice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 0;
+        }
+        .notice-header h2 {
+            margin: 0;
+            font-size: 38px;
+            color: #111;
+            font-weight: bold;
+            line-height: 1.1;
+        }
+        .notice-more {
+            font-size: 22px;
+            color: #222;
+            font-weight: 400;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            margin-left: 10px;
+            outline: none;
+        }
+        .notice-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .notice-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #666;
+            padding: 22px 0 19px 0;
+            color: #111;
+            font-size: 20px;
+            background: none;
+        }
+        .notice-type {
+            width: 180px;
+            font-weight: bold;
+            color: #111;
+            font-size: 21px;
+            flex-shrink: 0;
+        }
+        .notice-title {
+            flex: 1;
+            text-align: left;
+            padding: 0 10px;
+            color: #111;
+            font-size: 20px;
+            font-weight: 400;
+        }
+        .notice-date {
+            width: 130px;
+            text-align: right;
+            font-size: 18px;
+            color: #222;
+            flex-shrink: 0;
+        }
+        .cursor-dot, .cursor-outline {
+    pointer-events: none;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 10000;
+    transition: transform 0.15s, opacity 0.15s;
+}
+.cursor-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4b7bec;
+    opacity: 0.9;
+    mix-blend-mode: multiply;
+    transform: translate(-50%, -50%);
+}
+.cursor-outline {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2.5px solid #4b7bec;
+    opacity: 0.5;
+    transform: translate(-50%, -50%);
+}
+
+    </style>
+    
+</head>
+<body>
 
     <!-- 인기 도서 섹션 -->
     <div class="section books-section">
         <h2>요즘 부모님들은 이 책에 관심 있어요</h2>
         <div class="trending-tabs">
-            <button class="tab-btn active" data-tab="top5">지난주 인기 TOP 5</button>
+            <button class="tab-btn active" data-tab="top5">지난주 인기 TOP 4</button>
             <button class="tab-btn" data-tab="community">커뮤니티 화제의 책</button>
         </div>
-        <p>
-            <p></p>
-        </p>
-       
-
         <div class="tab-content active" id="top5-content">
-    <div class="masonry-grid">
-        <div class="book-item">
-            <img src="assets/pics/image 29.png" alt="책 1 포스터">
-            <p class="book-title">오늘 하루도, 소심한 야옹이</p>
+            <div class="masonry-grid">
+                <div class="book-item">
+                    <img src="assets/pics/image 29.png" alt="책 1 포스터">
+                    <p class="book-title">오늘 하루도, 소심한 야옹이</p>
+                </div>
+                <div class="book-item">
+                    <img src="assets/pics/image 32.png" alt="책 2 포스터">
+                    <p class="book-title">오직 나를 위한 시간</p>
+                </div>
+                <div class="book-item">
+                    <img src="assets/pics/image 35.png" alt="책 3 포스터">
+                    <p class="book-title">나의 소소한 행복 일기</p>
+                </div>
+                <div class="book-item">
+                    <img src="assets/pics/나답게 사는방법.png" alt="책 4 포스터">
+                    <p class="book-title">나답게 사는 방법</p>
+                </div>
+            </div>
         </div>
-        <div class="book-item">
-            <img src="assets/pics/image 32.png" alt="책 2 포스터">
-            <p class="book-title">오직 나를 위한 시간</p>
-        </div>
-        <div class="book-item">
-            <img src="assets/pics/image 35.png" alt="책 3 포스터">
-            <p class="book-title">나의 소소한 행복 일기</p>
-        </div>
-        <div class="book-item">
-            <img src="assets/pics/나답게 사는방법.png" alt="책 4 포스터">
-            <p class="book-title">나답게 사는 방법</p>
-        </div>
-    </div>
-</div>
-
-
         <div class="tab-content" id="community-content">
             <div class="masonry-grid">
                 <div class="book-item">
                     <img src="images/community1.jpg" alt="책 1 표지">
                     <p class="book-title">추가 예정</p>
                 </div>
-                 <div class="book-item">
+                <div class="book-item">
                     <img src="images/community1.jpg" alt="책 2 표지">
                     <p class="book-title">추가 예정</p>
                 </div>
-                 <div class="book-item">
+                <div class="book-item">
                     <img src="images/community1.jpg" alt="책 3 표지">
                     <p class="book-title">추가 예정</p>
                 </div>
-                 <div class="book-item">
+                <div class="book-item">
                     <img src="images/community1.jpg" alt="책 4 표지">
                     <p class="book-title">추가 예정</p>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- 진행중인 대회 섹션 -->
     <div class="section contest-section">
         <h2>현재 진행중인 대회들</h2>
@@ -464,152 +355,63 @@ body {
             </div>
         </div>
     </div>
-
-<!-- 공지사항 섹션 -->
-<div class="notice-header">
-  <h2>공지사항</h2>
- <span class="notice-more" onclick="location.href='notice.html'">더보기+</span>
-</div>
-
-<ul class="notice-list">
-  <ul>
-  <li>
-    <span class="notice-type">회원탈퇴</span>
-    <a class="notice-title" href="notice-detail.html?id=1">책 - 이름 페이지 회원탈퇴 방법 안내</a>
-    <span class="notice-date">2025/10/26</span>
-  </li>
-  <li>
-    <span class="notice-type">자유게시판</span>
-    <a class="notice-title" href="notice-detail.html?id=2">자유게시판 이용안내와 제한조치 규정 안내</a>
-    <span class="notice-date">2025/10/24</span>
-  </li>
-  <li>
-    <span class="notice-type">창작대회</span>
-    <a class="notice-title" href="notice-detail.html?id=3">창작대회 일정 및 참가상 안내</a>
-    <span class="notice-date">2025/10/21</span>
-  </li>
-</ul>
-
-
-
-
-
-
-<style>
-    .notice-header, .notice-list {
-  max-width: 900px;
-  margin: 0 auto;
-}
-.notice-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  border-bottom: 3px solid #444;
-  padding-bottom: 10px;
-  margin-bottom: 0;
-}
-
-.notice-header h2 {
-  margin: 0;
-  font-size: 38px;
-  color: #111;
-  font-weight: bold;
-  line-height: 1.1;
-}
-
-.notice-more {
-  font-size: 22px;
-  color: #222;
-  font-weight: 400;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-  margin-left: 10px;
-  outline: none;
-}
-
-.notice-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-    max-width: 900px;
-  margin: 0 auto;
-}
-
-.notice-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #666;
-  padding: 22px 0 19px 0;
-  color: #111;
-  font-size: 20px;
-  background: none;
-}
-
-.notice-type {
-  width: 180px;
-  font-weight: bold;
-  color: #111;
-  font-size: 21px;
-  flex-shrink: 0;
-}
-
-.notice-title {
-  flex: 1;
-  text-align: left;
-  padding: 0 10px;
-  color: #111;
-  font-size: 20px;
-  font-weight: 400;
-}
-
-.notice-date {
-  width: 130px;
-  text-align: right;
-  font-size: 18px;
-  color: #222;
-  flex-shrink: 0;
-}
-</style>
-
-<script>
-    // 탭 버튼과 콘텐츠 요소 모두 선택
-    const tabButtons = document.querySelectorAll(".tab-btn");
-    const tabContents = document.querySelectorAll(".tab-content");
-
-    // 각 버튼 클릭 이벤트 설정
-    tabButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            const targetId = button.dataset.tab; // 클릭된 버튼의 data-tab 값
-            const targetContent = document.getElementById(targetId + "-content");
-
-            // 모든 버튼의 active 제거
-            tabButtons.forEach(btn => btn.classList.remove("active"));
-
-            // 모든 콘텐츠 숨기기
-            tabContents.forEach(content => content.classList.remove("active"));
-
-            // 클릭된 버튼 및 해당 콘텐츠 활성화
-            button.classList.add("active");
-            targetContent.classList.add("active");
+    <!-- 공지사항 섹션 -->
+    <div class="notice-header">
+        <h2>공지사항</h2>
+        <span class="notice-more" onclick="location.href='notice.html'">더보기+</span>
+    </div>
+    <ul class="notice-list">
+        <ul>
+            <li>
+                <span class="notice-type">회원탈퇴</span>
+                <a class="notice-title" href="notice-detail.html?id=1">책 - 이름 페이지 회원탈퇴 방법 안내</a>
+                <span class="notice-date">2025/10/26</span>
+            </li>
+            <li>
+                <span class="notice-type">자유게시판</span>
+                <a class="notice-title" href="notice-detail.html?id=2">자유게시판 이용안내와 제한조치 규정 안내</a>
+                <span class="notice-date">2025/10/24</span>
+            </li>
+            <li>
+                <span class="notice-type">창작대회</span>
+                <a class="notice-title" href="notice-detail.html?id=3">창작대회 일정 및 참가상 안내</a>
+                <span class="notice-date">2025/10/21</span>
+            </li>
+        </ul>
+    </ul>
+    <!-- 푸터 섹션 -->
+    <div id="footer-placeholder"></div>
+    <!-- 라이브러리 먼저 로드 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+    <!-- 애플리케이션 스크립트 -->
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/library-api.js"></script>
+    <script src="js/index.js"></script>
+    <script>
+        // 탭 버튼과 콘텐츠 요소 모두 선택
+        const tabButtons = document.querySelectorAll(".tab-btn");
+        const tabContents = document.querySelectorAll(".tab-content");
+        // 각 버튼 클릭 이벤트 설정
+        tabButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const targetId = button.dataset.tab;
+                const targetContent = document.getElementById(targetId + "-content");
+                tabButtons.forEach(btn => btn.classList.remove("active"));
+                tabContents.forEach(content => content.classList.remove("active"));
+                button.classList.add("active");
+                targetContent.classList.add("active");
+            });
         });
-    });
-</script>
-<script>
-const slides = document.querySelector('.slide');
-const items = document.querySelectorAll('.item');
-let currentIndex = 0;
+    </script>
 
-function showSlide(index) {
-    slides.style.transform = `translateX(-${index * 100}%)`;
-}
-
-// 자동 슬라이드 (3초마다)
-setInterval(() => {
-    currentIndex++;
-    if (currentIndex >= items.length) currentIndex = 0;
-    showSlide(currentIndex);
-}, 3000);
-</script>
+</body>
+</html>
