@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>책·이음 | 책으로 이어지는 우리 가족의 시간</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+        <link rel="stylesheet" href="css/toast.css">
+</head>
+<body>
+    <!-- 네비게이션 섹션 -->
+    <div id="navbar-placeholder"></div>
+
+    <!-- 메인 슬라이드 섹션 -->
+    <div class="card-container">
+        <div class="slide">
+            <div class="item" style="background-image: url('assets/pics/main1.jpg');">
+                <div class="content">
+                    <div class="name">구독형 시스템</div>
+                    <div class="des">어떤 책을 읽을 지 고민하지 마세요.</div>
+                    <button><a href ="#"></a>자세히 보기</a></button>
+                </div>
+            </div>
+
+            <div class="item" style="background-image: url('assets/pics/main2.jpg');">
+                <div class="content">
+                    <div class="name">프로그램 소개</div>
+                    <div class="des">독서에 흥미를 붙여드립니다.</div>
+                    <button><a href="program.html">자세히 보기</a></button>
+                </div>
+            </div>
+
+            <div class="item" style="background-image: url('assets/pics/main3.jpg');">
+                <div class="content">
+                    <div class="name">커뮤니티</div>
+                    <div class="des">서로 소통하며 기쁨을 나누세요.</div>
+                    <button><a href ="program.html">자세히 보기</a></button>
+                </div>
+            </div>
+
+            <div class="item" style="background-image: url('assets/pics/main4.jpg');">
+                <div class="content">
+                    <div class="name">이벤트</div>
+                    <div class="des">다양한 챌린지가 준비되어 있습니다.</div>
+                    <button><a href ="program.html">자세히 보기</a></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="button">
+            <button class="prev">◁</button>
+            <button class="auto-toggle" title="자동 전환">⏸</button>
+            <button class="next">▷</button>
+        </div>
+    </div>
+
+    <style>
+    
+        /* 인기 도서 & 진행중인 대회 & 공지사항 섹션 */
+        .section {
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .section h2 {
+            font-size: 28px;
+            margin-bottom: 40px;
+        }
+        .masonry-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .book-item {
+            width: 200px;
+            text-align: center;
+        }
+        .book-item img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .book-item img:hover {
+            transform: scale(1.05);
+        }
+        .book-title {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+        .tab-btn.active {
+            background-color: #4b7bec;
+            color: white;
+            font-weight: bold;
+        }
+        .tab-btn {
+            background-color: #eee;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 0 5px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* 공지사항 */
+        .notice-list {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        .notice-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .notice-list li {
+            background-color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .notice-list li:hover {
+            transform: translateY(-3px);
+        }
+        .notice-list li span {
+            color: #4b7bec;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        /* 헤더 스타일 */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 30px;
+            width: 100%;
+            height: 60px;
+            position: fixed;
+            top: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header .logo {
+            margin-right: auto;
+        }
+        .header .logo img {
+            height: 70px;
+        }
+        .nav-menu {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-10%);
+        }
+        .nav-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 30px;
+        }
+        .nav-menu ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        .nav-menu ul li a:hover {
+            color: #4b7bec;
+        }
+        body {
+            padding-top: 80px; 
+        }
+        /* 공지사항 헤더 스타일 */
+        .notice-header, .notice-list {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .notice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 0;
+        }
+        .notice-header h2 {
+            margin: 0;
+            font-size: 38px;
+            color: #111;
+            font-weight: bold;
+            line-height: 1.1;
+        }
+        .notice-more {
+            font-size: 22px;
+            color: #222;
+            font-weight: 400;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            margin-left: 10px;
+            outline: none;
+        }
+        .notice-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .notice-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #666;
+            padding: 22px 0 19px 0;
+            color: #111;
+            font-size: 20px;
+            background: none;
+        }
+        .notice-type {
+            width: 180px;
+            font-weight: bold;
+            color: #111;
+            font-size: 21px;
+            flex-shrink: 0;
+        }
+        .notice-title {
+            flex: 1;
+            text-align: left;
+            padding: 0 10px;
+            color: #111;
+            font-size: 20px;
+            font-weight: 400;
+        }
+        .notice-date {
+            width: 130px;
+            text-align: right;
+            font-size: 18px;
+            color: #222;
+            flex-shrink: 0;
+        }
+        .cursor-dot, .cursor-outline {
+    pointer-events: none;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 10000;
+    transition: transform 0.15s, opacity 0.15s;
+}
+.cursor-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4b7bec;
+    opacity: 0.9;
+    mix-blend-mode: multiply;
+    transform: translate(-50%, -50%);
+}
+.cursor-outline {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2.5px solid #4b7bec;
+    opacity: 0.5;
+    transform: translate(-50%, -50%);
+}
+
+    </style>
+    
+</head>
+<body>
+
+    <!-- 인기 도서 섹션 -->
+    <div class="section books-section">
+        <h2>요즘 부모님들은 이 책에 관심 있어요</h2>
+        <div class="trending-tabs">
+            <button class="tab-btn active" data-tab="top5">지난주 인기 TOP 4</button>
+            <button class="tab-btn" data-tab="community">커뮤니티 화제의 책</button>
+        </div>
+        <div class="tab-content active" id="top5-content">
+            <div class="masonry-grid">
+                <div class="book-item">
+                    <img src="assets/pics/image 29.png" alt="책 1 포스터">
+                    <p class="book-title">오늘 하루도, 소심한 야옹이</p>
+                </div>
+                <div class="book-item">
+                    <img src="assets/pics/image 32.png" alt="책 2 포스터">
+                    <p class="book-title">오직 나를 위한 시간</p>
+                </div>
+                <div class="book-item">
+                    <img src="assets/pics/image 35.png" alt="책 3 포스터">
+                    <p class="book-title">나의 소소한 행복 일기</p>
+                </div>
+                <div class="book-item">
+                    <img src="assets/pics/나답게 사는방법.png" alt="책 4 포스터">
+                    <p class="book-title">나답게 사는 방법</p>
+                </div>
+            </div>
+        </div>
+        <div class="tab-content" id="community-content">
+            <div class="masonry-grid">
+                <div class="book-item">
+                    <img src="images/community1.jpg" alt="책 1 표지">
+                    <p class="book-title">추가 예정</p>
+                </div>
+                <div class="book-item">
+                    <img src="images/community1.jpg" alt="책 2 표지">
+                    <p class="book-title">추가 예정</p>
+                </div>
+                <div class="book-item">
+                    <img src="images/community1.jpg" alt="책 3 표지">
+                    <p class="book-title">추가 예정</p>
+                </div>
+                <div class="book-item">
+                    <img src="images/community1.jpg" alt="책 4 표지">
+                    <p class="book-title">추가 예정</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 진행중인 대회 섹션 -->
+    <div class="section contest-section">
+        <h2>현재 진행중인 대회들</h2>
+        <div class="masonry-grid">
+            <div class="book-item">
+                <img src="assets/pics/image 17.png" alt="창작동화 대회">
+                <p class="book-title">창작동화 대회</p>
+            </div>
+            <div class="book-item">
+                <img src="assets/pics/Rectangle 274175746.png" alt="어린이 글짓기 공모전">
+                <p class="book-title">어린이 글짓기 공모전</p>
+            </div>
+            <div class="book-item">
+                <img src="assets/pics/Rectangle 274175747.png" alt="전국 독서 감상문 대회">
+                <p class="book-title">전국 독서 감상문 대회</p>
+            </div>
+            <div class="book-item">
+                <img src="assets/pics/Rectangle 274175748.png" alt="에세이 독후감 공모전">
+                <p class="book-title">에세이 독후감 공모전</p>
+            </div>
+        </div>
+    </div>
+    <!-- 공지사항 섹션 -->
+    <div class="notice-header">
+        <h2>공지사항</h2>
+        <span class="notice-more" onclick="location.href='notice.html'">더보기+</span>
+    </div>
+    <ul class="notice-list">
+        <ul>
+            <li>
+                <span class="notice-type">회원탈퇴</span>
+                <a class="notice-title" href="notice-detail.html?id=1">책 - 이름 페이지 회원탈퇴 방법 안내</a>
+                <span class="notice-date">2025/10/26</span>
+            </li>
+            <li>
+                <span class="notice-type">자유게시판</span>
+                <a class="notice-title" href="notice-detail.html?id=2">자유게시판 이용안내와 제한조치 규정 안내</a>
+                <span class="notice-date">2025/10/24</span>
+            </li>
+            <li>
+                <span class="notice-type">창작대회</span>
+                <a class="notice-title" href="notice-detail.html?id=3">창작대회 일정 및 참가상 안내</a>
+                <span class="notice-date">2025/10/21</span>
+            </li>
+        </ul>
+    </ul>
+    <!-- 푸터 섹션 -->
+    <div id="footer-placeholder"></div>
+    <!-- 라이브러리 먼저 로드 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+    <!-- 애플리케이션 스크립트 -->
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/library-api.js"></script>
+    <script src="js/index.js"></script>
+    <script>
+        // 탭 버튼과 콘텐츠 요소 모두 선택
+        const tabButtons = document.querySelectorAll(".tab-btn");
+        const tabContents = document.querySelectorAll(".tab-content");
+        // 각 버튼 클릭 이벤트 설정
+        tabButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const targetId = button.dataset.tab;
+                const targetContent = document.getElementById(targetId + "-content");
+                tabButtons.forEach(btn => btn.classList.remove("active"));
+                tabContents.forEach(content => content.classList.remove("active"));
+                button.classList.add("active");
+                targetContent.classList.add("active");
+            });
+        });
+    </script>
+
+</body>
+</html>
