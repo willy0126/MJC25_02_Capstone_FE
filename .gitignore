@@ -1,0 +1,6 @@
+# Ignore MySQL data directory
+mysql_data/
+
+# Ignore node modules
+node_modules/
+

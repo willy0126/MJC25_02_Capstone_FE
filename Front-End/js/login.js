@@ -21,24 +21,28 @@ function checkAlreadyLoggedIn() {
    로그인 폼 초기화
 ======================================== */
 function initLoginForm() {
-    const loginForm = document.querySelector('.login-form');
-    const loginButton = document.querySelector('.login-button');
+    const loginForm = document.getElementById('loginForm');
 
-    if (!loginForm || !loginButton) return;
+    if (!loginForm) {
+        console.error('Login form not found');
+        return;
+    }
 
-    loginButton.addEventListener('click', function(e) {
+    loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
-        const rememberCheckbox = document.getElementById('remember');
 
-        if (!emailInput || !passwordInput) return;
+        if (!emailInput || !passwordInput) {
+            console.error('Email or password input not found');
+            return;
+        }
 
         const email = emailInput.value.trim();
         const password = passwordInput.value;
-        const remember = rememberCheckbox ? rememberCheckbox.checked : false;
 
+        // 클라이언트 측 유효성 검사
         if (!email) {
             showToast('이메일을 입력해주세요.', 'warning');
             emailInput.focus();
@@ -57,16 +61,8 @@ function initLoginForm() {
             return;
         }
 
-        performLogin(email, password, remember);
+        performLogin(email, password);
     });
-
-    if (loginForm) {
-        loginForm.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                loginButton.click();
-            }
-        });
-    }
 }
 
 /* ========================================
@@ -80,47 +76,88 @@ function validateEmail(email) {
 /* ========================================
    로그인 처리
 ======================================== */
-async function performLogin(email, password, remember) {
+async function performLogin(email, password) {
     const loginButton = document.querySelector('.login-button');
     const originalText = loginButton.textContent;
-    loginButton.textContent = '로그인 중...';
-    loginButton.disabled = true;
 
     try {
-        // 백엔드 로그인 API 호출
-        const response = await apiClient.login(email, password);
+        // 로딩 표시
+        loginButton.textContent = '로그인 중...';
+        loginButton.disabled = true;
+
+        // 백엔드 로그인 API 호출 (백엔드 응답 형식: {success, code, message, data: {accessToken, refreshToken, tokenType}})
+        const loginResponse = await apiClient.login(email, password);
+
+        // 로그인 성공 확인
+        if (!loginResponse.success || !loginResponse.data) {
+            throw new Error(loginResponse.message || '로그인에 실패했습니다.');
+        }
+
+        // 토큰은 이미 apiClient.login()에서 localStorage에 저장됨
+        console.log('로그인 성공:', {
+            tokenType: loginResponse.data.tokenType,
+            hasAccessToken: !!loginResponse.data.accessToken,
+            hasRefreshToken: !!loginResponse.data.refreshToken
+        });
 
         // 사용자 정보 가져오기
-        const userInfo = await apiClient.getUserInfo();
+        const userInfoResponse = await apiClient.getUserInfo();
 
-        // 로그인 상태 저장
+        if (!userInfoResponse.success || !userInfoResponse.data) {
+            throw new Error('사용자 정보를 가져올 수 없습니다.');
+        }
+
+        const userInfo = userInfoResponse.data;
+
+        // 로그인 상태 저장 (auth.js의 setLoginState 사용)
         const user = {
+            userId: userInfo.userId,
             email: userInfo.email,
-            name: userInfo.username,
+            username: userInfo.username,
             nickname: userInfo.nickname,
-            profileImageUrl: userInfo.profileImageUrl,
-            themeColor: userInfo.themeColor,
-            loginTime: new Date().toISOString(),
-            remember: remember
+            profileImg: userInfo.profileImg,
+            color: userInfo.color,
+            phone: userInfo.phone,
+            address: userInfo.address,
+            birth: userInfo.birth,
+            role: userInfo.role,
+            loginTime: new Date().toISOString()
         };
 
         setLoginState(user);
 
-        showToast(`${user.nickname || user.name}님, 환영합니다!`, 'success');
+        // 환영 메시지
+        const displayName = user.nickname || user.username || '사용자';
+        showToast(`${displayName}님, 환영합니다!`, 'success');
 
         // 토스트가 보이도록 약간의 지연 후 페이지 이동
         setTimeout(() => {
             const returnUrl = getReturnUrl() || 'bookcase.html';
             window.location.href = returnUrl;
-        }, 800);
+        }, 1000);
 
     } catch (error) {
         console.error('로그인 실패:', error);
 
         let errorMessage = '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.';
 
-        if (error.data && error.data.message) {
-            errorMessage = error.data.message;
+        // 백엔드 에러 응답 처리
+        if (error.data) {
+            if (error.data.message) {
+                errorMessage = error.data.message;
+            }
+
+            // 특정 에러 코드별 처리
+            switch (error.data.code) {
+                case 'AUTH004':
+                    errorMessage = '아이디 또는 비밀번호가 일치하지 않습니다.';
+                    break;
+                case 'USER001':
+                    errorMessage = '존재하지 않는 사용자입니다.';
+                    break;
+                default:
+                    break;
+            }
         } else if (error.message) {
             errorMessage = error.message;
         }

@@ -127,15 +127,19 @@ class ApiClient {
 
     // Authentication APIs
     async login(email, password) {
-        const data = await this.request('/auth/login', {
+        const response = await this.request('/auth/login', {
             method: 'POST',
             body: JSON.stringify({ email, password }),
             skipAuth: true
         });
 
-        // Save tokens
-        this.setTokens(data.accessToken, data.refreshToken);
-        return data;
+        // 백엔드 응답 형식: {success, code, message, data: {accessToken, refreshToken, tokenType}}
+        if (response.success && response.data) {
+            // Save tokens to localStorage
+            this.setTokens(response.data.accessToken, response.data.refreshToken);
+        }
+
+        return response;
     }
 
     async logout() {

@@ -1,6 +1,9 @@
 # Use official Nginx image as a base image
 FROM nginx:alpine
 
+# Copy custom Nginx configuration file to the container
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # Set the working directory to Nginx's default HTML directory
 WORKDIR /usr/share/nginx/html
 

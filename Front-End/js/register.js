@@ -29,10 +29,6 @@ function initializeTermsAgreement() {
 
 // 필수 약관 동의 확인
 function validateTermsAgreement() {
-    // 개발 중 - 유효성 검사 임시 비활성화
-    return true;
-
-    /*
     const requiredTerms = document.querySelectorAll('.required-term');
     const allRequiredChecked = Array.from(requiredTerms).every(term => term.checked);
 
@@ -41,7 +37,6 @@ function validateTermsAgreement() {
         return false;
     }
     return true;
-    */
 }
 
 // ==================== 2단계: 회원가입 정보 입력 ====================
@@ -117,7 +112,7 @@ function checkPasswordMatch() {
 }
 
 // 이메일 인증번호 발송
-function sendVerificationCode() {
+/* function sendVerificationCode() {
     const email = document.getElementById('email').value;
     if (!email) {
         showToast('이메일을 입력해주세요.', 'warning');
@@ -136,7 +131,7 @@ function verifyCode() {
     }
     // TODO: 실제 인증번호 확인 로직
     showToast('인증이 완료되었습니다.', 'success');
-}
+} */
 
 // 닉네임 중복 확인
 function checkNickname() {
@@ -155,19 +150,60 @@ function findAddress() {
     showToast('주소 찾기 기능은 추후 구현 예정입니다.', 'info');
 }
 
+// 전화번호 자동 포맷팅
+function formatPhoneNumber(event) {
+    const input = event.target;
+    let value = input.value.replace(/\D/g, ''); // 숫자만 추출
+
+    let formatted = '';
+    if (value.length <= 3) {
+        formatted = value;
+    } else if (value.length <= 7) {
+        if (value.startsWith('02')) {
+            // 서울 지역번호: 02-123-4567
+            formatted = `${value.substr(0, 2)}-${value.substr(2)}`;
+        } else {
+            // 휴대폰/지역번호: 010-1234, 031-123
+            formatted = `${value.substr(0, 3)}-${value.substr(3)}`;
+        }
+    } else if (value.length <= 10) {
+        if (value.startsWith('02')) {
+            // 서울: 02-123-4567
+            formatted = `${value.substr(0, 2)}-${value.substr(2, 3)}-${value.substr(5)}`;
+        } else {
+            // 지역번호: 031-123-4567
+            formatted = `${value.substr(0, 3)}-${value.substr(3, 3)}-${value.substr(6)}`;
+        }
+    } else {
+        if (value.startsWith('02')) {
+            // 서울: 02-1234-5678
+            formatted = `${value.substr(0, 2)}-${value.substr(2, 4)}-${value.substr(6, 4)}`;
+        } else {
+            // 휴대폰: 010-1234-5678
+            formatted = `${value.substr(0, 3)}-${value.substr(3, 4)}-${value.substr(7, 4)}`;
+        }
+    }
+
+    input.value = formatted;
+}
+
 // 2단계 이벤트 리스너 등록
 function initializeStep2EventListeners() {
     const password = document.getElementById('password');
     const passwordConfirm = document.getElementById('passwordConfirm');
+    const phone = document.getElementById('phone');
 
     // 비밀번호 실시간 검증
     password.addEventListener('input', validatePassword);
     password.addEventListener('input', checkPasswordMatch);
     passwordConfirm.addEventListener('input', checkPasswordMatch);
 
+    // 전화번호 자동 포맷팅
+    phone.addEventListener('input', formatPhoneNumber);
+
     // 버튼 이벤트
-    document.getElementById('sendVerification').addEventListener('click', sendVerificationCode);
-    document.getElementById('verifyCode').addEventListener('click', verifyCode);
+    // document.getElementById('sendVerification').addEventListener('click', sendVerificationCode);
+    // document.getElementById('verifyCode').addEventListener('click', verifyCode);
     document.getElementById('checkNickname').addEventListener('click', checkNickname);
     document.getElementById('findAddress').addEventListener('click', findAddress);
 }
@@ -405,63 +441,79 @@ async function handleSubmit(e) {
         return;
     }
 
-    // 생년월일 조합
-    const birthDate = birthYear.value && birthMonth.value && birthDay.value
+    // 생년월일 조합 (백엔드 형식: YYYY-MM-DD)
+    const birth = birthYear.value && birthMonth.value && birthDay.value
         ? `${birthYear.value}-${String(birthMonth.value).padStart(2, '0')}-${String(birthDay.value).padStart(2, '0')}`
         : null;
 
     // 주소 조합
-    const fullAddress = address.value && detailAddress.value
-        ? `${address.value} ${detailAddress.value}`
-        : address.value || null;
-
-    // 선택된 아바타 URL 가져오기
-    const selectedAvatar = document.querySelector('input[name="avatar"]:checked');
-    const avatarUrl = selectedAvatar ? selectedAvatar.value : null;
+    const fullAddress = address.value || null;
 
     // 선택된 색상 가져오기
     const selectedColor = document.getElementById('colorPicker').value || '#20B2AA';
 
-    // 약관 동의 정보 가져오기 (HTML에서는 terms prefix 사용)
-    const serviceTermAgreed = document.getElementById('termsService')?.checked || false;
-    const privacyTermAgreed = document.getElementById('termsPrivacy')?.checked || false;
-    const locationTermAgreed = document.getElementById('termsLocation')?.checked || false;
-    const marketingTermAgreed = document.getElementById('termsMarketing')?.checked || false;
+    // 전화번호 형식 검증 및 변환 (백엔드 요구 형식: XXX-XXXX-XXXX 또는 XXX-XXX-XXXX)
+    let formattedPhone = phone.value ? phone.value.trim() : null;
+    if (formattedPhone) {
+        // 하이픈 제거 후 숫자만 추출
+        const phoneDigits = formattedPhone.replace(/\D/g, '');
 
-    // 회원가입 데이터 생성
+        // 전화번호 형식 변환
+        if (phoneDigits.length === 11) {
+            // 휴대폰: 010-1234-5678
+            formattedPhone = `${phoneDigits.substr(0, 3)}-${phoneDigits.substr(3, 4)}-${phoneDigits.substr(7, 4)}`;
+        } else if (phoneDigits.length === 10) {
+            // 일반전화: 02-123-4567 또는 031-123-4567
+            if (phoneDigits.startsWith('02')) {
+                formattedPhone = `${phoneDigits.substr(0, 2)}-${phoneDigits.substr(2, 4)}-${phoneDigits.substr(6, 4)}`;
+            } else {
+                formattedPhone = `${phoneDigits.substr(0, 3)}-${phoneDigits.substr(3, 3)}-${phoneDigits.substr(6, 4)}`;
+            }
+        } else if (phoneDigits.length === 9 && phoneDigits.startsWith('02')) {
+            // 서울 지역번호: 02-123-4567
+            formattedPhone = `${phoneDigits.substr(0, 2)}-${phoneDigits.substr(2, 3)}-${phoneDigits.substr(5, 4)}`;
+        }
+    }
+
+    // 회원가입 데이터 생성 (백엔드 API 스펙에 맞춤)
     const signupData = {
         email: email.value,
         password: password.value,
         username: username.value,
-        nickname: nickname.value,
-        phone: phone.value,
-        birthDate: birthDate,
+        nickname: nickname.value || null,
+        phone: formattedPhone,
+        birth: birth,
         address: fullAddress,
-        profileImageUrl: avatarUrl,
-        themeColor: selectedColor,
-        serviceTermAgreed: serviceTermAgreed,
-        privacyTermAgreed: privacyTermAgreed,
-        locationTermAgreed: locationTermAgreed,
-        marketingTermAgreed: marketingTermAgreed
+        color: selectedColor
     };
+
+    // 로딩 표시용 변수 선언 (스코프 이슈 해결)
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
 
     try {
         // 로딩 표시
-        const submitBtn = document.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = '가입 중...';
 
-        // API 호출
+        // API 호출 (백엔드 응답 형식: {success, code, message, data})
         const response = await apiClient.signup(signupData);
 
         // 성공 처리
-        showToast('회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.', 'success');
+        if (response.success && response.data) {
+            showToast('회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.', 'success');
 
-        // 토스트가 보이도록 약간의 지연 후 페이지 이동
-        setTimeout(() => {
-            window.location.href = '/login.html';
-        }, 1000);
+            // 사용자 정보 로그 (디버깅용)
+            console.log('회원가입 성공:', response.data);
+
+            // 토스트가 보이도록 약간의 지연 후 페이지 이동
+            setTimeout(() => {
+                window.location.href = '/login.html';
+            }, 1500);
+        } else {
+            // 성공 플래그가 false인 경우
+            throw new Error(response.message || '회원가입에 실패했습니다.');
+        }
 
     } catch (error) {
         // 에러 처리
@@ -469,17 +521,37 @@ async function handleSubmit(e) {
 
         let errorMessage = '회원가입에 실패했습니다. 다시 시도해주세요.';
 
-        // 백엔드에서 반환된 에러 메시지 표시
-        if (error.data && error.data.message) {
-            errorMessage = error.data.message;
+        // 백엔드 에러 응답 처리
+        if (error.data) {
+            // 백엔드 표준 응답 형식: {success, code, message}
+            if (error.data.message) {
+                errorMessage = error.data.message;
+            }
+
+            // 특정 에러 코드별 처리
+            switch (error.data.code) {
+                case 'USER002':
+                    errorMessage = '이미 사용 중인 이메일입니다.';
+                    email.focus();
+                    break;
+                case 'USER003':
+                    errorMessage = '이미 사용 중인 사용자 이름입니다.';
+                    username.focus();
+                    break;
+                case 'C001':
+                    errorMessage = '입력 형식이 올바르지 않습니다. 다시 확인해주세요.';
+                    break;
+                default:
+                    // 기본 메시지 사용
+                    break;
+            }
         } else if (error.message) {
             errorMessage = error.message;
         }
 
         showToast(errorMessage, 'error');
 
-        // 버튼 복원
-        const submitBtn = document.querySelector('button[type="submit"]');
+        // 버튼 복원 (originalText는 이미 상위 스코프에서 선언됨)
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
     }

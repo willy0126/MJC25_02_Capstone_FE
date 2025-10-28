@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # ==================================
+  # 1. 프론트엔드 (FE) - 핫 리로딩 적용
+  # ==================================
+  frontend:
+    # [빌드 경로]
+    build:
+      context: .
+    container_name: frontend_container
+    ports:
+      - "8080:80"
+    volumes:
+      # [핫 리로딩]
+      - ./Front-End:/usr/share/nginx/html
+    depends_on:
+      - backend
+    networks:
+      - capstone
+
+  mysql:
+    container_name: mysql_container
+    image: mysql:8.0
+    ports:
+      - "13333:3306"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - TZ=Asia/Seoul
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=capstone
+      - MYSQL_USER=capstone_user
+      - MYSQL_PASSWORD=capstone_pass123
+    networks:
+      - capstone
+
+  backend:
+    image: jhh0101/capstone:v1.0.1
+    container_name: backend_container
+    ports:
+      - "18888:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/capstone?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+      - SPRING_DATASOURCE_USERNAME=capstone_user
+      - SPRING_DATASOURCE_PASSWORD=capstone_pass123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
+      - TZ=Asia/Seoul
+    depends_on:
+      - mysql
+    networks:
+      - capstone
+
+volumes:
+  mysql_data:
+
+networks:
+  capstone:
+    driver: bridge
