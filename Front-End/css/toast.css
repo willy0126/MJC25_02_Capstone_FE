@@ -161,3 +161,113 @@
         transform: translateY(-100px);
     }
 }
+
+/* Confirmation Modal */
+.confirm-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.confirm-modal-overlay.show {
+    opacity: 1;
+}
+
+.confirm-modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    min-width: 320px;
+    max-width: 500px;
+    width: 90%;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.confirm-modal-overlay.show .confirm-modal {
+    transform: scale(1);
+}
+
+.confirm-modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.confirm-modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.confirm-modal-body {
+    padding: 24px;
+}
+
+.confirm-modal-message {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.confirm-modal-footer {
+    padding: 16px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    border-top: 1px solid #e0e0e0;
+}
+
+.confirm-modal-button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.confirm-modal-button.cancel {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.confirm-modal-button.cancel:hover {
+    background: #e0e0e0;
+}
+
+.confirm-modal-button.confirm {
+    background: #2196f3;
+    color: white;
+}
+
+.confirm-modal-button.confirm:hover {
+    background: #1976d2;
+}
+
+/* Mobile Responsive for Modal */
+@media (max-width: 768px) {
+    .confirm-modal {
+        min-width: 280px;
+        width: 85%;
+    }
+
+    .confirm-modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .confirm-modal-button {
+        width: 100%;
+    }
+}

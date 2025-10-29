@@ -141,8 +141,14 @@ async function performLogin(email, password) {
 
         let errorMessage = '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.';
 
-        // 백엔드 에러 응답 처리
-        if (error.data) {
+        // HTTP 상태 코드별 처리
+        if (error.status === 500) {
+            // 500 에러는 대부분 로그인 실패 (backend의 LoginException)
+            errorMessage = '아이디 또는 비밀번호가 일치하지 않습니다.';
+        } else if (error.status === 401) {
+            errorMessage = '인증에 실패했습니다. 이메일과 비밀번호를 확인해주세요.';
+        } else if (error.data) {
+            // 백엔드 에러 응답 처리
             if (error.data.message) {
                 errorMessage = error.data.message;
             }

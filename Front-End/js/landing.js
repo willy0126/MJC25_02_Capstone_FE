@@ -4,12 +4,95 @@
 document.addEventListener("DOMContentLoaded", function() {
     loadLandingNavbar();
     loadFooter();
+    initSmoothScroll();
     initPromoAnimations();
     initStatsCountUp();
     initTestimonialAnimations();
     initFloatingButton();
     initFAQAccordion();
 });
+
+/* ========================================
+   Locomotive Smooth Scroll 초기화
+======================================== */
+function initSmoothScroll() {
+    // Locomotive Scroll 인스턴스 생성
+    const scroll = new LocomotiveScroll({
+        el: document.querySelector('[data-scroll-container]'),
+        smooth: true,
+        smoothMobile: false, // 모바일에서는 비활성화 (성능 이슈 방지)
+        multiplier: 0.9, // 스크롤 속도
+        lerp: 0.025, // 부드러움 정도
+        class: 'is-inview',
+        touchMultiplier: 2.5, // 터치 감도
+        smartphone: {
+            smooth: false // 스마트폰에서는 네이티브 스크롤 사용
+        },
+        tablet: {
+            smooth: false // 태블릿에서는 네이티브 스크롤 사용
+        }
+    });
+
+    // 페이지 로드 후 스크롤 업데이트
+    window.addEventListener('load', () => {
+        scroll.update();
+    });
+
+    // 이미지 로드 완료 후 스크롤 업데이트
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        img.addEventListener('load', () => {
+            scroll.update();
+        });
+    });
+
+    // Locomotive Scroll 이벤트 리스너 (플로팅 버튼용)
+    scroll.on('scroll', (args) => {
+        handleLocomotiveScroll(args.scroll.y);
+    });
+
+    // FAQ 아코디언이나 동적 콘텐츠 변경 시 스크롤 업데이트
+    window.updateLocomotiveScroll = () => {
+        scroll.update();
+    };
+
+    // 전역에서 접근 가능하도록 저장
+    window.locomotiveScroll = scroll;
+
+    return scroll;
+}
+
+/* ========================================
+   Locomotive Scroll 이벤트 핸들러
+======================================== */
+function handleLocomotiveScroll(scrollY) {
+    // 플로팅 버튼 처리
+    const floatBtn = document.getElementById('floatBtn');
+    const heroSection = document.querySelector('.hero-section');
+    const faqSection = document.querySelector('.landing-faq-section');
+
+    if (floatBtn && heroSection && faqSection) {
+        const heroSectionBottom = heroSection.offsetHeight;
+        const faqSectionTop = faqSection.offsetTop;
+
+        // Hero 섹션 이후부터 FAQ 섹션 전까지만 버튼 표시
+        if (scrollY > heroSectionBottom && scrollY < faqSectionTop - 200) {
+            floatBtn.classList.add('show');
+        } else {
+            floatBtn.classList.remove('show');
+        }
+    }
+
+    // Navbar 스크롤 효과 처리
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+        if (scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    }
+}
 
 /* ========================================
    Landing Navbar 로드 및 초기화
@@ -20,10 +103,12 @@ function loadLandingNavbar() {
         .then(data => {
             document.getElementById("navbar-placeholder").innerHTML = data;
 
-            // utils.js의 공통 함수 사용
-            if (typeof initNavbarScrollEffect === 'function') {
-                initNavbarScrollEffect();
-            }
+            // Navbar 로드 후 Locomotive Scroll 업데이트
+            setTimeout(() => {
+                if (typeof window.updateLocomotiveScroll === 'function') {
+                    window.updateLocomotiveScroll();
+                }
+            }, 100);
         })
         .catch(error => {
             console.error('Navbar 로드 실패:', error);
@@ -38,6 +123,13 @@ function loadFooter() {
         .then(response => response.text())
         .then(data => {
             document.getElementById("footer-placeholder").innerHTML = data;
+
+            // Footer 로드 후 Locomotive Scroll 업데이트
+            setTimeout(() => {
+                if (typeof window.updateLocomotiveScroll === 'function') {
+                    window.updateLocomotiveScroll();
+                }
+            }, 100);
         })
         .catch(error => {
             console.error('Footer 로드 실패:', error);
@@ -50,9 +142,9 @@ function loadFooter() {
 function initPromoAnimations() {
     const promoItems = document.querySelectorAll('.promo-item');
 
-    // Intersection Observer 설정 (70% 뷰포트에 들어왔을 때 트리거)
+    // Intersection Observer 설정 (60% 뷰포트에 들어왔을 때 트리거)
     const observerOptions = {
-        threshold: 0.70,
+        threshold: 0.6,
         rootMargin: '0px'
     };
 
@@ -68,11 +160,11 @@ function initPromoAnimations() {
                     promoText.classList.add('fade-in-up');
                 }
 
-                // 0.7초 후에 이미지 애니메이션 시작
+                // 0.6초 후에 이미지 애니메이션 시작
                 if (promoImage) {
                     setTimeout(() => {
                         promoImage.classList.add('fade-in-up');
-                    }, 700);
+                    }, 600);
                 }
 
                 // 한 번 애니메이션이 실행되면 observer 해제
@@ -214,26 +306,34 @@ function initTestimonialAnimations() {
 
 /* ========================================
    플로팅 버튼 스크롤 트리거
+   (Locomotive Scroll과 함께 작동하도록 handleLocomotiveScroll 사용)
 ======================================== */
 function initFloatingButton() {
-    const floatBtn = document.getElementById('floatBtn');
-    const heroSection = document.querySelector('.hero-section');
+    // Locomotive Scroll이 활성화된 경우 handleLocomotiveScroll에서 처리
+    // 모바일/태블릿의 경우 네이티브 스크롤 사용
+    if (window.innerWidth <= 1024) {
+        const floatBtn = document.getElementById('floatBtn');
+        const heroSection = document.querySelector('.hero-section');
+        const faqSection = document.querySelector('.landing-faq-section');
 
-    if (!floatBtn || !heroSection) {
-        console.warn('플로팅 버튼 또는 히어로 섹션을 찾을 수 없습니다.');
-        return;
-    }
-
-    window.addEventListener('scroll', function() {
-        const heroSectionBottom = heroSection.offsetTop + heroSection.offsetHeight;
-        const scrollPosition = window.scrollY;
-
-        if (scrollPosition > heroSectionBottom) {
-            floatBtn.classList.add('show');
-        } else {
-            floatBtn.classList.remove('show');
+        if (!floatBtn || !heroSection || !faqSection) {
+            console.warn('플로팅 버튼, 히어로 섹션 또는 FAQ 섹션을 찾을 수 없습니다.');
+            return;
         }
-    });
+
+        window.addEventListener('scroll', function() {
+            const heroSectionBottom = heroSection.offsetTop + heroSection.offsetHeight;
+            const faqSectionTop = faqSection.offsetTop;
+            const scrollPosition = window.scrollY;
+
+            // Hero 섹션 이후부터 FAQ 섹션 전까지만 버튼 표시
+            if (scrollPosition > heroSectionBottom && scrollPosition < faqSectionTop - 200) {
+                floatBtn.classList.add('show');
+            } else {
+                floatBtn.classList.remove('show');
+            }
+        });
+    }
 }
 
 /* ========================================
@@ -256,6 +356,13 @@ function initFAQAccordion() {
             if (!isActive) {
                 faqItem.classList.add('active');
             }
+
+            // Locomotive Scroll 업데이트 (높이 변경 반영)
+            setTimeout(() => {
+                if (typeof window.updateLocomotiveScroll === 'function') {
+                    window.updateLocomotiveScroll();
+                }
+            }, 300); // 애니메이션 완료 후 업데이트
         });
     });
 }

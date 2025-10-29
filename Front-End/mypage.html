@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/mypage.css">
+    <link rel="stylesheet" href="css/toast.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <!-- 비밀번호 재확인 모달 -->
+    <div id="passwordVerifyModal" class="modal">
+        <div class="modal-content">
+            <h2>비밀번호 확인</h2>
+            <p>회원정보 보호를 위해 비밀번호를 다시 한 번 입력해주세요.</p>
+            <form id="passwordVerifyForm">
+                <div class="input-group">
+                    <img class="icon-small" src="assets/pics/lock.png" alt="자물쇠 아이콘">
+                    <input type="password" id="verifyPassword" name="password" placeholder="비밀번호" required autocomplete="current-password">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="window.history.back()">취소</button>
+                    <button type="submit" class="btn-confirm">확인</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 마이페이지 메인 컨텐츠 -->
+    <main class="mypage-container" id="mypageContent" style="display: none;">
+        <div class="mypage-header">
+            <h1>마이페이지</h1>
+            <p class="subtitle">내 정보를 관리하고 활동 내역을 확인하세요</p>
+        </div>
+
+        <div class="mypage-content">
+            <!-- 프로필 섹션 -->
+            <section class="profile-section">
+                <h2>프로필 정보</h2>
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <div class="avatar-circle" id="userAvatar">
+                            <span id="userInitial">U</span>
+                        </div>
+                        <div class="color-indicator" id="userColor"></div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="info-row">
+                            <label>이메일</label>
+                            <span id="userEmail">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>이름</label>
+                            <span id="userName">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>닉네임</label>
+                            <span id="userNickname">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>전화번호</label>
+                            <span id="userPhone">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>생년월일</label>
+                            <span id="userBirth">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>주소</label>
+                            <span id="userAddress">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn-edit" onclick="editProfile()">정보 수정</button>
+                    <button class="btn-change-password" onclick="changePassword()">비밀번호 변경</button>
+                </div>
+            </section>
+
+            <!-- 활동 내역 섹션 -->
+            <section class="activity-section">
+                <h2>활동 내역</h2>
+                <div class="activity-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-info">
+                            <span class="stat-label">읽은 책</span>
+                            <span class="stat-value" id="booksRead">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✍️</div>
+                        <div class="stat-info">
+                            <span class="stat-label">작성한 리뷰</span>
+                            <span class="stat-value" id="reviewsWritten">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-info">
+                            <span class="stat-label">평균 평점</span>
+                            <span class="stat-value" id="avgRating">0.0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <span class="stat-label">참여 프로그램</span>
+                            <span class="stat-value" id="programsJoined">0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 구독 정보 섹션 -->
+            <section class="subscription-section">
+                <h2>구독 정보</h2>
+                <div class="subscription-card">
+                    <div class="subscription-status">
+                        <span class="status-badge" id="subscriptionStatus">미구독</span>
+                    </div>
+                    <div class="subscription-details" id="subscriptionDetails">
+                        <p>현재 구독 중인 플랜이 없습니다.</p>
+                    </div>
+                    <button class="btn-subscribe" onclick="goToSubscription()">구독 플랜 보기</button>
+                </div>
+            </section>
+
+            <!-- 계정 관리 섹션 -->
+            <section class="account-section">
+                <h2>계정 관리</h2>
+                <div class="account-actions">
+                    <button class="btn-logout" onclick="logout()">로그아웃</button>
+                    <button class="btn-delete-account" onclick="deleteAccount()">회원 탈퇴</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- 스크립트 -->
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/mypage.js"></script>
+</body>
+</html>

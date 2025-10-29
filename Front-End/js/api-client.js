@@ -81,16 +81,37 @@ class ApiClient {
         const contentType = response.headers.get('content-type');
         let data;
 
-        if (contentType && contentType.includes('application/json')) {
-            data = await response.json();
-        } else {
-            data = await response.text();
+        try {
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                data = await response.text();
+            }
+        } catch (parseError) {
+            console.error('Response parsing error:', parseError);
+            data = { message: '서버 응답을 처리할 수 없습니다.' };
         }
 
         if (!response.ok) {
-            const error = new Error(data.message || 'API request failed');
+            // 서버에서 받은 에러 메시지 구조화
+            let errorMessage = 'API request failed';
+            let errorCode = null;
+
+            if (typeof data === 'object' && data.message) {
+                errorMessage = data.message;
+                errorCode = data.code;
+            } else if (typeof data === 'string') {
+                // HTML 에러 페이지인 경우
+                if (data.includes('<html>') || data.includes('<!DOCTYPE')) {
+                    errorMessage = `서버 내부 오류가 발생했습니다 (HTTP ${response.status})`;
+                } else {
+                    errorMessage = data;
+                }
+            }
+
+            const error = new Error(errorMessage);
             error.status = response.status;
-            error.data = data;
+            error.data = typeof data === 'object' ? data : { message: errorMessage, code: errorCode };
             throw error;
         }
 
@@ -189,6 +210,22 @@ class ApiClient {
         return await this.request('/users', {
             method: 'DELETE',
             body: JSON.stringify(deleteData)
+        });
+    }
+
+    // Check nickname availability
+    async checkNickname(nickname) {
+        return await this.request(`/users/check-nickname?nickname=${encodeURIComponent(nickname)}`, {
+            method: 'GET',
+            skipAuth: true
+        });
+    }
+
+    // Verify password for sensitive operations
+    async verifyPassword(passwordData) {
+        return await this.request('/users/verify-password', {
+            method: 'POST',
+            body: JSON.stringify(passwordData)
         });
     }
 }

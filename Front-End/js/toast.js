@@ -123,6 +123,69 @@ class Toast {
     info(message, duration = 3000, title = null) {
         return this.show(message, 'info', duration, title);
     }
+
+    /**
+     * Show a confirmation modal with confirm/cancel buttons
+     * @param {string} message - The message to display
+     * @param {string} confirmText - Text for confirm button (default: '확인')
+     * @param {string} cancelText - Text for cancel button (default: '취소')
+     * @param {string} title - Optional title for the modal
+     * @returns {Promise<boolean>} - Resolves to true if confirmed, false if cancelled
+     */
+    confirm(message, confirmText = '확인', cancelText = '취소', title = '확인') {
+        return new Promise((resolve) => {
+            // Create modal overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'confirm-modal-overlay';
+
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'confirm-modal';
+
+            modal.innerHTML = `
+                <div class="confirm-modal-header">
+                    <h3 class="confirm-modal-title">${title}</h3>
+                </div>
+                <div class="confirm-modal-body">
+                    <p class="confirm-modal-message">${message}</p>
+                </div>
+                <div class="confirm-modal-footer">
+                    <button class="confirm-modal-button cancel">${cancelText}</button>
+                    <button class="confirm-modal-button confirm">${confirmText}</button>
+                </div>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            // Show modal with animation
+            setTimeout(() => {
+                overlay.classList.add('show');
+            }, 10);
+
+            // Handle button clicks
+            const confirmBtn = modal.querySelector('.confirm-modal-button.confirm');
+            const cancelBtn = modal.querySelector('.confirm-modal-button.cancel');
+
+            const closeModal = (result) => {
+                overlay.classList.remove('show');
+                setTimeout(() => {
+                    if (overlay.parentNode) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
+                }, 300);
+                resolve(result);
+            };
+
+            confirmBtn.addEventListener('click', () => closeModal(true));
+            cancelBtn.addEventListener('click', () => closeModal(false));
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    closeModal(false);
+                }
+            });
+        });
+    }
 }
 
 // Create global toast instance
@@ -131,4 +194,9 @@ const toast = new Toast();
 // Global helper function (mimics alert API for easy replacement)
 function showToast(message, type = 'info', duration = 3000) {
     return toast.show(message, type, duration);
+}
+
+// Global helper function for confirmation modal
+function showConfirm(message, confirmText = '확인', cancelText = '취소', title = '확인') {
+    return toast.confirm(message, confirmText, cancelText, title);
 }

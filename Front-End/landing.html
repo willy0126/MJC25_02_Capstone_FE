@@ -12,13 +12,17 @@
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/toast.css">
+    <!-- Locomotive Scroll CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.css">
 </head>
 
 <body>
-    <!-- 네비게이션 섹션 -->
+    <!-- 네비게이션 섹션 (Locomotive Scroll 컨테이너 밖에 배치) -->
     <div id="navbar-placeholder"></div>
 
-    <!-- Hero 섹션 -->
+    <!-- Locomotive Scroll Container -->
+    <div class="smooth-scroll" data-scroll-container>
+        <!-- Hero 섹션 -->
     <section class="hero-section">
         <div class="hero-content">
             <h1 class="hero-title">책으로 여는<br>우리 가족 독서 습관,<br>책·이음</h1>
@@ -246,7 +250,7 @@
                 </div>
                 <div class="faq-answer">
                     <span class="faq-a-icon">A</span>
-                    <p>월 구독료는 19,900원이며, 가족 구성원 수에 관계없이 동일한 요금으로 이용 가능합니다.</p>
+                    <p>월 구독료는 프로그램 연령대 별로 상이합니다.</p>
                 </div>
             </div>
 
@@ -265,10 +269,12 @@
     </section>
 
 
-    <!-- 푸터 섹션 -->
-    <div id="footer-placeholder"></div>
+        <!-- 푸터 섹션 -->
+        <div id="footer-placeholder"></div>
+    </div>
+    <!-- End Locomotive Scroll Container -->
 
-    <!-- 플로팅 버튼 -->
+    <!-- 플로팅 버튼 (Locomotive Scroll 컨테이너 밖에 배치) -->
     <a href="login.html" class="float-btn" id="floatBtn">
         <span class="float-btn-text">지금 가입하고 이용하기</span>
     </a>
@@ -282,6 +288,8 @@
     <script src="js/utils.js"></script>
     <script src="js/constants.js"></script>
     <script src="js/cursor.js"></script>
+    <!-- Locomotive Scroll JS -->
+    <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@4.1.4/dist/locomotive-scroll.min.js"></script>
     <script src="js/landing.js"></script>
 </body>
 </html>

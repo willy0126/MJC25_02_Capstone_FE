@@ -51,8 +51,10 @@ function updateNavbarLoginState() {
 
         if (typeof getCurrentUser === 'function') {
             const user = getCurrentUser();
-            if (user && user.name && userName) {
-                userName.textContent = user.name;
+            if (user && userName) {
+                // nickname이 있으면 nickname, 없으면 username 표시
+                const displayName = user.nickname || user.username || '사용자';
+                userName.textContent = displayName;
             }
         }
     } else {
@@ -97,12 +99,15 @@ function initLogoutButton() {
 
     if (!logoutBtn) return;
 
-    logoutBtn.addEventListener('click', function(e) {
+    logoutBtn.addEventListener('click', async function(e) {
         e.preventDefault();
 
-        if (confirm('로그아웃 하시겠습니까?')) {
+        // 커스텀 확인 모달 사용
+        const confirmed = await showConfirm('로그아웃 하시겠습니까?', '확인', '취소', '책·이음');
+
+        if (confirmed) {
             if (typeof clearLoginState === 'function') {
-                clearLoginState();
+                await clearLoginState();
             }
 
             const userDropdown = document.getElementById('user-dropdown');

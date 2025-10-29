@@ -3,6 +3,39 @@
    =================================== */
 
 /* ========================================
+   Locomotive Smooth Scroll 설정
+======================================== */
+html.has-scroll-smooth {
+    overflow: hidden;
+}
+
+html.has-scroll-dragging {
+    user-select: none;
+}
+
+.has-scroll-smooth body {
+    overflow: hidden;
+}
+
+.has-scroll-init .smooth-scroll {
+    opacity: 0;
+}
+
+.has-scroll-smooth .smooth-scroll {
+    will-change: transform;
+    opacity: 1;
+}
+
+[data-scroll-container] {
+    min-height: 100vh;
+}
+
+.smooth-scroll {
+    position: relative;
+    width: 100%;
+}
+
+/* ========================================
    전역 스타일
 ======================================== */
 * {

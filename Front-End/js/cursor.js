@@ -99,16 +99,22 @@ const CursorManager = {
         const selectorString = this.config.HOVER_SELECTORS.join(', ');
 
         document.addEventListener('mouseenter', (e) => {
-            const target = e.target.closest(selectorString);
-            if (target && this.state.cursorOutline) {
-                this.state.cursorOutline.classList.add('cursor-hover');
+            // Element 타입인지 확인 후 closest 호출
+            if (e.target instanceof Element) {
+                const target = e.target.closest(selectorString);
+                if (target && this.state.cursorOutline) {
+                    this.state.cursorOutline.classList.add('cursor-hover');
+                }
             }
         }, true); // 캡처 단계에서 실행
 
         document.addEventListener('mouseleave', (e) => {
-            const target = e.target.closest(selectorString);
-            if (target && this.state.cursorOutline) {
-                this.state.cursorOutline.classList.remove('cursor-hover');
+            // Element 타입인지 확인 후 closest 호출
+            if (e.target instanceof Element) {
+                const target = e.target.closest(selectorString);
+                if (target && this.state.cursorOutline) {
+                    this.state.cursorOutline.classList.remove('cursor-hover');
+                }
             }
         }, true);
     },

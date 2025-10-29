@@ -134,14 +134,64 @@ function verifyCode() {
 } */
 
 // 닉네임 중복 확인
-function checkNickname() {
+async function checkNickname() {
     const nickname = document.getElementById('nickname').value;
+    const checkBtn = document.getElementById('checkNickname');
+
     if (!nickname) {
         showToast('닉네임을 입력해주세요.', 'warning');
         return;
     }
-    // TODO: 실제 닉네임 중복 확인 로직
-    showToast('사용 가능한 닉네임입니다.', 'success');
+
+    // 닉네임 길이 검증 (2-20자)
+    if (nickname.length < 2 || nickname.length > 20) {
+        showToast('닉네임은 2-20자 사이여야 합니다.', 'warning');
+        return;
+    }
+
+    try {
+        // 버튼 비활성화
+        checkBtn.disabled = true;
+        checkBtn.textContent = '확인 중...';
+
+        // API 호출
+        const response = await apiClient.checkNickname(nickname);
+
+        // 백엔드 응답 형식: {success, code, message, data: {available: true/false}}
+        if (response.success && response.data) {
+            if (response.data.available) {
+                showToast('사용 가능한 닉네임입니다.', 'success');
+                // 닉네임 입력란 테두리 초록색으로 표시
+                document.getElementById('nickname').style.borderColor = '#27ae60';
+            } else {
+                showToast('이미 사용 중인 닉네임입니다.', 'error');
+                // 닉네임 입력란 테두리 빨간색으로 표시
+                document.getElementById('nickname').style.borderColor = '#e74c3c';
+            }
+        } else {
+            throw new Error(response.message || '닉네임 확인에 실패했습니다.');
+        }
+
+    } catch (error) {
+        console.error('닉네임 중복 확인 실패:', error);
+
+        let errorMessage = '닉네임 확인에 실패했습니다. 다시 시도해주세요.';
+
+        if (error.data && error.data.message) {
+            errorMessage = error.data.message;
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
+        showToast(errorMessage, 'error');
+        // 닉네임 입력란 테두리 초기화
+        document.getElementById('nickname').style.borderColor = '#ddd';
+
+    } finally {
+        // 버튼 복원
+        checkBtn.disabled = false;
+        checkBtn.textContent = '중복확인';
+    }
 }
 
 // 주소 찾기
