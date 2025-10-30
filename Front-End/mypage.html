@@ -13,6 +13,13 @@
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/mypage.css">
     <link rel="stylesheet" href="css/toast.css">
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
+
+    <!-- 카카오 주소 검색 API -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -86,6 +93,23 @@
                 </div>
             </section>
 
+            <!-- 자녀 관리 섹션 -->
+            <section class="children-section">
+                <div class="section-header">
+                    <h2>자녀 관리</h2>
+                    <button class="btn-add-child" onclick="openAddChildModal()">
+                        <span class="plus-icon">+</span> 자녀 추가
+                    </button>
+                </div>
+                <div class="children-list" id="childrenList">
+                    <!-- 자녀 카드들이 여기에 동적으로 추가됩니다 -->
+                    <div class="empty-children">
+                        <p>등록된 자녀가 없습니다.</p>
+                        <p class="empty-hint">자녀를 추가하여 맞춤형 도서를 추천받으세요!</p>
+                    </div>
+                </div>
+            </section>
+
             <!-- 구독 정보 섹션 -->
             <section class="subscription-section">
                 <h2>구독 정보</h2>
@@ -147,12 +171,20 @@
 
                 <div class="form-group">
                     <label for="editPhone">전화번호</label>
-                    <input type="tel" id="editPhone" name="phone" placeholder="010-1234-5678">
+                    <input type="tel" id="editPhone" name="phone" placeholder="010-1234-5678" maxlength="13">
                 </div>
 
                 <div class="form-group">
                     <label for="editAddress">주소</label>
-                    <input type="text" id="editAddress" name="address" placeholder="주소를 입력하세요">
+                    <div class="input-with-button">
+                        <input type="text" id="editAddress" name="address" placeholder="주소 찾기 버튼을 클릭하세요" readonly>
+                        <button type="button" class="btn-secondary" id="findAddress">주소 찾기</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDetailAddress">상세 주소</label>
+                    <input type="text" id="editDetailAddress" name="detailAddress" placeholder="상세 주소를 입력하세요">
                 </div>
 
                 <div class="form-group">
@@ -215,11 +247,104 @@
         </div>
     </div>
 
+    <!-- 자녀 추가/수정 모달 -->
+    <div id="childModal" class="modal" style="display: none;">
+        <div class="modal-content child-modal">
+            <h2 id="childModalTitle">자녀 추가</h2>
+            <form id="childForm">
+                <input type="hidden" id="childId" name="childId">
+
+                <div class="form-group">
+                    <label for="childName">자녀 이름 <span class="required">*</span></label>
+                    <input type="text" id="childName" name="childName" placeholder="자녀 이름을 입력하세요" maxlength="20" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="childBirth">생년월일</label>
+                    <input type="text" id="childBirth" name="childBirth" placeholder="YYYY-MM-DD" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>성별 <span class="required">*</span></label>
+                    <div class="gender-options">
+                        <label class="gender-option">
+                            <input type="radio" name="gender" value="M" required>
+                            <span class="gender-label">남자</span>
+                        </label>
+                        <label class="gender-option">
+                            <input type="radio" name="gender" value="F" required>
+                            <span class="gender-label">여자</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthOrder">출생 순서</label>
+                    <input type="number" id="birthOrder" name="birthOrder" placeholder="예: 1 (첫째), 2 (둘째)" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label>프로필 색상</label>
+                    <div class="color-picker">
+                        <div class="color-palette" id="childColorPalette">
+                            <!-- 색상 옵션들이 JavaScript로 동적 생성 -->
+                        </div>
+                        <div class="selected-color-display">
+                            <span>선택된 색상:</span>
+                            <div class="color-preview" id="childSelectedColorPreview"></div>
+                            <span class="color-hex" id="childSelectedColorHex">#FFB6C1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>프로필 아바타</label>
+                    <div class="avatar-selector">
+                        <div class="avatar-preview-container">
+                            <div class="avatar-preview" id="childAvatarPreview">
+                                <img id="childAvatarImg" src="" alt="아바타 미리보기">
+                            </div>
+                            <button type="button" class="btn-change-avatar" onclick="showAvatarSelection()">아바타 변경</button>
+                        </div>
+                        <div class="avatar-grid" id="childAvatarGrid" style="display: none;">
+                            <!-- 아바타 옵션들이 JavaScript로 동적 생성 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeChildModal()">취소</button>
+                    <button type="submit" class="btn-confirm">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 자녀 삭제 확인 모달 -->
+    <div id="deleteChildModal" class="modal" style="display: none;">
+        <div class="modal-content delete-modal">
+            <h2>자녀 삭제</h2>
+            <div class="warning-box">
+                <p>⚠️ 자녀 정보를 삭제하시겠습니까?</p>
+                <p class="child-name-display" id="deleteChildName"></p>
+            </div>
+            <p class="confirm-message">이 작업은 되돌릴 수 없습니다.</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeDeleteChildModal()">취소</button>
+                <button type="button" class="btn-delete-confirm" onclick="confirmDeleteChild()">삭제하기</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 커스텀 커서 -->
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
 
     <!-- 스크립트 -->
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
     <script src="js/toast.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/constants.js"></script>

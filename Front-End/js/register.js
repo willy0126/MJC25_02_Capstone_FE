@@ -43,35 +43,22 @@ function validateTermsAgreement() {
 
 // ==================== 2단계: 회원가입 정보 입력 ====================
 
-// 생년월일 옵션 생성
-function initializeBirthDateOptions() {
-    const birthYear = document.getElementById('birthYear');
-    const birthMonth = document.getElementById('birthMonth');
-    const birthDay = document.getElementById('birthDay');
+// 생년월일 Flatpickr 초기화
+function initializeBirthDatePicker() {
+    const birthInput = document.getElementById('birth');
 
-    // 년도 옵션 (1950 ~ 현재)
-    const currentYear = new Date().getFullYear();
-    for (let year = currentYear; year >= 1950; year--) {
-        const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year;
-        birthYear.appendChild(option);
-    }
-
-    // 월 옵션
-    for (let month = 1; month <= 12; month++) {
-        const option = document.createElement('option');
-        option.value = month;
-        option.textContent = month;
-        birthMonth.appendChild(option);
-    }
-
-    // 일 옵션
-    for (let day = 1; day <= 31; day++) {
-        const option = document.createElement('option');
-        option.value = day;
-        option.textContent = day;
-        birthDay.appendChild(option);
+    if (birthInput) {
+        flatpickr(birthInput, {
+            locale: 'ko',
+            dateFormat: 'Y-m-d',
+            maxDate: 'today',
+            minDate: '1950-01-01',
+            defaultDate: null,
+            allowInput: false,
+            disableMobile: true,
+            yearSelectorType: 'dropdown',
+            theme: 'light'
+        });
     }
 }
 
@@ -550,9 +537,7 @@ async function handleSubmit(e) {
     const username = document.getElementById('name'); // HTML에서는 id="name" 사용
     const nickname = document.getElementById('nickname');
     const phone = document.getElementById('phone');
-    const birthYear = document.getElementById('birthYear');
-    const birthMonth = document.getElementById('birthMonth');
-    const birthDay = document.getElementById('birthDay');
+    const birth = document.getElementById('birth');
     const address = document.getElementById('address');
     const detailAddress = document.getElementById('detailAddress');
 
@@ -583,10 +568,8 @@ async function handleSubmit(e) {
         return;
     } */
 
-    // 생년월일 조합 (백엔드 형식: YYYY-MM-DD)
-    const birth = birthYear.value && birthMonth.value && birthDay.value
-        ? `${birthYear.value}-${String(birthMonth.value).padStart(2, '0')}-${String(birthDay.value).padStart(2, '0')}`
-        : null;
+    // 생년월일 가져오기 (백엔드 형식: YYYY-MM-DD)
+    const birthValue = birth.value || null;
 
     // 주소 조합 (기본 주소 + 상세 주소)
     let fullAddress = null;
@@ -630,7 +613,7 @@ async function handleSubmit(e) {
         username: username.value,
         nickname: nickname.value || null,
         phone: formattedPhone,
-        birth: birth,
+        birth: birthValue,
         address: fullAddress,
         color: selectedColor
     };
@@ -713,7 +696,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTermsAgreement();
 
     // 2단계 초기화
-    initializeBirthDateOptions();
+    initializeBirthDatePicker();
     initializeStep2EventListeners();
 
     // 3단계 초기화

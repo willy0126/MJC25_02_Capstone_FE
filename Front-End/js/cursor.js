@@ -106,26 +106,12 @@ const CursorManager = {
 
         // 마우스 위치 추적
         this.state.mouseMoveHandler = (e) => {
-            // input, textarea, select 위에서는 커서 숨김
-            const target = e.target;
-            const isInputElement = target && (
-                target.tagName === 'INPUT' ||
-                target.tagName === 'TEXTAREA' ||
-                target.tagName === 'SELECT' ||
-                target.isContentEditable
-            );
-
-            if (isInputElement) {
-                if (this.state.cursorDot) this.state.cursorDot.style.opacity = '0';
-                if (this.state.cursorOutline) this.state.cursorOutline.style.opacity = '0';
-            } else {
-                // 첫 마우스 이동 시 커서를 표시
-                if (!this.state.firstMove) {
-                    this.state.firstMove = true;
-                }
-                if (this.state.cursorDot) this.state.cursorDot.style.opacity = '1';
-                if (this.state.cursorOutline) this.state.cursorOutline.style.opacity = '1';
+            // 첫 마우스 이동 시 커서를 표시
+            if (!this.state.firstMove) {
+                this.state.firstMove = true;
             }
+            if (this.state.cursorDot) this.state.cursorDot.style.opacity = '1';
+            if (this.state.cursorOutline) this.state.cursorOutline.style.opacity = '1';
 
             this.state.mouseX = e.clientX;
             this.state.mouseY = e.clientY;

@@ -243,6 +243,77 @@ class ApiClient {
             body: JSON.stringify(userData)
         });
     }
+
+    // ==================== Children APIs ====================
+
+    /**
+     * 자녀 등록
+     * @param {Object} childData - 자녀 정보
+     * @param {string} childData.childName - 자녀 이름 (필수, 최대 20자)
+     * @param {string} childData.childBirth - 생년월일 (선택, YYYY-MM-DD 형식)
+     * @param {string} childData.gender - 성별 (필수, "M" 또는 "F")
+     * @param {number} childData.birthOrder - 출생 순서 (선택)
+     * @param {string} childData.color - 프로필 색상 코드 (선택, 최대 10자, 예: "#FFB6C1")
+     * @param {string} childData.profileImg - 프로필 이미지 URL (선택, 최대 255자)
+     * @returns {Promise<Object>} 등록된 자녀 정보
+     */
+    async createChild(childData) {
+        return await this.request('/children', {
+            method: 'POST',
+            body: JSON.stringify(childData)
+        });
+    }
+
+    /**
+     * 자녀 목록 조회
+     * @returns {Promise<Array>} 자녀 목록
+     */
+    async getChildren() {
+        return await this.request('/children', {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 자녀 상세 조회
+     * @param {number} childId - 자녀 ID
+     * @returns {Promise<Object>} 자녀 상세 정보
+     */
+    async getChild(childId) {
+        return await this.request(`/children/${childId}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 자녀 정보 수정 (부분 업데이트)
+     * @param {number} childId - 자녀 ID
+     * @param {Object} childData - 수정할 자녀 정보 (수정할 필드만 포함)
+     * @param {string} childData.childName - 자녀 이름 (선택, 최대 20자)
+     * @param {string} childData.childBirth - 생년월일 (선택, YYYY-MM-DD 형식)
+     * @param {string} childData.gender - 성별 (선택, "M" 또는 "F")
+     * @param {number} childData.birthOrder - 출생 순서 (선택)
+     * @param {string} childData.color - 프로필 색상 코드 (선택, 최대 10자)
+     * @param {string} childData.profileImg - 프로필 이미지 URL (선택, 최대 255자)
+     * @returns {Promise<Object>} 수정된 자녀 정보
+     */
+    async updateChild(childId, childData) {
+        return await this.request(`/children/${childId}`, {
+            method: 'PATCH',
+            body: JSON.stringify(childData)
+        });
+    }
+
+    /**
+     * 자녀 삭제
+     * @param {number} childId - 자녀 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteChild(childId) {
+        return await this.request(`/children/${childId}`, {
+            method: 'DELETE'
+        });
+    }
 }
 
 // Export singleton instance

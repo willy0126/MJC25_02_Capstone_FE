@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // 사용자 정보 로드
     await loadUserInfo();
+
+    // 자녀 관리 초기화
+    initChildrenManagement();
 });
 
 // ==================== 비밀번호 재확인 (백엔드 API 구현 전까지 주석 처리) ====================
@@ -226,8 +229,16 @@ function editProfile() {
     if (userInfo) {
         document.getElementById('editNickname').value = userInfo.nickname || '';
         document.getElementById('editPhone').value = userInfo.phone || '';
-        document.getElementById('editAddress').value = userInfo.address || '';
+
+        // 주소 분리 (백엔드가 주소+상세주소를 하나로 저장했다고 가정)
+        const fullAddress = userInfo.address || '';
+        // 간단하게 전체 주소를 editAddress에 넣음
+        document.getElementById('editAddress').value = fullAddress;
+        document.getElementById('editDetailAddress').value = '';
     }
+
+    // 프로필 수정 모달 이벤트 리스너 등록
+    initEditProfileModal();
 
     // 모달 외부 클릭 시 닫기
     modal.addEventListener('click', function(e) {
@@ -316,51 +327,25 @@ async function handleProfileUpdate(e) {
     const nickname = document.getElementById('editNickname').value.trim();
     const phone = document.getElementById('editPhone').value.trim();
     const address = document.getElementById('editAddress').value.trim();
+    const detailAddress = document.getElementById('editDetailAddress').value.trim();
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
 
     try {
         submitBtn.disabled = true;
-        submitBtn.textContent = '확인 중...';
-
-        // 닉네임이 변경되었고 현재 값과 다른 경우 중복 체크
-        if (nickname && nickname !== userInfo.nickname) {
-            try {
-                const nicknameCheck = await apiClient.checkNickname(nickname, true);
-                if (!nicknameCheck.success || !nicknameCheck.data.available) {
-                    showToast('이미 사용 중인 닉네임입니다.', 'error');
-                    return;
-                }
-            } catch (error) {
-                console.error('닉네임 중복 체크 실패:', error);
-                // 중복 체크 실패 시 경고만 하고 계속 진행
-                showToast('닉네임 중복 체크를 할 수 없습니다. 계속 진행합니다.', 'warning');
-            }
-        }
-
-        // 전화번호가 변경되었고 현재 값과 다른 경우 중복 체크
-        if (phone && phone !== userInfo.phone) {
-            try {
-                const phoneCheck = await apiClient.checkPhone(phone);
-                if (!phoneCheck.success || !phoneCheck.data.available) {
-                    showToast('이미 사용 중인 전화번호입니다.', 'error');
-                    return;
-                }
-            } catch (error) {
-                console.error('전화번호 중복 체크 실패:', error);
-                // 중복 체크 API가 없는 경우 스킵
-                console.log('전화번호 중복 체크 API가 구현되지 않았습니다. 스킵합니다.');
-            }
-        }
-
         submitBtn.textContent = '저장 중...';
 
-        // 업데이트할 데이터 구성 (백엔드 API 스펙에 맞춤)
+        // 주소 + 상세주소 합치기
+        let fullAddress = address;
+        if (detailAddress) {
+            fullAddress = address ? `${address} ${detailAddress}` : detailAddress;
+        }
+
         const updateData = {
             nickname: nickname || null,
             phone: phone || null,
-            address: address || null,
+            address: fullAddress || null,
             color: selectedColor
         };
 
@@ -658,4 +643,552 @@ async function handleDeleteAccount(e) {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
     }
+}
+
+// ==================== 프로필 수정 입력 유효성 검사 ====================
+
+// 전화번호 자동 포맷팅
+function formatPhoneEdit() {
+    const phoneInput = document.getElementById('editPhone');
+    let phone = phoneInput.value.replace(/[^0-9]/g, ''); // 숫자만 추출
+
+    // 최대 11자리까지만 허용
+    if (phone.length > 11) {
+        phone = phone.slice(0, 11);
+    }
+
+    // 010-1234-5678 형식으로 포맷팅
+    if (phone.length >= 7) {
+        phone = phone.replace(/(\d{3})(\d{4})(\d{0,4})/, '$1-$2-$3');
+    } else if (phone.length >= 3) {
+        phone = phone.replace(/(\d{3})(\d{0,4})/, '$1-$2');
+    }
+
+    phoneInput.value = phone;
+}
+
+// 카카오 주소 검색
+function findAddressEdit() {
+    new daum.Postcode({
+        oncomplete: function(data) {
+            let addr = '';
+            let extraAddr = '';
+
+            if (data.userSelectedType === 'R') {
+                addr = data.roadAddress;
+            } else {
+                addr = data.jibunAddress;
+            }
+
+            if(data.userSelectedType === 'R'){
+                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                    extraAddr += data.bname;
+                }
+                if(data.buildingName !== '' && data.apartment === 'Y'){
+                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                if(extraAddr !== ''){
+                    extraAddr = ' (' + extraAddr + ')';
+                }
+            }
+
+            document.getElementById('editAddress').value = addr + extraAddr;
+            document.getElementById('editDetailAddress').focus();
+            showToast('주소가 입력되었습니다.', 'success');
+        },
+        theme: {
+            bgColor: "#FFFFFF",
+            searchBgColor: "#20B2AA",
+            contentBgColor: "#FFFFFF",
+            pageBgColor: "#FFFFFF",
+            textColor: "#333333",
+            queryTextColor: "#FFFFFF",
+            postcodeTextColor: "#20B2AA",
+            emphTextColor: "#20B2AA",
+            outlineColor: "#20B2AA"
+        },
+        width: '100%',
+        height: '100%'
+    }).open();
+}
+
+// 프로필 수정 모달 초기화 (이벤트 리스너 등록)
+function initEditProfileModal() {
+    const findAddressBtn = document.getElementById('findAddress');
+    const editPhoneInput = document.getElementById('editPhone');
+
+    // 주소 찾기 버튼 이벤트
+    if (findAddressBtn) {
+        findAddressBtn.addEventListener('click', findAddressEdit);
+    }
+
+    // 전화번호 자동 포맷팅 이벤트
+    if (editPhoneInput) {
+        editPhoneInput.addEventListener('input', formatPhoneEdit);
+    }
+}
+
+// ==================== 자녀 관리 ====================
+
+// 전역 변수
+let childrenData = [];
+let selectedChildColor = '#FFB6C1'; // 기본 색상 (핑크)
+let selectedChildAvatar = '';
+let currentEditingChildId = null;
+let deleteTargetChildId = null;
+
+// 색상 팔레트 (register.js와 동일)
+const childColorPalette = [
+    // 첫 번째 줄 - 빨강 계열
+    '#FF6B6B', '#FF8787', '#FFA5A5', '#FFC2C2', '#FFE0E0', '#FF5252', '#FF1744', '#D50000',
+    // 두 번째 줄 - 주황/노랑 계열
+    '#FFA94D', '#FFB366', '#FFCC80', '#FFE0B2', '#FFF3E0', '#FF9100', '#FF6D00', '#FFD700',
+    // 세 번째 줄 - 초록 계열
+    '#69DB7C', '#8CE99A', '#A9E34B', '#C0EB75', '#D8F5A2', '#00C853', '#00E676', '#76FF03',
+    // 네 번째 줄 - 청록 계열
+    '#3BC9DB', '#66D9E8', '#99E9F2', '#C5F6FA', '#E3FAFC', '#00BFA5', '#1DE9B6', '#20B2AA',
+    // 다섯 번째 줄 - 파랑 계열
+    '#4DABF7', '#74C0FC', '#A5D8FF', '#D0EBFF', '#E7F5FF', '#2979FF', '#2962FF', '#0D47A1',
+    // 여섯 번째 줄 - 보라 계열
+    '#B197FC', '#C084FC', '#D8B4FE', '#E9D5FF', '#F3E8FF', '#AA00FF', '#D500F9', '#9C27B0',
+    // 일곱 번째 줄 - 핑크 계열
+    '#F06595', '#F783AC', '#FAA2C1', '#FCC2D7', '#FFDEEB', '#F50057', '#C51162', '#FF4081',
+    // 여덟 번째 줄 - 회색 계열
+    '#868E96', '#ADB5BD', '#CED4DA', '#DEE2E6', '#F1F3F5', '#495057', '#343A40', '#212529'
+];
+
+// 아바타 스타일 옵션 (register.js와 동일)
+const avatarStyles = [
+    { style: 'adventurer', name: '모험가' },
+    { style: 'avataaars', name: '아바타' },
+    { style: 'big-smile', name: '큰 미소' },
+    { style: 'bottts', name: '로봇' },
+    { style: 'fun-emoji', name: '이모지' },
+    { style: 'lorelei', name: '로렐라이' },
+    { style: 'micah', name: '미카' },
+    { style: 'notionists', name: '노션' }
+];
+
+// 자녀 목록 로드
+async function loadChildren() {
+    try {
+        const response = await apiClient.getChildren();
+
+        if (response.success && response.data) {
+            childrenData = response.data;
+            renderChildrenList();
+        } else {
+            console.error('자녀 목록 로드 실패:', response.error);
+            showToast('자녀 목록을 불러오는데 실패했습니다.', 'error');
+        }
+    } catch (error) {
+        console.error('자녀 목록 로드 에러:', error);
+        showToast('자녀 목록을 불러오는데 실패했습니다.', 'error');
+    }
+}
+
+// 자녀 목록 렌더링
+function renderChildrenList() {
+    const childrenList = document.getElementById('childrenList');
+
+    if (!childrenData || childrenData.length === 0) {
+        childrenList.innerHTML = `
+            <div class="empty-children">
+                <p>등록된 자녀가 없습니다.</p>
+                <p class="empty-hint">자녀를 추가하여 맞춤형 도서를 추천받으세요!</p>
+            </div>
+        `;
+        return;
+    }
+
+    childrenList.innerHTML = childrenData.map(child => {
+        const genderText = child.gender === 'M' ? '남자' : '여자';
+        const birthText = child.childBirth ? formatDate(child.childBirth) : '미입력';
+        const orderText = child.birthOrder ? `${child.birthOrder}번째` : '미입력';
+        const avatarUrl = child.profileImg || generateDefaultAvatar(child.childName);
+        const cardColor = child.color || '#20B2AA';
+
+        return `
+            <div class="child-card" style="--child-color: ${cardColor};">
+                <div class="child-card-header">
+                    <div class="child-avatar">
+                        <img src="${avatarUrl}" alt="${child.childName}">
+                    </div>
+                    <div class="child-info-header">
+                        <h3 class="child-name">${child.childName}</h3>
+                        <span class="child-gender">${genderText}</span>
+                    </div>
+                </div>
+                <div class="child-details">
+                    <div class="child-detail-item">
+                        <span class="child-detail-label">생년월일</span>
+                        <span class="child-detail-value">${birthText}</span>
+                    </div>
+                    <div class="child-detail-item">
+                        <span class="child-detail-label">출생 순서</span>
+                        <span class="child-detail-value">${orderText}</span>
+                    </div>
+                </div>
+                <div class="child-card-actions">
+                    <button class="btn-edit-child" onclick="openEditChildModal(${child.childId})">수정</button>
+                    <button class="btn-delete-child" onclick="openDeleteChildModal(${child.childId}, '${child.childName}')">삭제</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// 날짜 포맷팅 (YYYY-MM-DD -> YYYY년 MM월 DD일)
+function formatDate(dateString) {
+    if (!dateString) return '미입력';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}년 ${month}월 ${day}일`;
+}
+
+// 기본 아바타 생성 (이름 기반)
+function generateDefaultAvatar(name) {
+    return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`;
+}
+
+// 자녀 생년월일 Flatpickr 초기화
+let childBirthPickerInstance = null;
+function initChildBirthPicker() {
+    const childBirthInput = document.getElementById('childBirth');
+
+    if (childBirthInput) {
+        // 이미 초기화된 인스턴스가 있으면 제거
+        if (childBirthPickerInstance) {
+            childBirthPickerInstance.destroy();
+        }
+
+        // 새로운 인스턴스 생성
+        childBirthPickerInstance = flatpickr(childBirthInput, {
+            locale: 'ko',
+            dateFormat: 'Y-m-d',
+            maxDate: 'today',
+            minDate: '1950-01-01',
+            defaultDate: null,
+            allowInput: false,
+            disableMobile: true,
+            yearSelectorType: 'dropdown',
+            theme: 'light'
+        });
+    }
+}
+
+// 자녀 추가 모달 열기
+function openAddChildModal() {
+    currentEditingChildId = null;
+    const modal = document.getElementById('childModal');
+    const modalTitle = document.getElementById('childModalTitle');
+    const form = document.getElementById('childForm');
+
+    modalTitle.textContent = '자녀 추가';
+    form.reset();
+    document.getElementById('childId').value = '';
+
+    // 기본 색상 설정
+    selectedChildColor = '#FFB6C1';
+    updateChildColorDisplay();
+
+    // 기본 아바타 생성
+    selectedChildAvatar = generateDefaultAvatar('default');
+    document.getElementById('childAvatarImg').src = selectedChildAvatar;
+
+    // 색상 팔레트 초기화
+    initChildColorPalette();
+
+    // 아바타 그리드는 숨김
+    document.getElementById('childAvatarGrid').style.display = 'none';
+
+    modal.style.display = 'flex';
+
+    // Flatpickr 초기화 (모달이 표시된 후)
+    setTimeout(() => {
+        initChildBirthPicker();
+    }, 100);
+
+    // 모달 외부 클릭 시 닫기
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeChildModal();
+        }
+    });
+}
+
+// 자녀 수정 모달 열기
+async function openEditChildModal(childId) {
+    currentEditingChildId = childId;
+    const modal = document.getElementById('childModal');
+    const modalTitle = document.getElementById('childModalTitle');
+    const form = document.getElementById('childForm');
+
+    modalTitle.textContent = '자녀 수정';
+
+    try {
+        const response = await apiClient.getChild(childId);
+
+        if (response.success && response.data) {
+            const child = response.data;
+
+            document.getElementById('childId').value = child.childId;
+            document.getElementById('childName').value = child.childName || '';
+            document.getElementById('childBirth').value = child.childBirth || '';
+            document.getElementById('birthOrder').value = child.birthOrder || '';
+
+            // 성별 선택
+            const genderRadio = form.querySelector(`input[name="gender"][value="${child.gender}"]`);
+            if (genderRadio) genderRadio.checked = true;
+
+            // 색상 설정
+            selectedChildColor = child.color || '#FFB6C1';
+            updateChildColorDisplay();
+            initChildColorPalette();
+
+            // 아바타 설정
+            selectedChildAvatar = child.profileImg || generateDefaultAvatar(child.childName);
+            document.getElementById('childAvatarImg').src = selectedChildAvatar;
+
+            // 아바타 그리드는 숨김
+            document.getElementById('childAvatarGrid').style.display = 'none';
+
+            modal.style.display = 'flex';
+
+            // Flatpickr 초기화 및 날짜 설정 (모달이 표시된 후)
+            setTimeout(() => {
+                initChildBirthPicker();
+                if (child.childBirth && childBirthPickerInstance) {
+                    childBirthPickerInstance.setDate(child.childBirth, false);
+                }
+            }, 100);
+
+            // 모달 외부 클릭 시 닫기
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeChildModal();
+                }
+            });
+        } else {
+            showToast('자녀 정보를 불러오는데 실패했습니다.', 'error');
+        }
+    } catch (error) {
+        console.error('자녀 정보 로드 에러:', error);
+        showToast('자녀 정보를 불러오는데 실패했습니다.', 'error');
+    }
+}
+
+// 자녀 모달 닫기
+function closeChildModal() {
+    const modal = document.getElementById('childModal');
+    modal.style.display = 'none';
+    currentEditingChildId = null;
+}
+
+// 색상 팔레트 초기화
+function initChildColorPalette() {
+    const colorPalette = document.getElementById('childColorPalette');
+    colorPalette.innerHTML = '';
+
+    childColorPalette.forEach((color) => {
+        const colorOption = document.createElement('div');
+        colorOption.className = 'color-option';
+        colorOption.style.backgroundColor = color;
+        colorOption.dataset.color = color;
+
+        if (color === selectedChildColor) {
+            colorOption.classList.add('selected');
+        }
+
+        colorOption.addEventListener('click', function() {
+            document.querySelectorAll('#childColorPalette .color-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            this.classList.add('selected');
+            selectedChildColor = color;
+            updateChildColorDisplay();
+        });
+
+        colorPalette.appendChild(colorOption);
+    });
+}
+
+// 색상 디스플레이 업데이트
+function updateChildColorDisplay() {
+    const preview = document.getElementById('childSelectedColorPreview');
+    const hex = document.getElementById('childSelectedColorHex');
+
+    if (preview) preview.style.backgroundColor = selectedChildColor;
+    if (hex) hex.textContent = selectedChildColor;
+}
+
+// 아바타 선택 UI 표시/숨김
+function showAvatarSelection() {
+    const avatarGrid = document.getElementById('childAvatarGrid');
+
+    if (avatarGrid.style.display === 'none' || !avatarGrid.style.display) {
+        // 아바타 그리드 생성
+        generateChildAvatarGrid();
+        avatarGrid.style.display = 'grid';
+    } else {
+        avatarGrid.style.display = 'none';
+    }
+}
+
+// 아바타 그리드 생성
+function generateChildAvatarGrid() {
+    const avatarGrid = document.getElementById('childAvatarGrid');
+    avatarGrid.innerHTML = '';
+
+    avatarStyles.forEach((avatarStyle, index) => {
+        const seed = `child-${avatarStyle.style}-${Date.now()}-${index}`;
+        const avatarUrl = `https://api.dicebear.com/7.x/${avatarStyle.style}/svg?seed=${seed}`;
+
+        const label = document.createElement('label');
+        label.className = 'avatar-option';
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'childAvatar';
+        input.value = avatarUrl;
+
+        if (avatarUrl === selectedChildAvatar) {
+            input.checked = true;
+        }
+
+        input.addEventListener('change', function() {
+            selectedChildAvatar = this.value;
+            document.getElementById('childAvatarImg').src = this.value;
+        });
+
+        const avatarBox = document.createElement('div');
+        avatarBox.className = 'avatar-box';
+
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = avatarStyle.name;
+        img.onerror = function() {
+            console.error('아바타 로드 실패:', avatarUrl);
+        };
+
+        const span = document.createElement('span');
+        span.className = 'avatar-label';
+        span.textContent = avatarStyle.name;
+
+        avatarBox.appendChild(img);
+        avatarBox.appendChild(span);
+        label.appendChild(input);
+        label.appendChild(avatarBox);
+        avatarGrid.appendChild(label);
+    });
+}
+
+// 자녀 폼 제출 처리
+async function handleChildFormSubmit(e) {
+    e.preventDefault();
+
+    const childName = document.getElementById('childName').value.trim();
+    const childBirth = document.getElementById('childBirth').value || null;
+    const gender = document.querySelector('input[name="gender"]:checked')?.value;
+    const birthOrder = document.getElementById('birthOrder').value ? parseInt(document.getElementById('birthOrder').value) : null;
+
+    if (!childName) {
+        showToast('자녀 이름을 입력해주세요.', 'error');
+        return;
+    }
+
+    if (!gender) {
+        showToast('성별을 선택해주세요.', 'error');
+        return;
+    }
+
+    const childData = {
+        childName,
+        childBirth,
+        gender,
+        birthOrder,
+        color: selectedChildColor,
+        profileImg: selectedChildAvatar
+    };
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+
+    try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '저장 중...';
+
+        let response;
+        if (currentEditingChildId) {
+            // 수정
+            response = await apiClient.updateChild(currentEditingChildId, childData);
+        } else {
+            // 등록
+            response = await apiClient.createChild(childData);
+        }
+
+        if (response.success) {
+            showToast(currentEditingChildId ? '자녀 정보가 수정되었습니다.' : '자녀가 추가되었습니다.', 'success');
+            closeChildModal();
+            await loadChildren(); // 목록 새로고침
+        } else {
+            showToast(response.error?.message || '작업에 실패했습니다.', 'error');
+        }
+    } catch (error) {
+        console.error('자녀 저장 에러:', error);
+        showToast('작업에 실패했습니다.', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+}
+
+// 자녀 삭제 모달 열기
+function openDeleteChildModal(childId, childName) {
+    deleteTargetChildId = childId;
+    const modal = document.getElementById('deleteChildModal');
+    const nameDisplay = document.getElementById('deleteChildName');
+
+    nameDisplay.textContent = `"${childName}"`;
+    modal.style.display = 'flex';
+}
+
+// 자녀 삭제 모달 닫기
+function closeDeleteChildModal() {
+    const modal = document.getElementById('deleteChildModal');
+    modal.style.display = 'none';
+    deleteTargetChildId = null;
+}
+
+// 자녀 삭제 확인
+async function confirmDeleteChild() {
+    if (!deleteTargetChildId) return;
+
+    try {
+        const response = await apiClient.deleteChild(deleteTargetChildId);
+
+        if (response.success) {
+            showToast('자녀 정보가 삭제되었습니다.', 'success');
+            closeDeleteChildModal();
+            await loadChildren(); // 목록 새로고침
+        } else {
+            showToast(response.error?.message || '삭제에 실패했습니다.', 'error');
+        }
+    } catch (error) {
+        console.error('자녀 삭제 에러:', error);
+        showToast('삭제에 실패했습니다.', 'error');
+    }
+}
+
+// 자녀 폼 초기화 함수
+function initChildrenManagement() {
+    const childForm = document.getElementById('childForm');
+    if (childForm) {
+        childForm.addEventListener('submit', handleChildFormSubmit);
+    }
+
+    // 자녀 목록 로드
+    loadChildren();
 }

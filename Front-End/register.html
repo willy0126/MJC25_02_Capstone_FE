@@ -7,6 +7,10 @@
     <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
     <link rel="stylesheet" href="css/register.css">
     <link rel="stylesheet" href="css/toast.css">
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
 </head>
 <body>
     <div class="register-container">
@@ -132,22 +136,8 @@
 
                 <!-- 생년월일 -->
                 <div class="form-group">
-                    <label for="birthYear">생년월일</label>
-                    <div class="birth-group">
-                        <select id="birthYear" name="birthYear" required>
-                            <option value="">년</option>
-                        </select>
-                        <span>년</span>
-                        <select id="birthMonth" name="birthMonth" required>
-                            <option value="">월</option>
-                        </select>
-                        <span>월</span>
-                        <select id="birthDay" name="birthDay" required>
-                            <option value="">일</option>
-                        </select>
-                        <span>일</span>
-                        <span class="help-icon">?</span>
-                    </div>
+                    <label for="birth">생년월일</label>
+                    <input type="text" id="birth" name="birth" placeholder="YYYY-MM-DD" required readonly>
                 </div>
 
                 <!-- 연락처 -->
@@ -233,6 +223,10 @@
 
     <!-- 카카오 주소 검색 API -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
 
     <script src="js/toast.js"></script>
     <script src="js/utils.js"></script>

@@ -261,15 +261,14 @@
 }
 
 .form-group input {
-    width: 70%;
+    width: 100%;
     padding: 10px 12px;
     border: 2px solid #ddd;
     border-radius: 8px;
     font-size: 0.95rem;
     transition: all 0.3s ease;
     height: 42px;
-    margin: 0 auto;
-    display: block;
+    box-sizing: border-box;
 }
 
 .form-group input:focus {
@@ -732,4 +731,420 @@ section h2 {
 
 .reset-password-modal input.invalid {
     border-color: #e74c3c;
+}
+
+/* ===================================
+   프로필 수정 모달 - 주소 검색 스타일
+   =================================== */
+
+/* 입력 필드 + 버튼 레이아웃 (주소 찾기) */
+.edit-profile-modal .input-with-button {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.edit-profile-modal .input-with-button input {
+    flex: 1;
+}
+
+.edit-profile-modal .input-with-button .btn-secondary {
+    padding: 12px 20px;
+    background-color: #20B2AA;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.edit-profile-modal .input-with-button .btn-secondary:hover {
+    background-color: #1a9e96;
+}
+
+/* 읽기 전용 입력 필드 (주소) */
+.edit-profile-modal input[readonly] {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+/* 주소 필드와 상세주소 필드 넓이 동일하게 설정 */
+.edit-profile-modal #editAddress {
+    width: 100%;
+}
+
+.edit-profile-modal #editDetailAddress {
+    width: 100%;
+}
+
+/* ==================== 자녀 관리 섹션 ==================== */
+
+.children-section {
+    margin-bottom: 40px;
+}
+
+.children-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.children-section h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.btn-add-child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #20B2AA 0%, #48D1CC 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(32, 178, 170, 0.3);
+}
+
+.btn-add-child:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(32, 178, 170, 0.4);
+}
+
+.btn-add-child .plus-icon {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* 자녀 목록 */
+.children-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* 빈 상태 */
+.empty-children {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+}
+
+.empty-children p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+.empty-children .empty-hint {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #adb5bd;
+}
+
+/* 자녀 카드 */
+.child-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.child-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--child-color, #20B2AA);
+}
+
+.child-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    border-color: var(--child-color, #20B2AA);
+}
+
+.child-card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.child-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--child-color, #20B2AA);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.child-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.child-info-header {
+    flex: 1;
+}
+
+.child-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 5px 0;
+}
+
+.child-gender {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--child-color, #20B2AA);
+    color: white;
+}
+
+.child-details {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.child-detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.child-detail-label {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.child-detail-value {
+    color: #333;
+    font-weight: 600;
+}
+
+.child-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn-edit-child,
+.btn-delete-child {
+    flex: 1;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-edit-child {
+    background-color: #20B2AA;
+    color: white;
+}
+
+.btn-edit-child:hover {
+    background-color: #1a9e96;
+    transform: translateY(-1px);
+}
+
+.btn-delete-child {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-delete-child:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+/* ==================== 자녀 추가/수정 모달 ==================== */
+
+.child-modal {
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.child-modal .required {
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+/* 성별 선택 */
+.gender-options {
+    display: flex;
+    gap: 15px;
+}
+
+.gender-option {
+    flex: 1;
+    position: relative;
+    cursor: pointer;
+}
+
+.gender-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.gender-label {
+    display: block;
+    padding: 12px 20px;
+    text-align: center;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background-color: white;
+}
+
+.gender-option input[type="radio"]:checked + .gender-label {
+    border-color: #20B2AA;
+    background-color: #e6f7f6;
+    color: #20B2AA;
+}
+
+.gender-option:hover .gender-label {
+    border-color: #20B2AA;
+}
+
+/* 아바타 선택 */
+.avatar-selector {
+    margin-top: 10px;
+}
+
+.avatar-preview-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.avatar-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-change-avatar {
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-change-avatar:hover {
+    background-color: #5a6268;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.avatar-option {
+    cursor: pointer;
+    position: relative;
+}
+
+.avatar-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.avatar-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    background-color: white;
+    transition: all 0.3s ease;
+}
+
+.avatar-option input[type="radio"]:checked + .avatar-box {
+    border-color: #20B2AA;
+    background-color: #e6f7f6;
+}
+
+.avatar-option:hover .avatar-box {
+    border-color: #20B2AA;
+}
+
+.avatar-box img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* 삭제 모달 추가 스타일 */
+.child-name-display {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #dc3545;
+    text-align: center;
+    margin: 15px 0;
 }
