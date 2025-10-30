@@ -81,6 +81,16 @@ body {
     border-color: inherit;
 }
 
+/* 읽기 전용 입력란 스타일 */
+.form-group input[readonly] {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.form-group input[readonly]:focus {
+    border-color: #ddd;
+}
+
 .btn-primary {
     background-color: #20B2AA;
     color: white;

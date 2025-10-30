@@ -214,10 +214,17 @@ class ApiClient {
     }
 
     // Check nickname availability
-    async checkNickname(nickname) {
+    async checkNickname(nickname, requireAuth = false) {
         return await this.request(`/users/check-nickname?nickname=${encodeURIComponent(nickname)}`, {
             method: 'GET',
-            skipAuth: true
+            skipAuth: !requireAuth
+        });
+    }
+
+    // Check phone availability
+    async checkPhone(phone) {
+        return await this.request(`/users/check-phone?phone=${encodeURIComponent(phone)}`, {
+            method: 'GET'
         });
     }
 
@@ -226,6 +233,14 @@ class ApiClient {
         return await this.request('/users/verify-password', {
             method: 'POST',
             body: JSON.stringify(passwordData)
+        });
+    }
+
+    // Update user profile information
+    async updateUserInfo(userData) {
+        return await this.request('/users/me', {
+            method: 'PUT',
+            body: JSON.stringify(userData)
         });
     }
 }

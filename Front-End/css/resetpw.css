@@ -1,0 +1,178 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Paperlogy', sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.resetpw-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo img {
+    width: 150px;
+    height: auto;
+    cursor: pointer;
+}
+
+.resetpw-content {
+    width: 100%;
+}
+
+.resetpw-content h2 {
+    text-align: center;
+    color: #20B2AA;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.description {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #20B2AA;
+}
+
+.form-group input:invalid:not(:placeholder-shown) {
+    border-color: #e74c3c;
+}
+
+.password-hint {
+    display: block;
+    font-size: 12px;
+    color: #999;
+    margin-top: 6px;
+}
+
+.error-message {
+    display: none;
+    font-size: 12px;
+    color: #e74c3c;
+    margin-top: 6px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #20B2AA;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background-color: #1a9b94;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(32, 178, 170, 0.3);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.submit-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.back-to-login {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-to-login a {
+    color: #20B2AA;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.back-to-login a:hover {
+    color: #1a9b94;
+    text-decoration: underline;
+}
+
+/* 비밀번호 유효성 검사 색상 */
+#newPassword.valid {
+    border-color: #27ae60;
+}
+
+#newPassword.invalid {
+    border-color: #e74c3c;
+}
+
+#confirmPassword.valid {
+    border-color: #27ae60;
+}
+
+#confirmPassword.invalid {
+    border-color: #e74c3c;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+    .resetpw-container {
+        padding: 30px 20px;
+    }
+
+    .resetpw-content h2 {
+        font-size: 24px;
+    }
+
+    .description {
+        font-size: 13px;
+    }
+}

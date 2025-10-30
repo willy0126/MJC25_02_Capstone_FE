@@ -15,7 +15,8 @@ const CursorManager = {
         isInitialized: false,
         firstMove: false,
         animationId: null,
-        observer: null
+        observer: null,
+        mouseMoveHandler: null
     },
 
     // 설정값 (constants.js에서 가져오기, 없으면 기본값)
@@ -32,9 +33,12 @@ const CursorManager = {
      * 커서 초기화
      */
     init() {
-        // 이미 초기화되었으면 리턴
-        if (this.state.isInitialized) return;
+        // 이미 초기화되었으면 cleanup 후 재시작
+        if (this.state.isInitialized) {
+            this.cleanup();
+        }
 
+        // 커서 요소 가져오기
         this.state.cursorDot = document.querySelector('.cursor-dot');
         this.state.cursorOutline = document.querySelector('.cursor-outline');
 
@@ -45,6 +49,13 @@ const CursorManager = {
         }
 
         this.state.isInitialized = true;
+        this.state.firstMove = false;
+
+        // 초기 위치를 화면 밖으로 설정 (첫 마우스 이동 전까지 숨김)
+        this.state.mouseX = -100;
+        this.state.mouseY = -100;
+        this.state.outlineX = -100;
+        this.state.outlineY = -100;
 
         // 초기에는 커서를 숨김
         this.state.cursorDot.style.opacity = '0';
@@ -59,34 +70,73 @@ const CursorManager = {
         // MutationObserver 시작
         this.startObserver();
 
+        // 페이지 로드 후 즉시 마우스 위치 감지
+        this.detectInitialMousePosition();
+
         // 페이지 언로드 시 정리
-        window.addEventListener('beforeunload', () => this.cleanup());
+        window.addEventListener('beforeunload', () => this.cleanup(), { once: true });
+    },
+
+    /**
+     * 페이지 로드 후 마우스 위치 즉시 감지
+     */
+    detectInitialMousePosition() {
+        const detectMouse = (e) => {
+            this.state.mouseX = e.clientX;
+            this.state.mouseY = e.clientY;
+            this.state.outlineX = e.clientX;
+            this.state.outlineY = e.clientY;
+
+            // 첫 마우스 감지 후 리스너 제거
+            document.removeEventListener('mousemove', detectMouse);
+        };
+
+        // 일회성 마우스 감지
+        document.addEventListener('mousemove', detectMouse, { once: true });
     },
 
     /**
      * 이벤트 리스너 등록
      */
     attachEventListeners() {
-        // 마우스 위치 추적 (throttle 적용)
-        const mouseMoveHandler = (e) => {
-            // 첫 마우스 이동 시 커서를 표시
-            if (!this.state.firstMove) {
-                this.state.cursorDot.style.opacity = '1';
-                this.state.cursorOutline.style.opacity = '1';
-                this.state.firstMove = true;
+        // 기존 이벤트 리스너 제거 (중복 방지)
+        if (this.state.mouseMoveHandler) {
+            window.removeEventListener('mousemove', this.state.mouseMoveHandler);
+        }
+
+        // 마우스 위치 추적
+        this.state.mouseMoveHandler = (e) => {
+            // input, textarea, select 위에서는 커서 숨김
+            const target = e.target;
+            const isInputElement = target && (
+                target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                target.tagName === 'SELECT' ||
+                target.isContentEditable
+            );
+
+            if (isInputElement) {
+                if (this.state.cursorDot) this.state.cursorDot.style.opacity = '0';
+                if (this.state.cursorOutline) this.state.cursorOutline.style.opacity = '0';
+            } else {
+                // 첫 마우스 이동 시 커서를 표시
+                if (!this.state.firstMove) {
+                    this.state.firstMove = true;
+                }
+                if (this.state.cursorDot) this.state.cursorDot.style.opacity = '1';
+                if (this.state.cursorOutline) this.state.cursorOutline.style.opacity = '1';
             }
 
             this.state.mouseX = e.clientX;
             this.state.mouseY = e.clientY;
 
-            // 점은 즉시 따라감
+            // 점은 즉시 따라감 (transform 사용, -50% 오프셋 적용)
             if (this.state.cursorDot) {
-                this.state.cursorDot.style.left = `${this.state.mouseX}px`;
-                this.state.cursorDot.style.top = `${this.state.mouseY}px`;
+                this.state.cursorDot.style.transform = `translate(calc(${this.state.mouseX}px - 50%), calc(${this.state.mouseY}px - 50%))`;
             }
         };
 
-        window.addEventListener('mousemove', mouseMoveHandler);
+        window.addEventListener('mousemove', this.state.mouseMoveHandler);
 
         // 호버 효과 (이벤트 위임 사용)
         this.attachHoverEffects();
@@ -123,15 +173,20 @@ const CursorManager = {
      * 커서 외곽선 애니메이션
      */
     animateCursorOutline() {
+        // 애니메이션이 중지되었으면 리턴
+        if (!this.state.isInitialized || !this.state.cursorOutline) {
+            return;
+        }
+
         // 지연 효과
         const speed = this.config.FOLLOW_SPEED;
         this.state.outlineX += (this.state.mouseX - this.state.outlineX) * speed;
         this.state.outlineY += (this.state.mouseY - this.state.outlineY) * speed;
 
-        if (this.state.cursorOutline) {
-            this.state.cursorOutline.style.left = `${this.state.outlineX}px`;
-            this.state.cursorOutline.style.top = `${this.state.outlineY}px`;
-        }
+        // transform 사용 (성능 최적화, -50% 오프셋 적용)
+        // 호버 효과가 있으면 scale 추가
+        const scale = this.state.cursorOutline.classList.contains('cursor-hover') ? 'scale(1.125)' : '';
+        this.state.cursorOutline.style.transform = `translate(calc(${this.state.outlineX}px - 50%), calc(${this.state.outlineY}px - 50%)) ${scale}`;
 
         // 다음 프레임 요청
         this.state.animationId = requestAnimationFrame(() => this.animateCursorOutline());
@@ -141,9 +196,11 @@ const CursorManager = {
      * 애니메이션 시작
      */
     startAnimation() {
-        if (!this.state.animationId) {
-            this.state.animationId = requestAnimationFrame(() => this.animateCursorOutline());
-        }
+        // 이미 실행 중이면 중지
+        this.stopAnimation();
+
+        // 새로운 애니메이션 시작
+        this.state.animationId = requestAnimationFrame(() => this.animateCursorOutline());
     },
 
     /**
@@ -186,15 +243,33 @@ const CursorManager = {
         // 애니메이션 중지
         this.stopAnimation();
 
+        // 이벤트 리스너 제거
+        if (this.state.mouseMoveHandler) {
+            window.removeEventListener('mousemove', this.state.mouseMoveHandler);
+            this.state.mouseMoveHandler = null;
+        }
+
         // MutationObserver 연결 해제
         if (this.state.observer) {
             this.state.observer.disconnect();
             this.state.observer = null;
         }
 
-        // 상태 초기화
+        // 커서 숨기기
+        if (this.state.cursorDot) {
+            this.state.cursorDot.style.opacity = '0';
+        }
+        if (this.state.cursorOutline) {
+            this.state.cursorOutline.style.opacity = '0';
+        }
+
+        // 상태 완전 초기화
         this.state.isInitialized = false;
         this.state.firstMove = false;
+        this.state.mouseX = -100;
+        this.state.mouseY = -100;
+        this.state.outlineX = -100;
+        this.state.outlineY = -100;
     }
 };
 
@@ -204,3 +279,14 @@ if (document.readyState === 'loading') {
 } else {
     CursorManager.init();
 }
+
+// 뒤로가기/앞으로가기 시 재초기화 (bfcache 대응)
+window.addEventListener('pageshow', (event) => {
+    // bfcache에서 복원된 경우
+    if (event.persisted) {
+        console.log('페이지가 bfcache에서 복원됨 - 커서 재초기화');
+        // 강제로 cleanup 후 재초기화
+        CursorManager.state.isInitialized = false;
+        CursorManager.init();
+    }
+});

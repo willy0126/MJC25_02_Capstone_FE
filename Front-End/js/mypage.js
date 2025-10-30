@@ -200,15 +200,347 @@ function getCurrentUserEmail() {
 }
 
 // ==================== 프로필 수정 ====================
+let selectedColor = '#20B2AA'; // 기본 색상
+
 function editProfile() {
-    // TODO: 프로필 수정 페이지로 이동 또는 모달 표시
-    showToast('프로필 수정 기능은 추후 구현 예정입니다.', 'info');
+    // 프로필 수정 모달 표시
+    const modal = document.getElementById('editProfileModal');
+    modal.style.display = 'flex';
+
+    // 현재 사용자 정보 저장
+    if (userInfo) {
+        selectedColor = userInfo.color || '#20B2AA';
+    }
+
+    // 폼 제출 이벤트 등록 (기존 이벤트 리스너 제거 후 재등록)
+    const form = document.getElementById('editProfileForm');
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+
+    newForm.addEventListener('submit', handleProfileUpdate);
+
+    // 색상 팔레트 생성 (폼 교체 후에 호출해야 이벤트 리스너가 제대로 등록됨)
+    generateColorPalette();
+
+    // 현재 사용자 정보로 폼 채우기 (색상 팔레트 생성 후에 채워야 함)
+    if (userInfo) {
+        document.getElementById('editNickname').value = userInfo.nickname || '';
+        document.getElementById('editPhone').value = userInfo.phone || '';
+        document.getElementById('editAddress').value = userInfo.address || '';
+    }
+
+    // 모달 외부 클릭 시 닫기
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeEditModal();
+        }
+    });
 }
 
-// ==================== 비밀번호 변경 ====================
-function changePassword() {
-    // TODO: 비밀번호 변경 페이지로 이동 또는 모달 표시
-    showToast('비밀번호 변경 기능은 추후 구현 예정입니다.', 'info');
+function generateColorPalette() {
+    const colorPalette = document.getElementById('colorPalette');
+    colorPalette.innerHTML = '';
+
+    // 색상 팔레트 (register.js와 동일한 색상 사용)
+    const colors = [
+        // 첫 번째 줄 - 빨강 계열
+        '#FF6B6B', '#FF8787', '#FFA5A5', '#FFC2C2', '#FFE0E0', '#FF5252', '#FF1744', '#D50000',
+        // 두 번째 줄 - 주황/노랑 계열
+        '#FFA94D', '#FFB366', '#FFCC80', '#FFE0B2', '#FFF3E0', '#FF9100', '#FF6D00', '#FFD700',
+        // 세 번째 줄 - 초록 계열
+        '#69DB7C', '#8CE99A', '#A9E34B', '#C0EB75', '#D8F5A2', '#00C853', '#00E676', '#76FF03',
+        // 네 번째 줄 - 청록 계열
+        '#3BC9DB', '#66D9E8', '#99E9F2', '#C5F6FA', '#E3FAFC', '#00BFA5', '#1DE9B6', '#20B2AA',
+        // 다섯 번째 줄 - 파랑 계열
+        '#4DABF7', '#74C0FC', '#A5D8FF', '#D0EBFF', '#E7F5FF', '#2979FF', '#2962FF', '#0D47A1',
+        // 여섯 번째 줄 - 보라 계열
+        '#B197FC', '#C084FC', '#D8B4FE', '#E9D5FF', '#F3E8FF', '#AA00FF', '#D500F9', '#9C27B0',
+        // 일곱 번째 줄 - 핑크 계열
+        '#F06595', '#F783AC', '#FAA2C1', '#FCC2D7', '#FFDEEB', '#F50057', '#C51162', '#FF4081',
+        // 여덟 번째 줄 - 회색 계열
+        '#868E96', '#ADB5BD', '#CED4DA', '#DEE2E6', '#F1F3F5', '#495057', '#343A40', '#212529'
+    ];
+
+    colors.forEach(color => {
+        const colorOption = document.createElement('div');
+        colorOption.className = 'color-option';
+        colorOption.style.backgroundColor = color;
+        colorOption.dataset.color = color;
+
+        // 현재 선택된 색상 표시
+        if (color === selectedColor) {
+            colorOption.classList.add('selected');
+        }
+
+        // 클릭 이벤트
+        colorOption.addEventListener('click', function() {
+            // 이전 선택 제거
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // 현재 선택 표시
+            this.classList.add('selected');
+
+            // 선택된 색상 업데이트
+            selectedColor = this.dataset.color;
+            updateColorPreview();
+        });
+
+        colorPalette.appendChild(colorOption);
+    });
+
+    // 초기 색상 미리보기 표시
+    updateColorPreview();
+}
+
+function updateColorPreview() {
+    const colorPreview = document.getElementById('selectedColorPreview');
+    const colorHex = document.getElementById('selectedColorHex');
+
+    colorPreview.style.backgroundColor = selectedColor;
+    colorHex.textContent = selectedColor;
+}
+
+function closeEditModal() {
+    const modal = document.getElementById('editProfileModal');
+    modal.style.display = 'none';
+
+    // 폼 초기화
+    document.getElementById('editProfileForm').reset();
+}
+
+async function handleProfileUpdate(e) {
+    e.preventDefault();
+
+    const nickname = document.getElementById('editNickname').value.trim();
+    const phone = document.getElementById('editPhone').value.trim();
+    const address = document.getElementById('editAddress').value.trim();
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+
+    try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '확인 중...';
+
+        // 닉네임이 변경되었고 현재 값과 다른 경우 중복 체크
+        if (nickname && nickname !== userInfo.nickname) {
+            try {
+                const nicknameCheck = await apiClient.checkNickname(nickname, true);
+                if (!nicknameCheck.success || !nicknameCheck.data.available) {
+                    showToast('이미 사용 중인 닉네임입니다.', 'error');
+                    return;
+                }
+            } catch (error) {
+                console.error('닉네임 중복 체크 실패:', error);
+                // 중복 체크 실패 시 경고만 하고 계속 진행
+                showToast('닉네임 중복 체크를 할 수 없습니다. 계속 진행합니다.', 'warning');
+            }
+        }
+
+        // 전화번호가 변경되었고 현재 값과 다른 경우 중복 체크
+        if (phone && phone !== userInfo.phone) {
+            try {
+                const phoneCheck = await apiClient.checkPhone(phone);
+                if (!phoneCheck.success || !phoneCheck.data.available) {
+                    showToast('이미 사용 중인 전화번호입니다.', 'error');
+                    return;
+                }
+            } catch (error) {
+                console.error('전화번호 중복 체크 실패:', error);
+                // 중복 체크 API가 없는 경우 스킵
+                console.log('전화번호 중복 체크 API가 구현되지 않았습니다. 스킵합니다.');
+            }
+        }
+
+        submitBtn.textContent = '저장 중...';
+
+        // 업데이트할 데이터 구성 (백엔드 API 스펙에 맞춤)
+        const updateData = {
+            nickname: nickname || null,
+            phone: phone || null,
+            address: address || null,
+            color: selectedColor
+        };
+
+        const response = await apiClient.updateUserInfo(updateData);
+
+        if (response.success) {
+            showToast('프로필이 성공적으로 수정되었습니다.', 'success');
+            closeEditModal();
+
+            // 사용자 정보 다시 로드
+            await loadUserInfo();
+        } else {
+            throw new Error(response.message || '프로필 수정에 실패했습니다.');
+        }
+
+    } catch (error) {
+        console.error('프로필 수정 실패:', error);
+
+        let errorMessage = '프로필 수정에 실패했습니다.';
+        if (error.data && error.data.message) {
+            errorMessage = error.data.message;
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
+        showToast(errorMessage, 'error');
+
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+}
+
+// ==================== 비밀번호 재설정 ====================
+
+// 비밀번호 유효성 검사
+function validateNewPassword() {
+    const newPassword = document.getElementById('newPassword');
+    const passwordValue = newPassword.value;
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+
+    // 입력값이 있을 때만 검증
+    if (passwordValue && passwordValue.length > 0) {
+        if (!regex.test(passwordValue)) {
+            newPassword.classList.remove('valid');
+            newPassword.classList.add('invalid');
+        } else {
+            newPassword.classList.remove('invalid');
+            newPassword.classList.add('valid');
+        }
+    } else {
+        newPassword.classList.remove('valid', 'invalid');
+    }
+
+    // 비밀번호 확인란도 체크
+    checkNewPasswordMatch();
+}
+
+// 비밀번호 일치 확인
+function checkNewPasswordMatch() {
+    const newPassword = document.getElementById('newPassword');
+    const confirmNewPassword = document.getElementById('confirmNewPassword');
+    const passwordError = document.getElementById('newPasswordError');
+
+    if (confirmNewPassword.value) {
+        if (newPassword.value !== confirmNewPassword.value) {
+            passwordError.style.display = 'block';
+            confirmNewPassword.classList.remove('valid');
+            confirmNewPassword.classList.add('invalid');
+        } else {
+            passwordError.style.display = 'none';
+            confirmNewPassword.classList.remove('invalid');
+            confirmNewPassword.classList.add('valid');
+        }
+    } else {
+        passwordError.style.display = 'none';
+        confirmNewPassword.classList.remove('valid', 'invalid');
+    }
+}
+
+// 비밀번호 재설정 모달 열기
+function resetPassword() {
+    const modal = document.getElementById('resetPasswordModal');
+    modal.style.display = 'flex';
+
+    // 모달 외부 클릭 시 닫기
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeResetPasswordModal();
+        }
+    });
+
+    // 이벤트 리스너 등록
+    const newPassword = document.getElementById('newPassword');
+    const confirmNewPassword = document.getElementById('confirmNewPassword');
+
+    newPassword.removeEventListener('input', validateNewPassword);
+    confirmNewPassword.removeEventListener('input', checkNewPasswordMatch);
+
+    newPassword.addEventListener('input', validateNewPassword);
+    confirmNewPassword.addEventListener('input', checkNewPasswordMatch);
+
+    // 폼 제출 이벤트
+    const form = document.getElementById('resetPasswordForm');
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+
+    newForm.addEventListener('submit', handlePasswordReset);
+}
+
+// 비밀번호 재설정 모달 닫기
+function closeResetPasswordModal() {
+    const modal = document.getElementById('resetPasswordModal');
+    modal.style.display = 'none';
+
+    // 폼 초기화
+    document.getElementById('resetPasswordForm').reset();
+    document.getElementById('newPassword').classList.remove('valid', 'invalid');
+    document.getElementById('confirmNewPassword').classList.remove('valid', 'invalid');
+    document.getElementById('newPasswordError').style.display = 'none';
+}
+
+// 비밀번호 재설정 처리
+async function handlePasswordReset(e) {
+    e.preventDefault();
+
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+    // 비밀번호 유효성 검사
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+
+    if (!regex.test(newPassword)) {
+        showToast('비밀번호는 영어, 숫자, 특수문자(@$!%*#?&)를 포함한 8자리 이상이어야 합니다.', 'warning');
+        return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+        showToast('비밀번호가 일치하지 않습니다.', 'warning');
+        return;
+    }
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+
+    try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '재설정 중...';
+
+        // 비밀번호 재설정 API 호출
+        const response = await apiClient.resetPassword({
+            email: userInfo.email,
+            username: userInfo.username,
+            newPassword: newPassword
+        });
+
+        if (response.success) {
+            showToast('비밀번호가 성공적으로 재설정되었습니다.', 'success');
+            closeResetPasswordModal();
+        } else {
+            throw new Error(response.message || '비밀번호 재설정에 실패했습니다.');
+        }
+
+    } catch (error) {
+        console.error('비밀번호 재설정 실패:', error);
+
+        let errorMessage = '비밀번호 재설정에 실패했습니다. 다시 시도해주세요.';
+
+        if (error.data && error.data.message) {
+            errorMessage = error.data.message;
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
+        showToast(errorMessage, 'error');
+
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
 }
 
 // ==================== 구독 플랜 보기 ====================
@@ -218,13 +550,29 @@ function goToSubscription() {
 }
 
 // ==================== 로그아웃 ====================
-async function logout() {
-    const confirmed = confirm('로그아웃 하시겠습니까?');
-    if (!confirmed) return;
+function logout() {
+    // 로그아웃 확인 모달 표시
+    const modal = document.getElementById('logoutModal');
+    modal.style.display = 'flex';
 
+    // 모달 외부 클릭 시 닫기
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeLogoutModal();
+        }
+    });
+}
+
+function closeLogoutModal() {
+    const modal = document.getElementById('logoutModal');
+    modal.style.display = 'none';
+}
+
+async function confirmLogout() {
     try {
         await apiClient.logout();
         showToast('로그아웃되었습니다.', 'success');
+        closeLogoutModal();
 
         setTimeout(() => {
             window.location.href = '/index.html';
@@ -239,18 +587,50 @@ async function logout() {
 }
 
 // ==================== 회원 탈퇴 ====================
-async function deleteAccount() {
-    const confirmed = confirm('정말로 회원 탈퇴하시겠습니까?\n이 작업은 취소할 수 없습니다.');
-    if (!confirmed) return;
+function deleteAccount() {
+    // 회원 탈퇴 모달 표시
+    const modal = document.getElementById('deleteAccountModal');
+    modal.style.display = 'flex';
 
-    const password = prompt('회원 탈퇴를 위해 비밀번호를 입력해주세요.');
-    if (!password) return;
+    // 폼 제출 이벤트 등록 (기존 이벤트 리스너 제거 후 재등록)
+    const form = document.getElementById('deleteAccountForm');
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+
+    newForm.addEventListener('submit', handleDeleteAccount);
+
+    // 모달 외부 클릭 시 닫기
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeDeleteModal();
+        }
+    });
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteAccountModal');
+    modal.style.display = 'none';
+
+    // 비밀번호 입력란 초기화
+    document.getElementById('deletePassword').value = '';
+}
+
+async function handleDeleteAccount(e) {
+    e.preventDefault();
+
+    const password = document.getElementById('deletePassword').value;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
 
     try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '처리 중...';
+
         const response = await apiClient.deleteUser({ password });
 
         if (response.success) {
             showToast('회원 탈퇴가 완료되었습니다.', 'success');
+            closeDeleteModal();
 
             setTimeout(() => {
                 apiClient.clearTokens();
@@ -271,5 +651,11 @@ async function deleteAccount() {
         }
 
         showToast(errorMessage, 'error');
+        document.getElementById('deletePassword').value = '';
+        document.getElementById('deletePassword').focus();
+
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
     }
 }

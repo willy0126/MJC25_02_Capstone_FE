@@ -1,5 +1,7 @@
 // ==================== 전역 변수 ====================
 let currentStep = 0;
+let isNicknameChecked = false; // 닉네임 중복 확인 여부
+let checkedNickname = ''; // 중복 확인된 닉네임
 
 // ==================== 1단계: 약관 동의 ====================
 
@@ -33,7 +35,7 @@ function validateTermsAgreement() {
     const allRequiredChecked = Array.from(requiredTerms).every(term => term.checked);
 
     if (!allRequiredChecked) {
-        alert('필수 약관에 모두 동의해주세요.');
+        showToast('필수 약관에 모두 동의해주세요.', 'warning');
         return false;
     }
     return true;
@@ -133,9 +135,13 @@ function verifyCode() {
     showToast('인증이 완료되었습니다.', 'success');
 } */
 
-// 닉네임 중복 확인
+// 닉네임 중복 확인 (API 미구현으로 비활성화)
 async function checkNickname() {
-    const nickname = document.getElementById('nickname').value;
+    showToast('닉네임 중복 확인 기능은 현재 준비 중입니다.', 'info');
+    return;
+
+    /* // API 구현 후 활성화
+    const nickname = document.getElementById('nickname').value.trim();
     const checkBtn = document.getElementById('checkNickname');
 
     if (!nickname) {
@@ -163,10 +169,16 @@ async function checkNickname() {
                 showToast('사용 가능한 닉네임입니다.', 'success');
                 // 닉네임 입력란 테두리 초록색으로 표시
                 document.getElementById('nickname').style.borderColor = '#27ae60';
+                // 중복 확인 완료 표시
+                isNicknameChecked = true;
+                checkedNickname = nickname;
             } else {
                 showToast('이미 사용 중인 닉네임입니다.', 'error');
                 // 닉네임 입력란 테두리 빨간색으로 표시
                 document.getElementById('nickname').style.borderColor = '#e74c3c';
+                // 중복 확인 실패
+                isNicknameChecked = false;
+                checkedNickname = '';
             }
         } else {
             throw new Error(response.message || '닉네임 확인에 실패했습니다.');
@@ -186,18 +198,87 @@ async function checkNickname() {
         showToast(errorMessage, 'error');
         // 닉네임 입력란 테두리 초기화
         document.getElementById('nickname').style.borderColor = '#ddd';
+        // 중복 확인 실패
+        isNicknameChecked = false;
+        checkedNickname = '';
 
     } finally {
         // 버튼 복원
         checkBtn.disabled = false;
         checkBtn.textContent = '중복확인';
     }
+    */
 }
 
-// 주소 찾기
+// 닉네임 입력 시 중복 확인 상태 초기화
+function handleNicknameInput() {
+    const nickname = document.getElementById('nickname').value.trim();
+
+    // 닉네임이 변경되면 중복 확인 상태 초기화
+    if (nickname !== checkedNickname) {
+        isNicknameChecked = false;
+        document.getElementById('nickname').style.borderColor = '#ddd';
+    }
+}
+
+// 주소 찾기 - 카카오 주소 검색 API
 function findAddress() {
-    // TODO: 주소 API 연동
-    showToast('주소 찾기 기능은 추후 구현 예정입니다.', 'info');
+    new daum.Postcode({
+        oncomplete: function(data) {
+            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드
+
+            // 각 주소의 노출 규칙에 따라 주소를 조합
+            // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기
+            let addr = ''; // 주소 변수
+            let extraAddr = ''; // 참고항목 변수
+
+            // 사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져옴
+            if (data.userSelectedType === 'R') { // 도로명 주소 선택
+                addr = data.roadAddress;
+            } else { // 지번 주소 선택
+                addr = data.jibunAddress;
+            }
+
+            // 도로명 주소인 경우 참고항목 조합
+            if(data.userSelectedType === 'R'){
+                // 법정동명이 있을 경우 추가 (법정리는 제외)
+                // 법정동의 경우 마지막 문자가 "동/로/가"로 끝남
+                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                    extraAddr += data.bname;
+                }
+                // 건물명이 있고, 공동주택일 경우 추가
+                if(data.buildingName !== '' && data.apartment === 'Y'){
+                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만듦
+                if(extraAddr !== ''){
+                    extraAddr = ' (' + extraAddr + ')';
+                }
+            }
+
+            // 우편번호와 주소 정보를 해당 필드에 넣음
+            document.getElementById('address').value = addr + extraAddr;
+
+            // 커서를 상세주소 필드로 이동
+            document.getElementById('detailAddress').focus();
+
+            showToast('주소가 입력되었습니다.', 'success');
+        },
+        theme: {
+            // 테마 커스터마이징
+            bgColor: "#FFFFFF", // 바탕 배경색
+            searchBgColor: "#20B2AA", // 검색창 배경색
+            contentBgColor: "#FFFFFF", // 본문 배경색
+            pageBgColor: "#FFFFFF", // 페이지 배경색
+            textColor: "#333333", // 기본 글자색
+            queryTextColor: "#FFFFFF", // 검색창 글자색
+            postcodeTextColor: "#20B2AA", // 우편번호 글자색
+            emphTextColor: "#20B2AA", // 강조 글자색
+            outlineColor: "#20B2AA" // 테두리색
+        },
+        width: '100%',
+        height: '100%'
+    }).open();
 }
 
 // 전화번호 자동 포맷팅
@@ -242,6 +323,7 @@ function initializeStep2EventListeners() {
     const password = document.getElementById('password');
     const passwordConfirm = document.getElementById('passwordConfirm');
     const phone = document.getElementById('phone');
+    const nickname = document.getElementById('nickname');
 
     // 비밀번호 실시간 검증
     password.addEventListener('input', validatePassword);
@@ -250,6 +332,9 @@ function initializeStep2EventListeners() {
 
     // 전화번호 자동 포맷팅
     phone.addEventListener('input', formatPhoneNumber);
+
+    // 닉네임 입력 시 중복 확인 상태 초기화
+    nickname.addEventListener('input', handleNicknameInput);
 
     // 버튼 이벤트
     // document.getElementById('sendVerification').addEventListener('click', sendVerificationCode);
@@ -491,13 +576,26 @@ async function handleSubmit(e) {
         return;
     }
 
+    // 닉네임 중복 확인 검증 (API 미구현으로 비활성화)
+    /* if (!isNicknameChecked || nickname.value.trim() !== checkedNickname) {
+        showToast('닉네임 중복 확인을 먼저 진행해주세요.', 'warning');
+        nickname.focus();
+        return;
+    } */
+
     // 생년월일 조합 (백엔드 형식: YYYY-MM-DD)
     const birth = birthYear.value && birthMonth.value && birthDay.value
         ? `${birthYear.value}-${String(birthMonth.value).padStart(2, '0')}-${String(birthDay.value).padStart(2, '0')}`
         : null;
 
-    // 주소 조합
-    const fullAddress = address.value || null;
+    // 주소 조합 (기본 주소 + 상세 주소)
+    let fullAddress = null;
+    if (address.value) {
+        fullAddress = address.value;
+        if (detailAddress.value) {
+            fullAddress += ' ' + detailAddress.value;
+        }
+    }
 
     // 선택된 색상 가져오기
     const selectedColor = document.getElementById('colorPicker').value || '#20B2AA';

@@ -82,42 +82,7 @@
                 </div>
                 <div class="profile-actions">
                     <button class="btn-edit" onclick="editProfile()">정보 수정</button>
-                    <button class="btn-change-password" onclick="changePassword()">비밀번호 변경</button>
-                </div>
-            </section>
-
-            <!-- 활동 내역 섹션 -->
-            <section class="activity-section">
-                <h2>활동 내역</h2>
-                <div class="activity-stats">
-                    <div class="stat-card">
-                        <div class="stat-icon">📚</div>
-                        <div class="stat-info">
-                            <span class="stat-label">읽은 책</span>
-                            <span class="stat-value" id="booksRead">0</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">✍️</div>
-                        <div class="stat-info">
-                            <span class="stat-label">작성한 리뷰</span>
-                            <span class="stat-value" id="reviewsWritten">0</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⭐</div>
-                        <div class="stat-info">
-                            <span class="stat-label">평균 평점</span>
-                            <span class="stat-value" id="avgRating">0.0</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🎯</div>
-                        <div class="stat-info">
-                            <span class="stat-label">참여 프로그램</span>
-                            <span class="stat-value" id="programsJoined">0</span>
-                        </div>
-                    </div>
+                    <button class="btn-change-password" onclick="resetPassword()">비밀번호 재설정</button>
                 </div>
             </section>
 
@@ -137,7 +102,7 @@
 
             <!-- 계정 관리 섹션 -->
             <section class="account-section">
-                <h2>계정 관리</h2>
+                <h2>계정 탈퇴</h2>
                 <div class="account-actions">
                     <button class="btn-logout" onclick="logout()">로그아웃</button>
                     <button class="btn-delete-account" onclick="deleteAccount()">회원 탈퇴</button>
@@ -147,6 +112,108 @@
     </main>
 
     <div id="footer-placeholder"></div>
+
+    <!-- 회원 탈퇴 확인 모달 -->
+    <div id="deleteAccountModal" class="modal" style="display: none;">
+        <div class="modal-content delete-modal">
+            <h2>회원 탈퇴</h2>
+            <div class="warning-box">
+                <p>⚠️ 회원 탈퇴 시 모든 정보가 삭제됩니다.</p>
+                <p>이 작업은 되돌릴 수 없습니다.</p>
+            </div>
+            <p class="confirm-message">정말로 탈퇴하시겠습니까? 비밀번호를 입력해주세요.</p>
+            <form id="deleteAccountForm">
+                <div class="input-group">
+                    <img class="icon-small" src="assets/pics/lock.png" alt="자물쇠 아이콘">
+                    <input type="password" id="deletePassword" name="password" placeholder="비밀번호" required autocomplete="current-password">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeDeleteModal()">취소</button>
+                    <button type="submit" class="btn-delete-confirm">탈퇴하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 프로필 수정 모달 -->
+    <div id="editProfileModal" class="modal" style="display: none;">
+        <div class="modal-content edit-profile-modal">
+            <h2>프로필 수정</h2>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label for="editNickname">닉네임</label>
+                    <input type="text" id="editNickname" name="nickname" placeholder="닉네임을 입력하세요" maxlength="20">
+                </div>
+
+                <div class="form-group">
+                    <label for="editPhone">전화번호</label>
+                    <input type="tel" id="editPhone" name="phone" placeholder="010-1234-5678">
+                </div>
+
+                <div class="form-group">
+                    <label for="editAddress">주소</label>
+                    <input type="text" id="editAddress" name="address" placeholder="주소를 입력하세요">
+                </div>
+
+                <div class="form-group">
+                    <label>프로필 색상</label>
+                    <div class="color-picker">
+                        <div class="color-palette" id="colorPalette">
+                            <!-- 색상 옵션들이 JavaScript로 동적 생성 -->
+                        </div>
+                        <div class="selected-color-display">
+                            <span>선택된 색상:</span>
+                            <div class="color-preview" id="selectedColorPreview"></div>
+                            <span class="color-hex" id="selectedColorHex">#20B2AA</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()">취소</button>
+                    <button type="submit" class="btn-confirm">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 로그아웃 확인 모달 -->
+    <div id="logoutModal" class="modal" style="display: none;">
+        <div class="modal-content logout-modal">
+            <h2>로그아웃</h2>
+            <p class="confirm-message">정말 로그아웃 하시겠습니까?</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeLogoutModal()">취소</button>
+                <button type="button" class="btn-confirm" onclick="confirmLogout()">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 비밀번호 재설정 모달 -->
+    <div id="resetPasswordModal" class="modal" style="display: none;">
+        <div class="modal-content reset-password-modal">
+            <h2>비밀번호 재설정</h2>
+            <p class="description">새로운 비밀번호를 입력해주세요.</p>
+            <form id="resetPasswordForm">
+                <div class="form-group">
+                    <label for="newPassword">새 비밀번호</label>
+                    <input type="password" id="newPassword" name="newPassword" placeholder="영문, 숫자, 특수문자 포함 8자 이상" required>
+                    <small class="password-hint">영문, 숫자, 특수문자(@$!%*#?&)를 포함한 8자리 이상</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmNewPassword">새 비밀번호 확인</label>
+                    <input type="password" id="confirmNewPassword" name="confirmNewPassword" placeholder="비밀번호를 다시 입력하세요" required>
+                    <small class="error-message" id="newPasswordError">비밀번호가 일치하지 않습니다.</small>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeResetPasswordModal()">취소</button>
+                    <button type="submit" class="btn-confirm">재설정</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- 커스텀 커서 -->
     <div class="cursor-dot"></div>

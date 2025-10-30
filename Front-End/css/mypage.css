@@ -58,8 +58,11 @@
     border-radius: 16px;
     max-width: 450px;
     width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     animation: slideUp 0.3s ease;
+    position: relative;
 }
 
 @keyframes slideUp {
@@ -153,6 +156,189 @@
     background-color: #1a9890;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3);
+}
+
+/* ==================== 로그아웃 확인 모달 ==================== */
+.logout-modal {
+    max-width: 450px;
+}
+
+.logout-modal .confirm-message {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+/* ==================== 회원 탈퇴 모달 ==================== */
+.delete-modal {
+    max-width: 500px;
+    padding: 30px !important;
+    box-sizing: border-box;
+}
+
+.warning-box {
+    background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+    color: white !important;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.warning-box p {
+    margin: 5px 0;
+    font-weight: 600;
+    line-height: 1.6;
+    color: white !important;
+}
+
+.delete-modal .confirm-message {
+    text-align: center;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.delete-modal .input-group {
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.delete-modal .input-group input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-delete-confirm {
+    background-color: #ff4757;
+    color: white;
+}
+
+.btn-delete-confirm:hover {
+    background-color: #ee2f3a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+/* ==================== 프로필 수정 모달 ==================== */
+.edit-profile-modal {
+    max-width: 650px;
+    max-height: 90vh;
+}
+
+/* 모달 스크롤바 스타일 */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #20B2AA;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #1a9890;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 70%;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    height: 42px;
+    margin: 0 auto;
+    display: block;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
+}
+
+.color-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.color-palette {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+}
+
+.color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.color-option:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.color-option.selected {
+    border-color: #333;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #333;
+    transform: scale(1.1);
+}
+
+.selected-color-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.selected-color-display span {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.color-preview {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+}
+
+.color-hex {
+    font-weight: 600;
+    color: #333;
+    font-family: monospace;
 }
 
 /* ==================== 프로필 섹션 ==================== */
@@ -484,4 +670,66 @@ section h2 {
     .modal-content {
         padding: 30px 20px;
     }
+}
+
+/* ==================== 비밀번호 재설정 모달 ==================== */
+.reset-password-modal {
+    max-width: 450px;
+}
+
+.reset-password-modal .description {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.reset-password-modal .form-group {
+    margin-bottom: 20px;
+}
+
+.reset-password-modal .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.reset-password-modal .form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.reset-password-modal .form-group input:focus {
+    outline: none;
+    border-color: #20B2AA;
+}
+
+.reset-password-modal .password-hint {
+    display: block;
+    font-size: 12px;
+    color: #999;
+    margin-top: 6px;
+}
+
+.reset-password-modal .error-message {
+    display: none;
+    font-size: 12px;
+    color: #e74c3c;
+    margin-top: 6px;
+}
+
+/* 비밀번호 유효성 검사 색상 */
+.reset-password-modal input.valid {
+    border-color: #27ae60;
+}
+
+.reset-password-modal input.invalid {
+    border-color: #e74c3c;
 }

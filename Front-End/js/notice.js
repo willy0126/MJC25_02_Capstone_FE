@@ -343,8 +343,9 @@ function handleEdit() {
 }
 
 // 삭제 처리
-function handleDelete() {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
+async function handleDelete() {
+    const confirmed = await showConfirm('정말 삭제하시겠습니까?', '삭제', '취소', '공지사항 삭제');
+    if (!confirmed) return;
 
     const noticeId = parseInt(document.getElementById('detailActions').dataset.noticeId);
     notices = notices.filter(n => n.id !== noticeId);

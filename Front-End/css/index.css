@@ -54,7 +54,6 @@ html * {
 }
 
 .cursor-outline.cursor-hover {
-    transform: translate(-50%, -50%) scale(1.125);
     background-color: rgba(124, 179, 66, 0.1);
 }
 

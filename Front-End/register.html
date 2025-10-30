@@ -160,9 +160,15 @@
                 <div class="form-group">
                     <label for="address">주소</label>
                     <div class="input-with-button">
-                        <input type="text" id="address" name="address" placeholder="주소를 입력하세요" required>
+                        <input type="text" id="address" name="address" placeholder="주소 찾기 버튼을 클릭하세요" readonly>
                         <button type="button" class="btn-secondary" id="findAddress">주소 찾기</button>
                     </div>
+                </div>
+
+                <!-- 상세 주소 -->
+                <div class="form-group">
+                    <label for="detailAddress">상세 주소</label>
+                    <input type="text" id="detailAddress" name="detailAddress" placeholder="상세 주소를 입력하세요">
                 </div>
 
                 <!-- 버튼 컨테이너 -->
@@ -224,6 +230,9 @@
             </div>
         </form>
     </div>
+
+    <!-- 카카오 주소 검색 API -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
     <script src="js/toast.js"></script>
     <script src="js/utils.js"></script>
