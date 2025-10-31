@@ -801,7 +801,14 @@ function renderChildrenList() {
         return;
     }
 
-    childrenList.innerHTML = childrenData.map(child => {
+    // 출생 순서에 따라 정렬 (1, 2, 3... 순서, birthOrder가 없는 경우는 뒤로)
+    const sortedChildren = [...childrenData].sort((a, b) => {
+        const orderA = a.birthOrder || 999; // birthOrder가 없으면 큰 값으로 취급
+        const orderB = b.birthOrder || 999;
+        return orderA - orderB; // 오름차순 정렬
+    });
+
+    childrenList.innerHTML = sortedChildren.map(child => {
         const genderText = child.gender === 'M' ? '남자' : '여자';
         const birthText = child.childBirth ? formatDate(child.childBirth) : '미입력';
         const orderText = child.birthOrder ? `${child.birthOrder}번째` : '미입력';
@@ -901,8 +908,9 @@ function openAddChildModal() {
     // 색상 팔레트 초기화
     initChildColorPalette();
 
-    // 아바타 그리드는 숨김
+    // 아바타 그리드와 새로고침 버튼은 숨김
     document.getElementById('childAvatarGrid').style.display = 'none';
+    document.getElementById('childAvatarRefreshContainer').style.display = 'none';
 
     modal.style.display = 'flex';
 
@@ -952,8 +960,9 @@ async function openEditChildModal(childId) {
             selectedChildAvatar = child.profileImg || generateDefaultAvatar(child.childName);
             document.getElementById('childAvatarImg').src = selectedChildAvatar;
 
-            // 아바타 그리드는 숨김
+            // 아바타 그리드와 새로고침 버튼은 숨김
             document.getElementById('childAvatarGrid').style.display = 'none';
+            document.getElementById('childAvatarRefreshContainer').style.display = 'none';
 
             modal.style.display = 'flex';
 
@@ -983,7 +992,12 @@ async function openEditChildModal(childId) {
 // 자녀 모달 닫기
 function closeChildModal() {
     const modal = document.getElementById('childModal');
+    const avatarGrid = document.getElementById('childAvatarGrid');
+    const refreshContainer = document.getElementById('childAvatarRefreshContainer');
+
     modal.style.display = 'none';
+    avatarGrid.style.display = 'none';
+    refreshContainer.style.display = 'none';
     currentEditingChildId = null;
 }
 
@@ -1027,13 +1041,16 @@ function updateChildColorDisplay() {
 // 아바타 선택 UI 표시/숨김
 function showAvatarSelection() {
     const avatarGrid = document.getElementById('childAvatarGrid');
+    const refreshContainer = document.getElementById('childAvatarRefreshContainer');
 
     if (avatarGrid.style.display === 'none' || !avatarGrid.style.display) {
         // 아바타 그리드 생성
         generateChildAvatarGrid();
         avatarGrid.style.display = 'grid';
+        refreshContainer.style.display = 'block';
     } else {
         avatarGrid.style.display = 'none';
+        refreshContainer.style.display = 'none';
     }
 }
 
@@ -1042,9 +1059,19 @@ function generateChildAvatarGrid() {
     const avatarGrid = document.getElementById('childAvatarGrid');
     avatarGrid.innerHTML = '';
 
-    avatarStyles.forEach((avatarStyle, index) => {
-        const seed = `child-${avatarStyle.style}-${Date.now()}-${index}`;
-        const avatarUrl = `https://api.dicebear.com/7.x/${avatarStyle.style}/svg?seed=${seed}`;
+    // DiceBear 스타일들 (안정적인 무료 API)
+    const styles = ['avataaars', 'bottts', 'fun-emoji', 'lorelei', 'micah', 'pixel-art'];
+
+    // 랜덤 시드 생성 (고유한 아바타를 위해)
+    const randomSeeds = [];
+    for (let i = 0; i < 6; i++) {
+        randomSeeds.push(Math.random().toString(36).substring(2, 15));
+    }
+
+    // 6개의 아바타 생성
+    randomSeeds.forEach((seed, index) => {
+        const style = styles[index % styles.length];
+        const avatarUrl = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
 
         const label = document.createElement('label');
         label.className = 'avatar-option';
@@ -1068,14 +1095,18 @@ function generateChildAvatarGrid() {
 
         const img = document.createElement('img');
         img.src = avatarUrl;
-        img.alt = avatarStyle.name;
+        img.alt = `아바타 ${index + 1}`;
+
+        // 이미지 로드 에러 처리
         img.onerror = function() {
             console.error('아바타 로드 실패:', avatarUrl);
+            // 폴백 이미지
+            this.src = generateDefaultAvatar('child-' + index);
         };
 
         const span = document.createElement('span');
         span.className = 'avatar-label';
-        span.textContent = avatarStyle.name;
+        span.textContent = `스타일 ${index + 1}`;
 
         avatarBox.appendChild(img);
         avatarBox.appendChild(span);
@@ -1083,6 +1114,12 @@ function generateChildAvatarGrid() {
         label.appendChild(avatarBox);
         avatarGrid.appendChild(label);
     });
+}
+
+// 자녀 아바타 새로고침 (랜덤 생성)
+function refreshChildAvatars() {
+    generateChildAvatarGrid();
+    showToast('새로운 아바타를 불러왔습니다!', 'success');
 }
 
 // 자녀 폼 제출 처리
@@ -1104,6 +1141,24 @@ async function handleChildFormSubmit(e) {
         return;
     }
 
+    // 출생 순서 중복 검사
+    if (birthOrder !== null) {
+        // 다른 자녀들의 출생 순서 확인 (수정 중인 자녀 제외)
+        const isDuplicate = childrenData.some(child => {
+            // 수정 중인 자녀는 제외
+            if (currentEditingChildId && child.childId === currentEditingChildId) {
+                return false;
+            }
+            // 같은 출생 순서가 있는지 확인
+            return child.birthOrder === birthOrder;
+        });
+
+        if (isDuplicate) {
+            showToast('이미 등록되어 있는 순서입니다.', 'warning');
+            return;
+        }
+    }
+
     const childData = {
         childName,
         childBirth,
@@ -1112,6 +1167,9 @@ async function handleChildFormSubmit(e) {
         color: selectedChildColor,
         profileImg: selectedChildAvatar
     };
+
+    // 디버깅: 전송할 데이터 확인
+    console.log('전송할 자녀 데이터:', childData);
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;

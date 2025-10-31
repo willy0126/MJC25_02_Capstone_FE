@@ -73,7 +73,7 @@ html * {
     left: 0;
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    z-index: 99999;
+    z-index: 100000;
     pointer-events: none;
     will-change: transform;
 }
