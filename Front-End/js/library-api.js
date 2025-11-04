@@ -5,8 +5,8 @@
    =================================== */
 
 const LibraryAPI = {
-  // API 인증키 :
-  /* authKey: '이곳에 인증키를 사용하세요.',*/
+  // API 인증키 (환경변수에서 가져오기)
+  authKey: window.ENV?.OPENLIBRARY_KEY || '',
 
   // API 베이스 URL
   baseURL: 'https://www.data4library.kr/api',
