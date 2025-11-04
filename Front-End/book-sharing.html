@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도서나눔 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/book-sharing.css">
+</head>
+<body> 
+    <div id="navbar-placeholder"></div>
+
+    <main class="book-sharing-container">
+        <!-- Hero Section -->
+        <section class="book-sharing-hero">
+            <h1>도서나눔</h1>
+            <p>함께 나누는 책, 함께 나누는 행복</p>
+        </section>
+
+        <!-- Book-Sharing Board Section -->
+        <section class="book-sharing-board">
+            <!-- 검색 및 작성 버튼 영역 -->
+            <div class="board-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="제목 또는 내용으로 검색">
+                    <button class="search-btn" id="searchBtn">🔍 검색</button>
+                </div>
+                <button class="write-btn" id="writeBtn">✏️ 글쓰기</button>
+            </div>
+
+            <!-- 도서나눔 테이블 -->
+            <div class="book-sharing-table-wrapper">
+                <table class="book-sharing-table">
+                    <thead>
+                        <tr>
+                            <th>나눔책 목록</th>
+                            <th>글제목</th>
+                            <th>상태</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                <tbody id="book-sharingTableBody">
+    <tr data-name="책1" data-title="첫 번째 나눔" data-status="나눔중">
+        <td>책1</td>
+        <td>첫 번째 나눔</td>
+        <td>나눔중</td>
+        <td>
+            <button class="edit-btn">수정</button>
+            <button class="delete-btn">삭제</button>
+        </td>
+    </tr>
+    <tr data-name="책2" data-title="두 번째 나눔" data-status="완료">
+        <td>책2</td>
+        <td>두 번째 나눔</td>
+        <td>완료</td>
+        <td>
+            <button class="edit-btn">수정</button>
+            <button class="delete-btn">삭제</button>
+        </td>
+    </tr>
+</tbody>
+
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- 글쓰기/수정 모달 -->
+    <div class="modal" id="writeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">글쓰기</h2>
+                <button class="modal-close" id="writeModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label>책 이름: <input type="text" id="bookNameInput"></label><br><br>
+                <label>글 제목: <input type="text" id="bookTitleInput"></label><br><br>
+                <label>상태:
+                    <select id="bookStatusInput">
+                        <option value="나눔중">나눔중</option>
+                        <option value="완료">완료</option>
+                    </select>
+                </label><br><br>
+                <button id="saveBookBtn">저장</button>
+            </div>
+        </div>
+    </div>
+  <!-- 상세보기 모달 -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>공지사항</h2>
+                <button class="modal-close" id="viewModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="notice-detail">
+                    <div class="detail-badge" id="detailBadge"></div>
+                    <h3 class="detail-title" id="detailTitle"></h3>
+                    <div class="detail-meta">
+                        <span id="detailAuthor"></span>
+                        <span id="detailDate"></span>
+                        <span id="detailViews"></span>
+                    </div>
+                    <div class="detail-content" id="detailContent"></div>
+                </div>
+                <div class="detail-actions" id="detailActions" style="display: none;">
+                    <button class="btn-edit" id="editBtn">수정</button>
+                    <button class="btn-delete" id="deleteBtn">삭제</button>
+                </div>
+                <div class="detail-close-wrapper">
+                    <button class="btn-close" id="closeViewBtn">목록으로</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+<script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+
+    <script src="js/book-sharing.js">
+
+    </script>
+
+</body>
+</html>

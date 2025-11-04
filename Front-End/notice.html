@@ -3,134 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>공지사항 - 책·이음</title>
+    <title>도서나눔 - 책·이음</title>
     <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/navbar.css">
-    <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/notice.css">
+    <style>
+        /* 전체 폰트 */
+        body {
+            font-family: 'Paperlogy', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        /* 검색창과 버튼 영역 */
+        .board-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 5px;
+        }
+
+        input[type="text"] {
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            outline: none;
+            width: 250px;
+        }
+
+        button {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: none;
+            background-color: #6c63ff;
+            color: #fff;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #5a52d4;
+        }
+
+        /* 메인 영역 */
+        .notice-container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .notice-hero {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .notice-hero h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .notice-hero p {
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        /* 테이블 스타일 */
+        .notice-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .notice-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .notice-table th, .notice-table td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        .notice-table thead {
+            background-color: #6c63ff;
+            color: #fff;
+        }
+
+        .notice-table tbody tr {
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
+        }
+
+        .notice-table tbody tr:hover {
+            background-color: #f0f0ff;
+        }
+
+        /* 페이지네이션 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination button {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        /* 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 1em;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
 
     <main class="notice-container">
-        <!-- Hero Section -->
         <section class="notice-hero">
-            <h1>공지사항</h1>
-            <p>책·이음의 새로운 소식과 중요한 공지를 확인하세요.</p>
+            <h1>도서나눔</h1>
+            <p>함께 나누는 책, 함께 나누는 행복</p>
         </section>
 
-        <!-- Notice Board Section -->
         <section class="notice-board">
-            <!-- 검색 및 작성 버튼 영역 -->
             <div class="board-controls">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="제목 또는 내용으로 검색">
+                    <input type="text" id="searchInput" placeholder="책 제목 또는 상태 검색">
                     <button class="search-btn" id="searchBtn">🔍 검색</button>
                 </div>
-                <button class="write-btn" id="writeBtn" style="display: none;">
-                    ✏️ 글쓰기
-                </button>
+                <button class="write-btn" id="writeBtn">✏️ 글쓰기</button>
             </div>
 
-            <!-- 게시판 테이블 -->
             <div class="notice-table-wrapper">
                 <table class="notice-table">
                     <thead>
                         <tr>
-                            <th class="col-num">번호</th>
-                            <th class="col-badge">구분</th>
-                            <th class="col-title">제목</th>
-                            <th class="col-author">작성자</th>
-                            <th class="col-date">작성일</th>
-                            <th class="col-views">조회수</th>
+                            <th>나눔책 목록</th>
+                            <th>글제목</th>
+                            <th>상태</th>
                         </tr>
                     </thead>
                     <tbody id="noticeTableBody">
-                        <!-- JavaScript로 동적 생성 -->
+                        <tr>
+                            <td>책1</td>
+                            <td>첫 번째 나눔</td>
+                            <td>나눔중</td>
+                        </tr>
+                        <tr>
+                            <td>책2</td>
+                            <td>두 번째 나눔</td>
+                            <td>완료</td>
+                        </tr>
+                        <tr>
+                            <td>책3</td>
+                            <td>세 번째 나눔</td>
+                            <td>나눔중</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- 페이지네이션 -->
-            <div class="pagination" id="pagination">
-                <!-- JavaScript로 동적 생성 -->
+            <div class="pagination">
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
             </div>
         </section>
     </main>
 
-    <!-- 글쓰기/수정 모달 -->
-    <div class="modal" id="writeModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">공지사항 작성</h2>
-                <button class="modal-close" id="modalClose">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="noticeForm">
-                    <input type="hidden" id="noticeId" value="">
+    <div id="footer-placeholder"></div>
+</body>
+</html>
 
-                    <div class="form-group">
-                        <label for="noticeBadge">구분</label>
-                        <select id="noticeBadge" required>
-                            <option value="">선택하세요</option>
-                            <option value="important">중요</option>
-                            <option value="new">신규</option>
-                            <option value="event">이벤트</option>
-                            <option value="normal">일반</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="noticeTitle">제목</label>
-                        <input type="text" id="noticeTitle" placeholder="제목을 입력하세요" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="noticeContent">내용</label>
-                        <textarea id="noticeContent" rows="15" placeholder="내용을 입력하세요" required></textarea>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn-submit">저장</button>
-                        <button type="button" class="btn-cancel" id="cancelBtn">취소</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- 상세보기 모달 -->
-    <div class="modal" id="viewModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>공지사항</h2>
-                <button class="modal-close" id="viewModalClose">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="notice-detail">
-                    <div class="detail-badge" id="detailBadge"></div>
-                    <h3 class="detail-title" id="detailTitle"></h3>
-                    <div class="detail-meta">
-                        <span id="detailAuthor"></span>
-                        <span id="detailDate"></span>
-                        <span id="detailViews"></span>
-                    </div>
-                    <div class="detail-content" id="detailContent"></div>
-                </div>
-                <div class="detail-actions" id="detailActions" style="display: none;">
-                    <button class="btn-edit" id="editBtn">수정</button>
-                    <button class="btn-delete" id="deleteBtn">삭제</button>
-                </div>
-                <div class="detail-close-wrapper">
-                    <button class="btn-close" id="closeViewBtn">목록으로</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div id="footer-placeholder"></div>
 

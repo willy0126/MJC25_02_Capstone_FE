@@ -1,0 +1,159 @@
+
+
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나눔목록 상세보기</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nanum Gothic', sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 36px;
+      color: #333;
+      position: relative;
+    }
+    h2::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background-color: #4b7bec;
+      margin: 10px auto 0 auto;
+      border-radius: 2px;
+    }
+    .notice-card {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .notice-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .notice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .notice-type {
+      font-weight: 700;
+      color: #4b7bec;
+      font-size: 18px;
+    }
+    .notice-date {
+      font-size: 16px;
+      color: #777;
+    }
+    .notice-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .notice-content {
+      font-size: 16px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .notice-content ul {
+      padding-left: 20px;
+    }
+    .notice-content li {
+      margin-bottom: 10px;
+    }
+    .back-button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: #4b7bec;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+    }
+    .back-button:hover {
+      background-color: #3860d4;
+    }
+
+    /* 커스텀 커서 스타일 */
+    .cursor-dot, .cursor-outline {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease;
+      z-index: 9999;
+    }
+    .cursor-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #4b7bec;
+    }
+    .cursor-outline {
+      width: 35px;
+      height: 35px;
+      border: 2px solid #4b7bec;
+    }
+  </style>
+</head>
+<body>
+
+<div class="notice-card">
+  <div class="notice-header">
+    <span class="notice-type" id="detailBookName"></span>
+    <span class="notice-date" id="detailStatus"></span>
+  </div>
+  <div class="notice-title" id="detailTitle"></div>
+  <div class="notice-content" id="detailContent">
+    <p>책에 대한 상세 설명이 여기에 표시됩니다.</p>
+  </div>
+  <a href="book-sharing.html" class="back-button">목록으로 돌아가기</a>
+</div>
+
+<script>
+  // URL에서 쿼리 가져오기
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get("name") || "책 이름 없음";
+  const title = params.get("title") || "제목 없음";
+  const status = params.get("status") || "상태 없음";
+
+  document.getElementById("detailBookName").textContent = name;
+  document.getElementById("detailTitle").textContent = title;
+  document.getElementById("detailStatus").textContent = status;
+
+  
+  // 필요하면 content 영역을 동적으로 추가 가능
+  document.getElementById("detailContent").innerHTML = `<p>${name}의 상세 정보가 여기에 표시됩니다.</p>`;
+  
+</script>
+
+  <!-- 커스텀 커서 -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-outline"></div>
+
+  <!-- JS 파일 -->
+  <script src="js/cursor.js"></script>
+  <script src="js/notice.js"></script>
+</body>
+</html>
