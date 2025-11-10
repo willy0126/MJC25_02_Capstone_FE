@@ -1,0 +1,242 @@
+/* ============================================
+   Login Page Styles
+   ============================================ */
+
+/* --- Global Styles --- */
+* {
+    box-sizing: border-box;
+}
+
+body:has(.login-container) {
+    margin: 0;
+    padding: 0;
+    font-family: 'Paperlogy', sans-serif;
+    background: #fff;
+    overflow-x: hidden;
+}
+
+/* --- Animations --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Layout --- */
+.login-container {
+    position: relative;
+    display: flex;
+    min-height: 100vh;
+    padding-top: 100px;
+    background-color: #fffcfa;
+    overflow: hidden;
+}
+
+.login-background {
+    position: absolute;
+    top: 100px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 100px);
+    background-image: url('../assets/pics/loginbg.png');
+    background-size: cover;
+    background-position: center;
+    clip-path: polygon(0 0, 60% 0, 45% 100%, 0% 100%);
+    z-index: 1;
+    animation: fadeIn 0.9s ease-in-out;
+}
+
+.login-content {
+    position: relative;
+    z-index: 2;
+    margin: 100px 100px 0 auto;
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+/* --- Form Styles --- */
+.form-container {
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 26px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #94d2c2;
+    padding-bottom: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.input-group:focus-within {
+    border-color: #21bfae;
+}
+
+.input-group input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 19px;
+    background: transparent;
+    font-family: inherit;
+}
+
+.input-group input::placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+.icon-small {
+    width: 25px;
+    height: 25px;
+    margin-right: 8px;
+    object-fit: contain;
+}
+
+/* --- Buttons --- */
+.login-button {
+    background: linear-gradient(160deg, #29cfbf 0%, #0d9486 50%, #08312a 100%);
+    background-size: 200% 200%;
+    background-position: left;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    height: 48px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 18px;
+    font-family: inherit;
+    transition: background-position 0.7s ease, transform 0.3s ease;
+}
+
+.login-button:hover {
+    background-position: right;
+    transform: translateY(-1px);
+}
+
+.login-button:active {
+    background: linear-gradient(135deg, #189085 0%, #166f65 100%);
+    transform: translateY(0);
+}
+
+/* --- Links --- */
+.links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    font-size: 17px;
+    color: #222;
+    margin-bottom: 2px;
+}
+
+.link {
+    color: #222;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.link:hover {
+    color: #21bfae;
+}
+
+.separator {
+    color: #b4b4b4;
+}
+
+.signup {
+    margin-top: 5px;
+    font-size: 15px;
+    color: #222;
+}
+
+.signup-link {
+    color: #21bfae;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.signup-link:hover {
+    color: #1da89a;
+}
+
+/* --- Divider --- */
+.divider {
+    width: 100%;
+    max-width: 340px;
+    border-bottom: 1px solid #94d2c2;
+    margin: 38px 0 12px 0;
+}
+
+/* --- Social Login --- */
+.social-login {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.social-title {
+    font-size: 15px;
+    color: #222;
+    margin: 0 0 13px 0;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 34px;
+}
+
+.social-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s ease;
+}
+
+.social-button:hover {
+    transform: scale(1.05);
+}
+
+.social-button:active {
+    transform: scale(0.95);
+}
+
+.social-button .icon {
+    display: block;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px #ddd;
+}
+
+.social-button.kakao .icon {
+    background: #fee500;
+}
+
+.social-button.naver .icon {
+    background: #03c75a;
+}
