@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>비밀번호 재설정 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <link rel="stylesheet" href="css/resetpw.css">
+    <link rel="stylesheet" href="css/toast.css">
+</head>
+<body>
+    <div class="resetpw-container">
+        <div class="logo">
+            <a href="landing.html">
+                <img src="assets/logo/tplogo.png" alt="로고" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22150%22 height=%22100%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22%3ELogo%3C/text%3E%3C/svg%3E'">
+            </a>
+        </div>
+
+        <div class="resetpw-content">
+            <h2>비밀번호 재설정</h2>
+            <p class="description">가입 시 등록한 이메일과 이름을 입력하고<br>새로운 비밀번호를 설정해주세요.</p>
+
+            <form id="resetpwForm">
+                <!-- 이메일 -->
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input type="email" id="email" name="email" placeholder="이메일을 입력하세요" required>
+                </div>
+
+                <!-- 이름 -->
+                <div class="form-group">
+                    <label for="username">이름</label>
+                    <input type="text" id="username" name="username" placeholder="이름을 입력하세요" required>
+                </div>
+
+                <!-- 새 비밀번호 -->
+                <div class="form-group">
+                    <label for="newPassword">새 비밀번호</label>
+                    <input type="password" id="newPassword" name="newPassword" placeholder="영문, 숫자, 특수문자 포함 8자 이상" required>
+                    <small class="password-hint">영문, 숫자, 특수문자(@$!%*#?&)를 포함한 8자리 이상</small>
+                </div>
+
+                <!-- 새 비밀번호 확인 -->
+                <div class="form-group">
+                    <label for="confirmPassword">새 비밀번호 확인</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="비밀번호를 다시 입력하세요" required>
+                    <small class="error-message" id="passwordError">비밀번호가 일치하지 않습니다.</small>
+                </div>
+
+                <!-- 버튼 -->
+                <button type="submit" class="submit-btn">비밀번호 재설정</button>
+            </form>
+
+            <div class="back-to-login">
+                <a href="login.html">로그인 페이지로 돌아가기</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/resetpw.js"></script>
+</body>
+</html>

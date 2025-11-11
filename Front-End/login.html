@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 - 책-이음</title>
+    <title>로그인 - 책·이음</title>
     <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/toast.css">
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -20,15 +21,15 @@
         <div class="login-background"></div>
 
         <div class="login-content">
-            <form class="form-container">
+            <form class="form-container" id="loginForm">
                 <div class="input-group">
                     <img class="icon-small" src="assets/pics/person.png" alt="사용자 아이콘">
-                    <input type="text" placeholder="Email or Phone" required lang="en" inputmode="email">
+                    <input type="email" id="email" name="email" placeholder="Email" required lang="en" inputmode="email">
                 </div>
 
                 <div class="input-group">
                     <img class="icon-small" src="assets/pics/lock.png" alt="자물쇠 아이콘">
-                    <input type="password" placeholder="Password" required>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
                 </div>
 
                 <button type="submit" class="login-button">LOG IN</button>
@@ -37,12 +38,12 @@
             <div class="links">
                 <a href="#" class="link">아이디 찾기</a>
                 <span class="separator">|</span>
-                <a href="#" class="link">비밀번호 찾기</a>
+                <a href="resetpw.html" class="link">비밀번호 재설정</a>
             </div>
 
             <div class="signup">
                 아직 계정이 없으신가요?
-                <a href="#" class="signup-link">회원가입</a>
+                <a href="register.html" class="signup-link">회원가입</a>
             </div>
 
             <div class="divider"></div>
@@ -63,6 +64,14 @@
 
     <div id="footer-placeholder"></div>
 
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/include.js"></script>
     <script src="js/cursor.js"></script>

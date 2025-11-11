@@ -5,7 +5,7 @@ body {
     font-family: 'Paperlogy', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    height: 1500px;
+    height: 500px;
 }
 
 a {
@@ -34,7 +34,7 @@ html * {
     left: 0;
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    z-index: 99999;
+    z-index: 100000;
     pointer-events: none;
     will-change: transform;
 }
@@ -54,21 +54,21 @@ html * {
 }
 
 .cursor-outline.cursor-hover {
-    transform: translate(-50%, -50%) scale(1.125);
     background-color: rgba(124, 179, 66, 0.1);
 }
 
 /* --- 메인 피처 섹션 --- */
 .main-feature {
-    padding: 40px 240px;
+    padding: 50px 240px;
     min-height: 500px;
-    background-color: #f1ebeb;
+    background: #FBF5FD;
+    background: linear-gradient(180deg,rgba(251, 245, 253, 1) 0%, rgba(252, 221, 255, 1) 100%);
 }
 
 .main-feature h1 {
     margin: 0 0 60px 0;
     text-align: center;
-    color: #222;
+    color: #912f56;
 }
 
 .main-feature h3 {
@@ -141,6 +141,178 @@ html * {
     font-size: 16px;
 }
 
+/* --- Tilted Sections 레이아웃 --- */
+/* 기울어질 섹션의 공통 스타일 */
+.tilted-section {
+    position: relative;
+    background-color: #ffffff;
+
+    /* Y축을 기준으로 -5도 기울임 */
+    transform: skewY(-5deg);
+
+    /* 기울어진 모서리가 겹치지 않도록 충분한 상하 여백 */
+    margin-top: 10vw;
+    margin-bottom: 10vw;
+
+    /* 콘텐츠가 들어갈 내부 상하 여백 */
+    padding: 8vw 0;
+
+    /* 배경 이미지 설정 */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* z-index를 높여서 그라디언트 배경 위에 표시 */
+    z-index: 10;
+
+    /* 초기 상태: 투명하고 아래에서 올라옴 */
+    opacity: 0;
+    transform: skewY(-5deg) translateY(100px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 활성화된 상태 (뷰포트에 들어왔을 때) */
+.tilted-section.active {
+    opacity: 1;
+    transform: skewY(-5deg) translateY(0);
+}
+
+/* 콘텐츠를 담을 래퍼 */
+.content-wrapper {
+    /* 기울어진 섹션과 반대 방향으로 기울여서 콘텐츠를 똑바로 세움 */
+    transform: skewY(5deg);
+
+    /* 콘텐츠 가로 정렬 */
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    color: #fff;
+    text-shadow: 4px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+.content-wrapper h2 {
+    font-size: 42px;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.content-wrapper p {
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+/* 각 섹션의 배경 이미지 설정 */
+.section-a {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../assets/pics/sub1.jpg');
+}
+
+.section-b {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../assets/pics/sub2.jpg');
+}
+
+.section-c {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../assets/pics/sub3.jpg');
+}
+
+/* 반응형 처리: 모바일 화면에서는 기울임 효과 제거 */
+@media (max-width: 768px) {
+    .tilted-section {
+        transform: none;
+        margin-top: 0;
+        margin-bottom: 40px;
+        padding: 60px 0;
+    }
+
+    .content-wrapper {
+        transform: none;
+    }
+
+    .content-wrapper h2 {
+        font-size: 28px;
+    }
+
+    .content-wrapper p {
+        font-size: 16px;
+    }
+}
+
+/* --- 히어로 갤러리 섹션 --- */
+.hero-gallery-section {
+    width: 100%;
+    background-color: #fcddff;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 그라데이션 배경 */
+.gradient-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.gradient-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    height: 100%;
+    filter: blur(80px);
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.7;
+}
+
+.shape1 {
+    background-color: #4A6C9B;
+    width: 400px;
+    height: 400px;
+    top: 10%;
+    left: 10%;
+}
+
+.shape2 {
+    background-color: #6B87B4;
+    width: 350px;
+    height: 350px;
+    top: 20%;
+    left: 5%;
+}
+
+.shape3 {
+    background-color: #83a2ec;
+    width: 450px;
+    height: 450px;
+    top: 35%;
+    right: 15%;
+}
+
+.shape4 {
+    background-color: #9ba5be;
+    width: 380px;
+    height: 380px;
+    bottom: 20%;
+    left: 20%;
+}
+
+.shape5 {
+    background-color: #ffd3c8;
+    width: 320px;
+    height: 320px;
+    bottom: 10%;
+    right: 10%;
+}
+
 /* --- 카드 슬라이드 --- */
 .card-container {
     position: relative;
@@ -148,10 +320,9 @@ html * {
     max-width: 1920px;
     height: 700px;
     margin: 0 auto;
-    background: #f5f5f5;
-    box-shadow: 0 30px 50px #dbdbdb;
+    background: #fcfbfb;
     opacity: 0;
-    animation: fadeInContainer 0.5s ease-in-out forwards;
+    animation: fadeInContainer 0.7s ease-in-out forwards;
 }
 
 .card-container .slide {
@@ -165,12 +336,11 @@ html * {
     top: 50%;
     transform: translate(0, -25%);
     border-radius: 25px;
-    box-shadow: 0 5px 10px #adadad;
     background-position: 50% 50%;
     background-size: cover;
     display: inline-block;
-    transition: all 0.5s;
-    opacity: 0.7;
+    transition: all 0.4s;
+    opacity: 0.75;
     cursor: pointer;
 }
 
@@ -182,7 +352,7 @@ html * {
     width: 100%;
     height: 100%;
     border-radius: 0;
-    transition: all 0.5s;
+    transition: all 0.4s;
     opacity: 1;
 }
 
@@ -270,9 +440,8 @@ html * {
     display: flex;
     flex-direction: row;
     gap: 20px;
-    left: 45%;
-    right: 50%;
-    width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
     align-items: center;
     text-align: center;
     position: absolute;
@@ -313,96 +482,11 @@ html * {
     padding: 0 3px 0 0;
 }
 
-/* --- 스크롤 애니메이션 성장 섹션 --- */
-.reading-growth-section {
-    min-height: 700vh;
-    padding: 100px 240px;
-    background: linear-gradient(180deg, #f1ebeb 0%, #fcf8f2 100%);
-    position: relative;
-}
-
-.growth-title {
-    text-align: center;
-    font-size: 42px;
-    color: #333;
-    margin-bottom: 100px;
-    font-weight: 700;
-    opacity: 0;
-    animation: fadeInUp 0.8s ease-out 0.2s forwards;
-}
-
-.growth-animation-container {
-    position: sticky;
-    top: 20vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 60vh;
-}
-
-.growth-stage {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 40px;
-    opacity: 0;
-}
-
-.growth-svg-wrapper {
-    width: 650px;
-    height: 650px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* 새싹(500x500)과 선물상자(400x400)를 위한 개별 크기 조정 */
-#stage-1 .growth-svg-wrapper {
-    width: 400px;
-    height: 400px;
-}
-
-#stage-2 .growth-svg-wrapper {
-    width: 500px;
-    height: 500px;
-}
-
-#stage-3 .growth-svg-wrapper {
-    width: 650px;
-    height: 650px;
-}
-
-.growth-text {
-    text-align: center;
-}
-
-.growth-text p {
-    font-size: 24px;
-    font-weight: 500;
-    line-height: 1.6;
-    margin: 0;
-}
-
-/* 시퀀스별 텍스트 색상 - 점점 밝아짐 */
-#stage-1 .growth-text p {
-    color: #666;
-}
-
-#stage-2 .growth-text p {
-    color: #444;
-}
-
-#stage-3 .growth-text p {
-    color: #222;
-    font-weight: 600;
-}
-
 /* --- 인기 도서 섹션 --- */
 .trending-books-section {
     padding: 100px 240px;
-    background-color: #fcf8f2;
+    background: #FCDDFF;
+    background: linear-gradient(180deg,rgba(252, 221, 255, 1) 0%, rgba(252, 248, 242, 1) 100%);
 }
 
 .trending-books-section h2 {
@@ -595,96 +679,6 @@ html * {
     font-weight: 600;
 }
 
-/* --- 후기 섹션 --- */
-.testimonial-section {
-    padding: 100px 240px;
-    background-color: #fff;
-}
-
-.testimonial-section h2 {
-    text-align: center;
-    font-size: 36px;
-    color: #333;
-    margin-bottom: 80px;
-    font-weight: 700;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.testimonial-section h2.reveal-active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.testimonial-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 40px;
-}
-
-.testimonial-card {
-    background: #fcf8f2;
-    padding: 40px 35px;
-    border-radius: 20px;
-    position: relative;
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    opacity: 0;
-    transform: translateY(40px);
-    border: 2px solid transparent;
-}
-
-.testimonial-card.reveal-active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.testimonial-card:hover {
-    border-color: #e0e0e0;
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-}
-
-.testimonial-quote {
-    font-family: 'Paperlogy', sans-serif;
-    font-size: 72px;
-    color: #e0e0e0;
-    line-height: 0.5;
-    margin-bottom: 20px;
-    font-weight: 700;
-}
-
-.testimonial-card p {
-    font-size: 16px;
-    color: #555;
-    line-height: 1.8;
-    margin-bottom: 30px;
-}
-
-.testimonial-author {
-    border-top: 2px solid #e0e0e0;
-    padding-top: 20px;
-}
-
-.author-name {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 5px;
-}
-
-.author-role {
-    font-size: 14px;
-    color: #999;
-}
-
-.disclaimer-text {
-    margin-top: 40px;
-    font-size: 12px;
-    color: #666666;
-    text-align: left;
-}
-
 /* --- 스크롤 애니메이션 유틸리티 --- */
 .reveal-on-scroll {
     opacity: 0;
@@ -743,9 +737,8 @@ html * {
         gap: 40px;
     }
 
-    .testimonial-section {
-        padding-left: 80px;
-        padding-right: 80px;
+    .hero-gallery-section {
+        padding: 140px 0;
     }
 }
 
@@ -784,6 +777,41 @@ html * {
     .masonry-grid {
         column-count: 1;
     }
+
+    .hero-gallery-section {
+        padding: 100px 0;
+    }
+
+    /* 모바일에서 그라데이션 도형 크기 조정 */
+    .gradient-wrapper {
+        filter: blur(60px);
+    }
+
+    .shape1 {
+        width: 250px;
+        height: 250px;
+    }
+
+    .shape2 {
+        width: 220px;
+        height: 220px;
+    }
+
+    .shape3 {
+        width: 280px;
+        height: 280px;
+    }
+
+    .shape4 {
+        width: 240px;
+        height: 240px;
+    }
+
+    .shape5 {
+        width: 200px;
+        height: 200px;
+    }
+
     .navbar,
     .navbar.scrolled {
         padding-left: 20px;
@@ -811,20 +839,6 @@ html * {
     .login-btn {
         padding: 5px 10px;
         font-size: 10px;
-    }
-
-    .testimonial-section {
-        padding: 60px 20px;
-    }
-
-    .testimonial-section h2 {
-        font-size: 28px;
-        margin-bottom: 50px;
-    }
-
-    .testimonial-container {
-        grid-template-columns: 1fr;
-        gap: 30px;
     }
 
     html, html * {

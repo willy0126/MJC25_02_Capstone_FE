@@ -2,9 +2,9 @@
    로그인 상태 확인
 ======================================== */
 function isLoggedIn() {
-    const loginState = localStorage.getItem('isLoggedIn');
+    const accessToken = localStorage.getItem('accessToken');
     const userInfo = localStorage.getItem('userInfo');
-    return loginState === 'true' && userInfo !== null;
+    return accessToken !== null && userInfo !== null;
 }
 
 /* ========================================
@@ -28,7 +28,7 @@ function getCurrentUser() {
    로그인 상태 설정
 ======================================== */
 function setLoginState(userInfo) {
-    localStorage.setItem('isLoggedIn', 'true');
+    // accessToken과 refreshToken은 api-client.js에서 관리
     localStorage.setItem('userInfo', JSON.stringify(userInfo));
 
     window.dispatchEvent(new CustomEvent('loginStateChanged', {
@@ -39,8 +39,12 @@ function setLoginState(userInfo) {
 /* ========================================
    로그인 상태 초기화 (로그아웃)
 ======================================== */
-function clearLoginState() {
-    localStorage.removeItem('isLoggedIn');
+async function clearLoginState() {
+    // API 로그아웃 호출 (토큰도 함께 삭제됨)
+    if (typeof apiClient !== 'undefined') {
+        await apiClient.logout();
+    }
+
     localStorage.removeItem('userInfo');
 
     window.dispatchEvent(new CustomEvent('loginStateChanged', {

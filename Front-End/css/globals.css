@@ -4,14 +4,18 @@
 .globals-container {
     min-height: 100vh;
     padding-top: 80px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f5f7fa 0%, #fef7ff 100%);
 }
 
 /* Hero Section */
 .globals-hero {
+    min-height: 200px;
     text-align: center;
     padding: 60px 20px 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../assets/pics/aboutus4.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: white;
     margin-bottom: 60px;
 }
@@ -38,23 +42,56 @@
 
 .continent-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 30px;
-    justify-items: center;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 50px;
+    max-width: 1500px;
+    margin: 0 auto;
 }
 
 .continent-card {
     background: white;
     border-radius: 20px;
-    padding: 40px 30px;
+    padding: 40px 20px;
     text-align: center;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 220px;
     position: relative;
     overflow: hidden;
+    opacity: 0;
+    animation: fadeInScale 0.6s ease forwards;
+}
+
+.continent-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.continent-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.continent-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.continent-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.continent-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .continent-card::before {
@@ -74,13 +111,13 @@
 
 .continent-card:hover {
     transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
 }
 
 .continent-card.active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    transform: translateY(-10px) scale(1.05);
+    transform: translateY(-10px) scale(1.1);
     box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
 }
 
@@ -88,11 +125,11 @@
     font-size: 60px;
     margin-bottom: 20px;
     display: inline-block;
-    transition: transform 0.3s ease;
+    transition: transform 1s ease;
 }
 
 .continent-card:hover .continent-icon {
-    transform: rotate(10deg) scale(1.1);
+    transform: rotate(25deg) scale(1.1);
 }
 
 .continent-card.active .continent-icon {
@@ -124,8 +161,8 @@
 /* Continent Content Area */
 .continent-content {
     max-width: 1400px;
-    margin: 0 auto 80px;
-    padding: 0 40px;
+    margin: 0 auto;
+    padding: 0 40px 40px;
     min-height: 400px;
 }
 
@@ -174,6 +211,19 @@
     background: white;
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    animation: fadeInDown 0.8s ease 0.2s forwards;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .continent-header h2 {
@@ -208,6 +258,24 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     border-left: 5px solid transparent;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.country-card:nth-child(1) {
+    animation-delay: 0.4s;
+}
+
+.country-card:nth-child(2) {
+    animation-delay: 0.6s;
+}
+
+.country-card:nth-child(3) {
+    animation-delay: 0.8s;
+}
+
+.country-card:nth-child(4) {
+    animation-delay: 1s;
 }
 
 .country-card:hover {
@@ -264,82 +332,6 @@
     transform: translateY(-2px);
 }
 
-/* Global Impact Section */
-.global-impact {
-    max-width: 1200px;
-    margin: 80px auto 0;
-    padding: 60px 40px;
-    background: white;
-    border-radius: 30px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-.global-impact h2 {
-    font-size: 40px;
-    font-weight: 700;
-    color: #2d3748;
-    margin-bottom: 50px;
-    position: relative;
-    display: inline-block;
-}
-
-.global-impact h2::after {
-    content: '';
-    position: absolute;
-    bottom: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    height: 4px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    border-radius: 2px;
-}
-
-.impact-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 40px;
-    margin-bottom: 50px;
-}
-
-.stat-card {
-    padding: 30px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    border-radius: 20px;
-    transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-.stat-number {
-    font-size: 48px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 10px;
-}
-
-.stat-label {
-    font-size: 18px;
-    font-weight: 600;
-    color: #4a5568;
-}
-
-.impact-description {
-    font-size: 18px;
-    line-height: 1.8;
-    color: #4a5568;
-    max-width: 900px;
-    margin: 0 auto;
-    text-align: left;
-}
-
 /* Responsive Design */
 @media (max-width: 1024px) {
     .globals-hero h1 {
@@ -347,12 +339,12 @@
     }
 
     .continent-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
         gap: 20px;
     }
 
     .continent-card {
-        padding: 30px 20px;
+        padding: 30px 15px;
     }
 
     .countries-grid {
@@ -395,7 +387,6 @@
 
     .continent-card {
         padding: 25px 15px;
-        max-width: none;
     }
 
     .continent-icon {
@@ -437,33 +428,6 @@
 
     .country-card p {
         font-size: 14px;
-    }
-
-    .global-impact {
-        padding: 40px 20px;
-        margin-top: 60px;
-    }
-
-    .global-impact h2 {
-        font-size: 28px;
-        margin-bottom: 40px;
-    }
-
-    .impact-stats {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .stat-number {
-        font-size: 36px;
-    }
-
-    .stat-label {
-        font-size: 16px;
-    }
-
-    .impact-description {
-        font-size: 16px;
     }
 }
 

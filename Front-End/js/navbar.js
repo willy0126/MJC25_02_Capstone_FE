@@ -8,12 +8,31 @@ function initNavbar() {
     }
 
     updateNavbarLoginState();
+    updateNavbarLogoLink();
     initUserMenu();
     initLogoutButton();
 
     window.addEventListener('loginStateChanged', function() {
         updateNavbarLoginState();
+        updateNavbarLogoLink();
     });
+}
+
+/* ========================================
+   로그인 상태에 따른 Navbar 로고 링크 업데이트
+======================================== */
+function updateNavbarLogoLink() {
+    const logoLink = document.getElementById('nav-logo-link');
+
+    if (!logoLink) return;
+
+    if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+        // 로그인 상태: index.html로 이동
+        logoLink.href = 'index.html';
+    } else {
+        // 비로그인 상태: landing.html로 이동
+        logoLink.href = 'landing.html';
+    }
 }
 
 /* ========================================
@@ -32,8 +51,10 @@ function updateNavbarLoginState() {
 
         if (typeof getCurrentUser === 'function') {
             const user = getCurrentUser();
-            if (user && user.name && userName) {
-                userName.textContent = user.name;
+            if (user && userName) {
+                // nickname이 있으면 nickname, 없으면 username 표시
+                const displayName = user.nickname || user.username || '사용자';
+                userName.textContent = displayName;
             }
         }
     } else {
@@ -78,12 +99,15 @@ function initLogoutButton() {
 
     if (!logoutBtn) return;
 
-    logoutBtn.addEventListener('click', function(e) {
+    logoutBtn.addEventListener('click', async function(e) {
         e.preventDefault();
 
-        if (confirm('로그아웃 하시겠습니까?')) {
+        // 커스텀 확인 모달 사용
+        const confirmed = await showConfirm('로그아웃 하시겠습니까?', '확인', '취소', '책·이음');
+
+        if (confirmed) {
             if (typeof clearLoginState === 'function') {
-                clearLoginState();
+                await clearLoginState();
             }
 
             const userDropdown = document.getElementById('user-dropdown');
@@ -91,7 +115,16 @@ function initLogoutButton() {
                 userDropdown.classList.remove('show');
             }
 
-            window.location.href = 'index.html';
+            // 현재 페이지 확인
+            const currentPage = window.location.pathname.split('/').pop();
+
+            // index.html에서 로그아웃하면 landing.html로 리다이렉트
+            if (currentPage === 'index.html' || currentPage === '') {
+                window.location.href = 'landing.html';
+            } else {
+                // 다른 페이지에서는 기존처럼 index.html로 이동
+                window.location.href = 'index.html';
+            }
         }
     });
 }

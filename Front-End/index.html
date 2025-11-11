@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>책-이음</title>
+    <title>책·이음 | 책으로 이어지는 우리 가족의 시간</title>
     <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/toast.css">
 </head>
 
 <body>
@@ -32,7 +33,7 @@
                 <div class="content">
                     <div class="name">프로그램 소개</div>
                     <div class="des">독서에 흥미를 붙여드립니다.</div>
-                    <button><a href ="#">자세히 보기</a></button>
+                    <button><a href="program.html">자세히 보기</a></button>
                 </div>
             </div>
 
@@ -60,274 +61,6 @@
         </div>
     </div>
 
-    <!-- 메인 피처 섹션 -->
-    <div class="main-feature">
-        <h1>책-이음에 오신 것을 환영합니다!</h1>
-        <h3>저희는...</h3>
-
-        <div class="features-section">
-            <div class="feature-card">
-                <div class="feature-icon">🎯</div>
-                <h3>독서 습관 형성</h3>
-                <p>독서 기록 및 일정 관리로<br>
-                    자연스럽게 독서 습관을 만들어갑니다.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">👥</div>
-                <h3>함께하는 커뮤니티</h3>
-                <p>같은 관심사를 가진 부모님들과<br> 
-                    소통하고 정보를 공유하세요.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🎁</div>
-                <h3>다양한 혜택</h3>
-                <p>독서 챌린지 참여로<br>
-                    특별한 리워드를 받아보세요.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 스크롤 애니메이션 섹션 (anime.js) -->
-    <div class="reading-growth-section">
-        <h2 class="growth-title">책과 함께 자라나요</h2>
-
-        <div class="growth-animation-container">
-            <div class="growth-stage" id="stage-1">
-                <div class="growth-svg-wrapper">
-                    <svg id="gift-box" width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Sparkle effects around gift box -->
-                        <g id="sparkles">
-                            <!-- Top left sparkle -->
-                            <path d="M 80 150 L 85 160 L 90 150 L 85 140 Z" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.8"/>
-                            <circle cx="85" cy="150" r="3" fill="#FFD700" opacity="0.6"/>
-                            <!-- Top right sparkle -->
-                            <path d="M 320 150 L 315 160 L 310 150 L 315 140 Z" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.8"/>
-                            <circle cx="315" cy="150" r="3" fill="#FFD700" opacity="0.6"/>
-                            <!-- Left sparkle -->
-                            <path d="M 70 250 L 75 260 L 80 250 L 75 240 Z" fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.7"/>
-                            <circle cx="75" cy="250" r="2.5" fill="#FFD700" opacity="0.5"/>
-                            <!-- Right sparkle -->
-                            <path d="M 330 250 L 325 260 L 320 250 L 325 240 Z" fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.7"/>
-                            <circle cx="325" cy="250" r="2.5" fill="#FFD700" opacity="0.5"/>
-                            <!-- Bottom sparkles (new) -->
-                            <path d="M 90 320 L 95 330 L 100 320 L 95 310 Z" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.8"/>
-                            <circle cx="95" cy="320" r="3" fill="#FFD700" opacity="0.6"/>
-                            <path d="M 310 320 L 305 330 L 300 320 L 305 310 Z" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.8"/>
-                            <circle cx="305" cy="320" r="3" fill="#FFD700" opacity="0.6"/>
-                            <!-- Small sparkles -->
-                            <line x1="100" y1="180" x2="105" y2="185" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="105" y1="180" x2="100" y2="185" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="295" y1="180" x2="300" y2="185" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="300" y1="180" x2="295" y2="185" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <!-- Additional small sparkles (new) -->
-                            <line x1="110" y1="300" x2="115" y2="305" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="115" y1="300" x2="110" y2="305" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="285" y1="300" x2="290" y2="305" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="290" y1="300" x2="285" y2="305" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="60" y1="210" x2="65" y2="215" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="65" y1="210" x2="60" y2="215" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="335" y1="210" x2="340" y2="215" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="340" y1="210" x2="335" y2="215" stroke="#FDD835" stroke-width="1.5" opacity="0.6"/>
-                        </g>
-                        <!-- Glow circles -->
-                        <circle id="glow-outer" cx="200" cy="250" r="160" fill="none" stroke="#FFD700" stroke-width="2" opacity="0"/>
-                        <circle id="glow-middle" cx="200" cy="250" r="140" fill="none" stroke="#FDD835" stroke-width="2.5" opacity="0"/>
-                        <circle id="glow-inner" cx="200" cy="250" r="120" fill="none" stroke="#FFEB3B" stroke-width="3" opacity="0"/>
-                        <circle cx="200" cy="250" r="160" fill="none" stroke="#A5D6A7" stroke-width="1" opacity="0.3"/>
-                        <circle cx="200" cy="250" r="140" fill="none" stroke="#81C784" stroke-width="1.5" opacity="0.4"/>
-                        <!-- Gift box base -->
-                        <rect class="gift-draw" x="120" y="200" width="160" height="130" fill="none" stroke="#81C784" stroke-width="3" stroke-linejoin="round"/>
-                        <!-- Box decorative lines -->
-                        <line class="gift-draw" x1="140" y1="200" x2="140" y2="330" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <line class="gift-draw" x1="260" y1="200" x2="260" y2="330" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <line class="gift-draw" x1="120" y1="230" x2="280" y2="230" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <line class="gift-draw" x1="120" y1="280" x2="280" y2="280" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <!-- Gift box lid -->
-                        <rect class="gift-draw" x="110" y="175" width="180" height="30" fill="none" stroke="#81C784" stroke-width="3" stroke-linejoin="round"/>
-                        <!-- Lid shadow line -->
-                        <line class="gift-draw" x1="110" y1="200" x2="290" y2="200" stroke="#66BB6A" stroke-width="2"/>
-                        <!-- Ribbon vertical -->
-                        <line class="gift-draw" x1="200" y1="175" x2="200" y2="330" stroke="#66BB6A" stroke-width="5"/>
-                        <!-- Ribbon horizontal -->
-                        <line class="gift-draw" x1="120" y1="215" x2="280" y2="215" stroke="#66BB6A" stroke-width="5"/>
-                        <!-- Ribbon cross decoration -->
-                        <circle class="gift-draw" cx="200" cy="215" r="8" fill="none" stroke="#4CAF50" stroke-width="2"/>
-                        <!-- Bow left loop -->
-                        <path class="gift-draw" d="M 160 175 Q 140 150 145 120 Q 150 140 155 155 Q 160 165 165 170" fill="none" stroke="#66BB6A" stroke-width="3.5"/>
-                        <!-- Bow left inner detail -->
-                        <path class="gift-draw" d="M 155 155 Q 148 145 150 135" fill="none" stroke="#A5D6A7" stroke-width="2"/>
-                        <!-- Bow right loop -->
-                        <path class="gift-draw" d="M 240 175 Q 260 150 255 120 Q 250 140 245 155 Q 240 165 235 170" fill="none" stroke="#66BB6A" stroke-width="3.5"/>
-                        <!-- Bow right inner detail -->
-                        <path class="gift-draw" d="M 245 155 Q 252 145 250 135" fill="none" stroke="#A5D6A7" stroke-width="2"/>
-                        <!-- Bow center knot -->
-                        <path class="gift-draw" d="M 190 165 L 200 175 L 210 165" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/>
-                        <!-- Bow ribbons hanging -->
-                        <path class="gift-draw" d="M 195 175 Q 185 185 180 200" fill="none" stroke="#81C784" stroke-width="2.5"/>
-                        <path class="gift-draw" d="M 205 175 Q 215 185 220 200" fill="none" stroke="#81C784" stroke-width="2.5"/>
-                        <!-- Box corner details -->
-                        <circle cx="125" cy="205" r="3" fill="none" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <circle cx="275" cy="205" r="3" fill="none" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <circle cx="125" cy="325" r="3" fill="none" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <circle cx="275" cy="325" r="3" fill="none" stroke="#A5D6A7" stroke-width="1.5"/>
-                    </svg>
-                </div>
-                <div class="growth-text">
-                    <p id="text-stage-1"></p>
-                </div>
-            </div>
-
-            <div class="growth-stage" id="stage-2">
-                <div class="growth-svg-wrapper">
-                    <svg id="sprout" width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Soil layers (brown color) -->
-                        <line class="sprout-soil" x1="125" y1="375" x2="375" y2="375" stroke="#8D6E63" stroke-width="4"/>
-                        <path class="sprout-soil" d="M 135 375 Q 160 370 185 375 Q 210 380 235 375 Q 260 370 285 375 Q 310 380 335 375 Q 355 370 365 375" fill="none" stroke="#A1887F" stroke-width="2.5"/>
-                        <!-- Soil texture details -->
-                        <circle cx="160" cy="387" r="2.5" fill="none" stroke="#BCAAA4" stroke-width="1"/>
-                        <circle cx="220" cy="393" r="2.5" fill="none" stroke="#BCAAA4" stroke-width="1"/>
-                        <circle cx="300" cy="390" r="2.5" fill="none" stroke="#BCAAA4" stroke-width="1"/>
-                        <circle cx="180" cy="395" r="2" fill="none" stroke="#D7CCC8" stroke-width="1"/>
-                        <circle cx="260" cy="397" r="2" fill="none" stroke="#D7CCC8" stroke-width="1"/>
-                        <circle cx="330" cy="388" r="2" fill="none" stroke="#D7CCC8" stroke-width="1"/>
-                        <!-- More soil texture -->
-                        <path d="M 140 380 Q 145 385 150 380" fill="none" stroke="#A1887F" stroke-width="1"/>
-                        <path d="M 240 380 Q 245 385 250 380" fill="none" stroke="#A1887F" stroke-width="1"/>
-                        <path d="M 340 380 Q 345 385 350 380" fill="none" stroke="#A1887F" stroke-width="1"/>
-                        <!-- Water drops falling -->
-                        <g id="water-drops">
-                            <!-- Large Drop 1 -->
-                            <path d="M 170 100 Q 170 110 175 115 Q 170 120 165 115 Q 170 110 170 100" fill="none" stroke="#42A5F5" stroke-width="2.5" opacity="0.8"/>
-                            <!-- Large Drop 2 -->
-                            <path d="M 210 80 Q 210 90 215 95 Q 210 100 205 95 Q 210 90 210 80" fill="none" stroke="#42A5F5" stroke-width="2.5" opacity="0.8"/>
-                            <!-- Large Drop 3 -->
-                            <path d="M 250 110 Q 250 120 255 125 Q 250 130 245 125 Q 250 120 250 110" fill="none" stroke="#42A5F5" stroke-width="2.5" opacity="0.8"/>
-                            <!-- Large Drop 4 -->
-                            <path d="M 290 90 Q 290 100 295 105 Q 290 110 285 105 Q 290 100 290 90" fill="none" stroke="#42A5F5" stroke-width="2.5" opacity="0.8"/>
-                            <!-- Large Drop 5 -->
-                            <path d="M 200 130 Q 200 140 205 145 Q 200 150 195 145 Q 200 140 200 130" fill="none" stroke="#42A5F5" stroke-width="2.5" opacity="0.8"/>
-                            <!-- Small drop 1 -->
-                            <circle cx="190" cy="115" r="3.5" fill="none" stroke="#64B5F6" stroke-width="1.8" opacity="0.7"/>
-                            <!-- Small drop 2 -->
-                            <circle cx="230" cy="95" r="3.5" fill="none" stroke="#64B5F6" stroke-width="1.8" opacity="0.7"/>
-                            <!-- Small drop 3 -->
-                            <circle cx="270" cy="125" r="3.5" fill="none" stroke="#64B5F6" stroke-width="1.8" opacity="0.7"/>
-                        </g>
-                        <!-- Main stem (larger) -->
-                        <path class="sprout-draw" d="M 250 375 Q 243 337 247 300 Q 250 275 250 250" fill="none" stroke="#66BB6A" stroke-width="5"/>
-                        <!-- Stem texture lines -->
-                        <line class="sprout-draw" x1="247" y1="350" x2="253" y2="347" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <line class="sprout-draw" x1="246" y1="325" x2="252" y2="322" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <line class="sprout-draw" x1="247" y1="300" x2="253" y2="297" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <line class="sprout-draw" x1="248" y1="275" x2="252" y2="272" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <!-- Left leaf large -->
-                        <path class="sprout-draw" d="M 250 325 Q 206 318 181 293 Q 175 281 177 268 Q 181 277 187 285 Q 206 302 231 312" fill="none" stroke="#81C784" stroke-width="4.5"/>
-                        <!-- Left leaf vein -->
-                        <path class="sprout-draw" d="M 231 312 Q 212 306 197 293" fill="none" stroke="#A5D6A7" stroke-width="2"/>
-                        <path class="sprout-draw" d="M 212 303 Q 203 300 197 293" fill="none" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <!-- Left leaf small -->
-                        <path class="sprout-draw" d="M 243 337 Q 218 335 206 322 Q 212 327 225 332" fill="none" stroke="#A5D6A7" stroke-width="3"/>
-                        <!-- Right leaf large -->
-                        <path class="sprout-draw" d="M 250 306 Q 293 300 318 275 Q 325 262 323 250 Q 318 258 312 266 Q 293 283 268 293" fill="none" stroke="#81C784" stroke-width="4.5"/>
-                        <!-- Right leaf vein -->
-                        <path class="sprout-draw" d="M 268 293 Q 287 287 302 275" fill="none" stroke="#A5D6A7" stroke-width="2"/>
-                        <path class="sprout-draw" d="M 287 286 Q 296 279 302 275" fill="none" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <!-- Right leaf small -->
-                        <path class="sprout-draw" d="M 252 318 Q 277 316 290 303 Q 283 308 271 313" fill="none" stroke="#A5D6A7" stroke-width="3"/>
-                        <!-- Top leaves emerging -->
-                        <path class="sprout-draw" d="M 250 268 Q 235 260 227 247" fill="none" stroke="#A5D6A7" stroke-width="2.5"/>
-                        <path class="sprout-draw" d="M 250 262 Q 265 254 273 241" fill="none" stroke="#A5D6A7" stroke-width="2.5"/>
-                        <!-- Center bud -->
-                        <ellipse class="sprout-draw" cx="250" cy="243" rx="10" ry="15" fill="none" stroke="#66BB6A" stroke-width="3"/>
-                        <path class="sprout-draw" d="M 250 228 Q 243 235 250 243 Q 257 235 250 228" fill="none" stroke="#4CAF50" stroke-width="2.5"/>
-                        <!-- Bud petals detail -->
-                        <line x1="245" y1="237" x2="255" y2="237" stroke="#A5D6A7" stroke-width="1.5"/>
-                        <line x1="247" y1="243" x2="253" y2="243" stroke="#A5D6A7" stroke-width="1.5"/>
-                    </svg>
-                </div>
-                <div class="growth-text">
-                    <p id="text-stage-2"></p>
-                </div>
-            </div>
-
-            <div class="growth-stage" id="stage-3">
-                <div class="growth-svg-wrapper">
-                    <svg id="tree" width="650" height="650" viewBox="0 0 650 650" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Ground with brown soil -->
-                        <line class="tree-soil" x1="130" y1="555" x2="520" y2="555" stroke="#8D6E63" stroke-width="5"/>
-                        <path class="tree-soil" d="M 140 555 Q 165 550 190 555 Q 215 560 240 555 Q 265 550 290 555 Q 315 560 340 555 Q 365 550 390 555 Q 415 560 440 555 Q 465 550 490 555 Q 505 560 510 555" fill="none" stroke="#A1887F" stroke-width="3"/>
-                        <!-- Soil texture -->
-                        <circle cx="170" cy="568" r="3" fill="none" stroke="#BCAAA4" stroke-width="1"/>
-                        <circle cx="250" cy="573" r="3" fill="none" stroke="#BCAAA4" stroke-width="1"/>
-                        <circle cx="350" cy="570" r="3" fill="none" stroke="#BCAAA4" stroke-width="1"/>
-                        <circle cx="450" cy="575" r="3" fill="none" stroke="#BCAAA4" stroke-width="1"/>
-                        <circle cx="210" cy="577" r="2.5" fill="none" stroke="#D7CCC8" stroke-width="1"/>
-                        <circle cx="310" cy="579" r="2.5" fill="none" stroke="#D7CCC8" stroke-width="1"/>
-                        <circle cx="410" cy="572" r="2.5" fill="none" stroke="#D7CCC8" stroke-width="1"/>
-                        <!-- Grass -->
-                        <path d="M 145 555 L 152 540 L 160 555" fill="none" stroke="#A5D6A7" stroke-width="2"/>
-                        <path d="M 195 555 L 203 538 L 210 555" fill="none" stroke="#A5D6A7" stroke-width="2"/>
-                        <path d="M 260 555 L 268 535 L 275 555" fill="none" stroke="#A5D6A7" stroke-width="2"/>
-                        <path d="M 375 555 L 383 538 L 390 555" fill="none" stroke="#A5D6A7" stroke-width="2"/>
-                        <path d="M 440 555 L 448 540 L 455 555" fill="none" stroke="#A5D6A7" stroke-width="2"/>
-                        <path d="M 490 555 L 498 542 L 505 555" fill="none" stroke="#A5D6A7" stroke-width="2"/>
-                        <!-- Trunk -->
-                        <rect class="tree-draw" x="293" y="390" width="65" height="165" fill="none" stroke="#66BB6A" stroke-width="5"/>
-                        <!-- Main branches -->
-                        <line class="tree-draw" x1="300" y1="405" x2="244" y2="358" stroke="#66BB6A" stroke-width="5"/>
-                        <line class="tree-draw" x1="350" y1="405" x2="406" y2="358" stroke="#66BB6A" stroke-width="5"/>
-                        <!-- Crown circles (foliage) - larger -->
-                        <circle class="tree-draw" cx="325" cy="280" r="95" fill="none" stroke="#81C784" stroke-width="5"/>
-                        <circle class="tree-draw" cx="244" cy="330" r="70" fill="none" stroke="#81C784" stroke-width="5"/>
-                        <circle class="tree-draw" cx="406" cy="330" r="70" fill="none" stroke="#81C784" stroke-width="5"/>
-                        <!-- Red Apples on tree -->
-                        <g id="apples">
-                            <!-- Apple 1 -->
-                            <circle cx="268" cy="285" r="12" fill="none" stroke="#E53935" stroke-width="3.5" opacity="0"/>
-                            <circle cx="268" cy="285" r="10" fill="#EF5350" opacity="0"/>
-                            <circle cx="265" cy="282" r="4" fill="#FFCDD2" opacity="0"/>
-                            <line x1="268" y1="273" x2="268" y2="277" stroke="#66BB6A" stroke-width="2.5" opacity="0"/>
-                            <!-- Apple 2 -->
-                            <circle cx="382" cy="285" r="12" fill="none" stroke="#E53935" stroke-width="3.5" opacity="0"/>
-                            <circle cx="382" cy="285" r="10" fill="#EF5350" opacity="0"/>
-                            <circle cx="379" cy="282" r="4" fill="#FFCDD2" opacity="0"/>
-                            <line x1="382" y1="273" x2="382" y2="277" stroke="#66BB6A" stroke-width="2.5" opacity="0"/>
-                            <!-- Apple 3 -->
-                            <circle cx="325" cy="301" r="12" fill="none" stroke="#E53935" stroke-width="3.5" opacity="0"/>
-                            <circle cx="325" cy="301" r="10" fill="#EF5350" opacity="0"/>
-                            <circle cx="322" cy="298" r="4" fill="#FFCDD2" opacity="0"/>
-                            <line x1="325" y1="289" x2="325" y2="293" stroke="#66BB6A" stroke-width="2.5" opacity="0"/>
-                            <!-- Apple 4 -->
-                            <circle cx="228" cy="330" r="11" fill="none" stroke="#E53935" stroke-width="3" opacity="0"/>
-                            <circle cx="228" cy="330" r="9" fill="#EF5350" opacity="0"/>
-                            <circle cx="225" cy="327" r="3.5" fill="#FFCDD2" opacity="0"/>
-                            <line x1="228" y1="319" x2="228" y2="323" stroke="#66BB6A" stroke-width="2.5" opacity="0"/>
-                            <!-- Apple 5 -->
-                            <circle cx="422" cy="330" r="11" fill="none" stroke="#E53935" stroke-width="3" opacity="0"/>
-                            <circle cx="422" cy="330" r="9" fill="#EF5350" opacity="0"/>
-                            <circle cx="419" cy="327" r="3.5" fill="#FFCDD2" opacity="0"/>
-                            <line x1="422" y1="319" x2="422" y2="323" stroke="#66BB6A" stroke-width="2.5" opacity="0"/>
-                            <!-- Apple 6 (additional) -->
-                            <circle cx="300" cy="250" r="11" fill="none" stroke="#E53935" stroke-width="3" opacity="0"/>
-                            <circle cx="300" cy="250" r="9" fill="#EF5350" opacity="0"/>
-                            <circle cx="297" cy="247" r="3.5" fill="#FFCDD2" opacity="0"/>
-                            <line x1="300" y1="239" x2="300" y2="243" stroke="#66BB6A" stroke-width="2.5" opacity="0"/>
-                            <!-- Apple 7 (additional) -->
-                            <circle cx="350" cy="250" r="11" fill="none" stroke="#E53935" stroke-width="3" opacity="0"/>
-                            <circle cx="350" cy="250" r="9" fill="#EF5350" opacity="0"/>
-                            <circle cx="347" cy="247" r="3.5" fill="#FFCDD2" opacity="0"/>
-                            <line x1="350" y1="239" x2="350" y2="243" stroke="#66BB6A" stroke-width="2.5" opacity="0"/>
-                        </g>
-                    </svg>
-                </div>
-                <div class="growth-text">
-                    <p id="text-stage-3"></p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- 인기 도서 섹션 -->
     <div class="trending-books-section">
@@ -351,52 +84,26 @@
         </div>
     </div>
 
-    <!-- 후기 섹션 -->
-    <div class="testimonial-section">
-        <h2 class="reveal-on-scroll">이용자 후기</h2>
-
-        <div class="testimonial-container">
-            <div class="testimonial-card tilt-card reveal-on-scroll">
-                <div class="testimonial-quote">"</div>
-                <p>아이가 책을 멀리했었는데 책-이음을 통해 독서 습관이 생겼어요. 챌린지 기능이 특히 좋습니다!</p>
-                <div class="testimonial-author">
-                    <div class="author-name">김xx</div>
-                    <div class="author-role">초등학생 학부모</div>
-                </div>
-            </div>
-
-            <div class="testimonial-card tilt-card reveal-on-scroll">
-                <div class="testimonial-quote">"</div>
-                <p>커뮤니티에서 다른 부모님들과 정보를 나누며 좋은 책들을 많이 알게 되었어요.</p>
-                <div class="testimonial-author">
-                    <div class="author-name">박xx</div>
-                    <div class="author-role">중학생 학부모</div>
-                </div>
-            </div>
-
-            <div class="testimonial-card tilt-card reveal-on-scroll">
-                <div class="testimonial-quote">"</div>
-                <p>구독 시스템 덕분에 매달 새로운 책을 접할 수 있어서 아이도 저도 만족하고 있습니다.</p>
-                <div class="testimonial-author">
-                    <div class="author-name">이xx</div>
-                    <div class="author-role">초등학생 학부모</div>
-                </div>
-            </div>
-        </div>
-
-        <p class="disclaimer-text">* 본 콘텐츠는 사이트 경험을 돕기 위한 내용으로, 실제 내용이 아닙니다.</p>
-    </div>
-
     <!-- 푸터 섹션 -->
     <div id="footer-placeholder"></div>
 
     <!-- 라이브러리 먼저 로드 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
     <!-- 애플리케이션 스크립트 -->
+    <script src="js/env-config.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/include.js"></script>
     <script src="js/cursor.js"></script>
+    <script src="js/library-api.js"></script>
     <script src="js/index.js"></script>
 </body>
 
