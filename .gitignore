@@ -1,0 +1,12 @@
+# Ignore MySQL data directory
+mysql_data/
+
+# Ignore node modules
+node_modules/
+
+# environment variable files
+.env
+env-config.js
+
+# Ignore Claude AI files
+.claude
