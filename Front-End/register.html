@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <link rel="stylesheet" href="css/register.css">
+    <link rel="stylesheet" href="css/toast.css">
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <a href="landing.html">
+                <img src="assets/logo/tplogo.png" alt="로고" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22150%22 height=%22100%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22%3ELogo%3C/text%3E%3C/svg%3E'">
+            </a>
+        </div>
+
+        <!-- 단계 표시기 -->
+        <div class="step-indicator">
+            <span class="step"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+        </div>
+
+        <form id="registerForm">
+            <!-- 1단계: 약관 동의 -->
+            <div class="form-step active" id="step1">
+                <div class="terms-container">
+                    <h2>서비스 약관에 동의해 주세요.</h2>
+
+                    <!-- 모두 동의 -->
+                    <div class="terms-item all-agree">
+                        <label>
+                            <input type="checkbox" id="agreeAll">
+                            <span>모두 동의합니다.</span>
+                        </label>
+                        <p class="terms-description">
+                            전체 동의는 필수 및 선택항목에 대한 동의도 포함되어 있으며, 개별적으로 동의를 선택하실 수 있습니다.
+                            선택항목에 대한 동의를 거부하시는 경우에도 서비스는 이용이 가능합니다.
+                        </p>
+                    </div>
+
+                    <!-- 필수 약관들 -->
+                    <div class="terms-item required">
+                        <label>
+                            <input type="checkbox" class="required-term" id="termsService">
+                            <span><b>[필수] 서비스 약관</b></span>
+                            <a href="serviceterm.html" target="_blank" class="terms-detail" onclick="event.stopPropagation()">〉</a>
+                        </label>
+                    </div>
+
+                    <div class="terms-item required">
+                        <label>
+                            <input type="checkbox" class="required-term" id="termsPrivacy">
+                            <span><b>[필수] 개인정보 수집 및 이용 동의</b></span>
+                            <a href="privacyterm.html" target="_blank" class="terms-detail" onclick="event.stopPropagation()">〉</a>
+                        </label>
+                    </div>
+
+                    <!-- 선택 약관들 -->
+                    <div class="terms-item optional">
+                        <label>
+                            <input type="checkbox" class="optional-term" id="termsMarketing">
+                            <span>[선택] 마케팅 정보 수신 동의</span>
+                            <a href="marketingterm.html" target="_blank" class="terms-detail" onclick="event.stopPropagation()">〉</a>
+                        </label>
+                    </div>
+
+                    <div class="terms-item optional">
+                        <label>
+                            <input type="checkbox" class="optional-term" id="termsLocation">
+                            <span>[선택] 위치정보 수집 및 이용 동의</span>
+                            <a href="locationterm.html" target="_blank" class="terms-detail" onclick="event.stopPropagation()">〉</a>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="button" class="submit-btn" id="nextToStep2">동의</button>
+            </div>
+
+            <!-- 2단계: 회원가입 폼 -->
+            <div class="form-step" id="step2">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #333;">회원 가입</h2>
+                <!-- 이메일 -->
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <div class="input-with-button">
+                        <input type="email" id="email" name="email" placeholder="이메일을 입력하세요" required>
+                        <button type="button" class="btn-primary" id="sendVerification">인증번호 받기</button>
+                    </div>
+                </div>
+
+                <!-- 인증번호 -->
+                <div class="form-group">
+                    <label for="verificationCode">인증번호</label>
+                    <div class="input-with-button">
+                        <input type="text" id="verificationCode" name="verificationCode" placeholder="인증번호를 입력하세요">
+                        <button type="button" class="btn-secondary" id="verifyCode">확인</button>
+                    </div>
+                </div>
+
+                <!-- 이름 -->
+                <div class="form-group">
+                    <label for="name">이름</label>
+                    <input type="text" id="name" name="name" placeholder="이름을 입력하세요" required>
+                </div>
+
+                <!-- 닉네임 -->
+                <div class="form-group">
+                    <label for="nickname">닉네임</label>
+                    <div class="input-with-button">
+                        <input type="text" id="nickname" name="nickname" placeholder="닉네임을 입력하세요" required>
+                        <button type="button" class="btn-secondary" id="checkNickname">중복 확인</button>
+                    </div>
+                </div>
+
+                <!-- 비밀번호 -->
+                <div class="form-group">
+                    <label for="password">비밀번호</label>
+                    <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+                    <span class="validation-message info">영어, 숫자, 특수문자(@$!%*#?&) 포함 8자리 이상으로 입력해주세요</span>
+                </div>
+
+                <!-- 비밀번호 확인 -->
+                <div class="form-group">
+                    <label for="passwordConfirm">비밀번호 확인</label>
+                    <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="비밀번호를 다시 입력하세요" required>
+                    <span class="validation-message error" id="passwordError" style="display: none;">비밀번호가 일치하지 않습니다</span>
+                </div>
+
+                <!-- 생년월일 -->
+                <div class="form-group">
+                    <label for="birthYear">생년월일</label>
+                    <div class="birth-group">
+                        <select id="birthYear" name="birthYear" required>
+                            <option value="">년</option>
+                        </select>
+                        <span>년</span>
+                        <select id="birthMonth" name="birthMonth" required>
+                            <option value="">월</option>
+                        </select>
+                        <span>월</span>
+                        <select id="birthDay" name="birthDay" required>
+                            <option value="">일</option>
+                        </select>
+                        <span>일</span>
+                        <span class="help-icon">?</span>
+                    </div>
+                </div>
+
+                <!-- 연락처 -->
+                <div class="form-group">
+                    <label for="phone">연락처</label>
+                    <input type="tel" id="phone" name="phone" placeholder="연락처를 입력하세요" required>
+                </div>
+
+                <!-- 주소 -->
+                <div class="form-group">
+                    <label for="address">주소</label>
+                    <div class="input-with-button">
+                        <input type="text" id="address" name="address" placeholder="주소를 입력하세요" required>
+                        <button type="button" class="btn-secondary" id="findAddress">주소 찾기</button>
+                    </div>
+                </div>
+
+                <!-- 버튼 컨테이너 -->
+                <div class="btn-container">
+                    <button type="button" class="prev-btn" id="prevBtn">이전</button>
+                    <button type="button" class="submit-btn" id="nextToStep3">다음</button>
+                </div>
+            </div>
+
+            <!-- 3단계: 프로필 설정 -->
+            <div class="form-step" id="step3">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #333;">프로필 설정</h2>
+
+                <!-- 아바타 선택 -->
+                <div class="profile-section">
+                    <h3>아바타 선택</h3>
+                    <p class="section-description">원하는 프로필 아바타를 선택해주세요.</p>
+
+                    <div class="avatar-grid" id="avatarGrid">
+                        <!-- JavaScript로 동적 생성됨 -->
+                    </div>
+
+                    <div class="avatar-actions">
+                        <button type="button" class="btn-secondary" id="refreshAvatars">다른 아바타 보기</button>
+                    </div>
+                </div>
+
+                <!-- 대표 색상 선택 -->
+                <div class="profile-section">
+                    <h3>대표 색상</h3>
+                    <p class="section-description">프로필 대표 색상을 선택해주세요.</p>
+
+                    <div class="color-picker-container">
+                        <!-- 색상 미리보기 -->
+                        <div class="color-preview-wrapper">
+                            <label>선택된 색상</label>
+                            <div class="color-preview" id="colorPreview" style="background-color: #20B2AA;"></div>
+                            <div class="color-hex-display" id="colorHexDisplay">#20B2AA</div>
+                        </div>
+
+                        <!-- 색상 팔레트 그리드 -->
+                        <div class="color-palette-wrapper">
+                            <label>색상 선택</label>
+                            <div class="color-palette-grid" id="colorPaletteGrid">
+                                <!-- JavaScript로 동적 생성됨 -->
+                            </div>
+                        </div>
+
+                        <!-- 숨겨진 input (폼 제출용) -->
+                        <input type="hidden" id="colorPicker" name="color" value="#20B2AA" required>
+                    </div>
+                </div>
+
+                <!-- 버튼 컨테이너 -->
+                <div class="btn-container">
+                    <button type="button" class="prev-btn" id="prevBtn2">이전</button>
+                    <button type="submit" class="submit-btn">회원가입</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/register.js"></script>
+</body>
+</html>
