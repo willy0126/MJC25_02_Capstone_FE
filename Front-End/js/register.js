@@ -583,6 +583,13 @@ async function handleSubmit(e) {
     // 선택된 색상 가져오기
     const selectedColor = document.getElementById('colorPicker').value || '#20B2AA';
 
+    // 선택된 아바타 가져오기
+    const selectedAvatar = document.querySelector('input[name="avatar"]:checked');
+    if (!selectedAvatar) {
+        showToast('아바타를 선택해주세요.', 'warning');
+        return;
+    }
+
     // 전화번호 형식 검증 및 변환 (백엔드 요구 형식: XXX-XXXX-XXXX 또는 XXX-XXX-XXXX)
     let formattedPhone = phone.value ? phone.value.trim() : null;
     if (formattedPhone) {
@@ -606,18 +613,6 @@ async function handleSubmit(e) {
         }
     }
 
-    // 회원가입 데이터 생성 (백엔드 API 스펙에 맞춤)
-    const signupData = {
-        email: email.value,
-        password: password.value,
-        username: username.value,
-        nickname: nickname.value || null,
-        phone: formattedPhone,
-        birth: birthValue,
-        address: fullAddress,
-        color: selectedColor
-    };
-
     // 로딩 표시용 변수 선언 (스코프 이슈 해결)
     const submitBtn = document.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
@@ -626,6 +621,40 @@ async function handleSubmit(e) {
         // 로딩 표시
         submitBtn.disabled = true;
         submitBtn.textContent = '가입 중...';
+
+        // 선택된 아바타 URL에서 SVG 콘텐츠 가져오기
+        const avatarUrl = selectedAvatar.value;
+        let avatarSvg = null;
+
+        try {
+            const avatarResponse = await fetch(avatarUrl);
+            if (avatarResponse.ok) {
+                avatarSvg = await avatarResponse.text();
+                console.log('아바타 SVG 길이:', avatarSvg.length);
+                console.log('아바타 SVG 일부:', avatarSvg.substring(0, 200));
+            } else {
+                throw new Error('아바타 로드 실패');
+            }
+        } catch (avatarError) {
+            console.error('아바타 가져오기 실패:', avatarError);
+            showToast('아바타를 불러오는데 실패했습니다. 다시 시도해주세요.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            return;
+        }
+
+        // 회원가입 데이터 생성 (백엔드 API 스펙에 맞춤)
+        const signupData = {
+            email: email.value,
+            password: password.value,
+            username: username.value,
+            nickname: nickname.value || null,
+            phone: formattedPhone,
+            birth: birthValue,
+            address: fullAddress,
+            color: selectedColor,
+            profileImg: avatarSvg
+        };
 
         // API 호출 (백엔드 응답 형식: {success, code, message, data})
         const response = await apiClient.signup(signupData);

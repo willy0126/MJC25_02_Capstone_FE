@@ -38,6 +38,87 @@ body {
     width: 100%;
 }
 
+/* 단계 표시기 */
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background-color: #e0e0e0;
+    z-index: 0;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+    background-color: #20B2AA;
+    color: white;
+}
+
+.step-label {
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+.step.active .step-label {
+    color: #20B2AA;
+    font-weight: 600;
+}
+
+/* 단계 콘텐츠 */
+.step-content {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.step-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .resetpw-content h2 {
     text-align: center;
     color: #20B2AA;
@@ -84,7 +165,8 @@ body {
     border-color: #e74c3c;
 }
 
-.password-hint {
+.password-hint,
+.hint {
     display: block;
     font-size: 12px;
     color: #999;
@@ -126,6 +208,25 @@ body {
     background-color: #ccc;
     cursor: not-allowed;
     transform: none;
+}
+
+.back-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #f5f5f5;
+    color: #666;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.back-btn:hover {
+    background-color: #e8e8e8;
+    border-color: #ccc;
 }
 
 .back-to-login {
