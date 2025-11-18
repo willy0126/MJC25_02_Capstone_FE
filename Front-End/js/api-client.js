@@ -199,10 +199,34 @@ class ApiClient {
         });
     }
 
-    async resetPassword(passwordData) {
-        return await this.request('/users/reset-password', {
+    // 비밀번호 재설정 - 3단계 프로세스
+    // 1단계: 이메일로 인증 코드 발송
+    async forgotPassword(email) {
+        return await this.request('/auth/forgot-password', {
             method: 'POST',
-            body: JSON.stringify(passwordData)
+            body: JSON.stringify({ email }),
+            skipAuth: true
+        });
+    }
+
+    // 2단계: 인증 코드 검증
+    async verifyResetCode(code) {
+        return await this.request('/auth/verify-code', {
+            method: 'POST',
+            body: JSON.stringify({ code }),
+            skipAuth: true
+        });
+    }
+
+    // 3단계: 새 비밀번호 설정 (임시 토큰 사용)
+    async resetPassword(newPassword, confirmPassword, temporaryToken) {
+        return await this.request('/auth/reset-password', {
+            method: 'POST',
+            body: JSON.stringify({ newPassword, confirmPassword }),
+            headers: {
+                'Authorization': `Bearer ${temporaryToken}`
+            },
+            skipAuth: true // getAccessToken() 호출 방지
         });
     }
 
