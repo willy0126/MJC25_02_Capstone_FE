@@ -42,7 +42,7 @@ const UI_CONFIG = {
 
     // 커서
     CURSOR: {
-        FOLLOW_SPEED: 0.13,          // 커서 따라오기 속도 (0-1, 낮을수록 빠름)
+        FOLLOW_SPEED: 0.25,          // 커서 따라오기 속도 (0-1, 낮을수록 빠름)
         HOVER_SELECTORS: [           // 호버 효과 적용 대상
             'a',
             'button',

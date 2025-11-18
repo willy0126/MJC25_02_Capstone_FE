@@ -23,14 +23,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 사용자 권한 확인
 function checkUserAuth() {
-    // localStorage에서 로그인 정보 확인
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const userId = localStorage.getItem('userId');
+    // auth.js의 getCurrentUser() 함수 사용
+    const user = getCurrentUser();
 
-    if (isLoggedIn && userId) {
-        currentUser = userId;
-        // admin이 포함된 ID인지 확인
-        isAdmin = userId.toLowerCase().includes('admin');
+    if (user && user.email) {
+        currentUser = user.email;
+        // 이메일에 admin이 포함되어 있는지 확인
+        isAdmin = user.email.toLowerCase().includes('admin');
 
         // 관리자면 글쓰기 버튼 표시
         if (isAdmin) {
@@ -52,7 +51,7 @@ function loadNotices() {
                 badge: 'important',
                 title: '책·이음 서비스 정기 점검 안내',
                 content: '안녕하세요, 책·이음입니다.\n\n보다 나은 서비스 제공을 위해 정기 점검을 실시합니다.\n\n점검 시간: 2025년 1월 20일 (월) 02:00 ~ 06:00\n점검 내용: 서버 및 데이터베이스 최적화\n\n점검 시간 동안 서비스 이용이 일시 중단됩니다.\n이용에 불편을 드려 죄송합니다.\n\n감사합니다.',
-                author: 'admin',
+                author: 'admin@chaeg-ium.com',
                 date: '2025.01.15',
                 views: 1234
             },
@@ -61,7 +60,7 @@ function loadNotices() {
                 badge: 'new',
                 title: '2025년 신규 독서 프로그램 안내',
                 content: '새해를 맞아 가족과 함께하는 새로운 독서 프로그램을 출시합니다.\n\n주요 내용:\n- 연령별 맞춤 독서 가이드\n- 다양한 독후 활동\n- 가족 독서 챌린지\n\n많은 참여 부탁드립니다.',
-                author: 'admin',
+                author: 'admin@chaeg-ium.com',
                 date: '2025.01.10',
                 views: 856
             },
@@ -70,7 +69,7 @@ function loadNotices() {
                 badge: 'event',
                 title: '겨울방학 특별 창작 대회 개최',
                 content: '겨울방학을 맞아 특별 창작 대회를 개최합니다.\n\n참가 대상: 초등학생부터 청소년까지\n접수 기간: 2025.01.05 ~ 2025.01.31\n발표일: 2025.02.15\n\n우수 작품에는 푸짐한 상품이 준비되어 있습니다.',
-                author: 'admin',
+                author: 'admin@chaeg-ium.com',
                 date: '2025.01.05',
                 views: 2103
             }

@@ -24,7 +24,7 @@ const CursorManager = {
         return typeof UI_CONFIG !== 'undefined' && UI_CONFIG.CURSOR
             ? UI_CONFIG.CURSOR
             : {
-                FOLLOW_SPEED: 0.13,
+                FOLLOW_SPEED: 0.25,
                 HOVER_SELECTORS: ['a', 'button', '.feature-card', '.nav-item', '.login-btn']
             };
     },

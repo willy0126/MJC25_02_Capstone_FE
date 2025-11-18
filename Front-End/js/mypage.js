@@ -230,11 +230,25 @@ function editProfile() {
         document.getElementById('editNickname').value = userInfo.nickname || '';
         document.getElementById('editPhone').value = userInfo.phone || '';
 
-        // 주소 분리 (백엔드가 주소+상세주소를 하나로 저장했다고 가정)
+        // 주소 분리 (백엔드가 주소+상세주소를 하나로 저장한 경우)
         const fullAddress = userInfo.address || '';
-        // 간단하게 전체 주소를 editAddress에 넣음
-        document.getElementById('editAddress').value = fullAddress;
-        document.getElementById('editDetailAddress').value = '';
+
+        // 주소를 기본주소와 상세주소로 분리
+        let baseAddress = fullAddress;
+        let detailAddress = '';
+
+        // 패턴: "로", "길", "대로" + 번지수 + (괄호) 까지를 기본주소로 간주
+        // 예: "서울 강동구 동남로 562 (둔촌동)" + " 테스트주소 22"
+        const addressPattern = /(.*?(?:로|길|대로)\s+\d+[-\d]*\s*(?:\([^)]*\))?)\s*(.*)/;
+        const match = fullAddress.match(addressPattern);
+
+        if (match) {
+            baseAddress = match[1].trim();
+            detailAddress = match[2].trim();
+        }
+
+        document.getElementById('editAddress').value = baseAddress;
+        document.getElementById('editDetailAddress').value = detailAddress;
     }
 
     // 프로필 수정 모달 이벤트 리스너 등록

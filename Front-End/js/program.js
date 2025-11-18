@@ -20,7 +20,7 @@ function initStepCardsAnimation() {
 
     // Intersection Observer 옵션 설정
     const observerOptions = {
-        threshold: 1.0,        // 요소가 100% 보일 때 콜백 실행
+        threshold: 0.7,        // 요소가 70% 보일 때 콜백 실행
         rootMargin: '0px'      // 뷰포트 마진 없음
     };
 
