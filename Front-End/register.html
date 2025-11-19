@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+<!-- HEAD: 메타데이터 및 스타일시트 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
 </head>
+
+<!-- BODY: 회원가입 페이지 (3단계 폼) -->
 <body>
     <div class="register-container">
         <div class="logo">
@@ -114,10 +117,7 @@
                 <!-- 닉네임 -->
                 <div class="form-group">
                     <label for="nickname">닉네임</label>
-                    <div class="input-with-button">
-                        <input type="text" id="nickname" name="nickname" placeholder="닉네임을 입력하세요" required>
-                        <button type="button" class="btn-secondary" id="checkNickname">중복 확인</button>
-                    </div>
+                    <input type="text" id="nickname" name="nickname" placeholder="닉네임을 입력하세요" required>
                 </div>
 
                 <!-- 비밀번호 -->
@@ -221,13 +221,12 @@
         </form>
     </div>
 
-    <!-- 카카오 주소 검색 API -->
+    <!-- 외부 라이브러리 -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-
-    <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
 
+    <!-- 애플리케이션 스크립트 -->
     <script src="js/toast.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/constants.js"></script>

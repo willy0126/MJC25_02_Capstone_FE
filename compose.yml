@@ -45,7 +45,7 @@ services:
       - capstone
 
   backend:
-    image: jhh0101/capstone:v1.0.6
+    image: jhh0101/capstone:v1.0.11
     container_name: backend_container
     env_file:
       - .env

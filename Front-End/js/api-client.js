@@ -338,6 +338,142 @@ class ApiClient {
             method: 'DELETE'
         });
     }
+
+    // ==================== Notice APIs ====================
+
+    /**
+     * 공지사항 목록 조회 (페이징)
+     * @param {number} page - 페이지 번호 (0부터 시작)
+     * @param {number} size - 페이지 크기
+     * @returns {Promise<Object>} 페이징된 공지사항 목록
+     */
+    async getNotices(page = 0, size = 10) {
+        return await this.request(`/notices?page=${page}&size=${size}`, {
+            method: 'GET',
+            skipAuth: true // 인증 불필요
+        });
+    }
+
+    /**
+     * 공지사항 상세 조회
+     * @param {number} noticeId - 공지사항 ID
+     * @returns {Promise<Object>} 공지사항 상세 정보
+     */
+    async getNotice(noticeId) {
+        return await this.request(`/notices/${noticeId}`, {
+            method: 'GET',
+            skipAuth: true // 인증 불필요
+        });
+    }
+
+    /**
+     * 공지사항 작성 (ADMIN 전용)
+     * @param {Object} noticeData - 공지사항 정보
+     * @param {string} noticeData.title - 제목 (필수, 최대 100자)
+     * @param {string} noticeData.content - 내용 (필수, 최대 2000자)
+     * @param {number} noticeData.imageId - 이미지 ID (선택)
+     * @returns {Promise<Object>} 작성된 공지사항 정보
+     */
+    async createNotice(noticeData) {
+        return await this.request('/notices', {
+            method: 'POST',
+            body: JSON.stringify(noticeData)
+        });
+    }
+
+    /**
+     * 공지사항 수정 (ADMIN 전용)
+     * @param {number} noticeId - 공지사항 ID
+     * @param {Object} noticeData - 수정할 공지사항 정보
+     * @param {string} noticeData.title - 제목 (선택, 최대 100자)
+     * @param {string} noticeData.content - 내용 (선택, 최대 2000자)
+     * @param {number} noticeData.imageId - 이미지 ID (선택)
+     * @returns {Promise<Object>} 수정된 공지사항 정보
+     */
+    async updateNotice(noticeId, noticeData) {
+        return await this.request(`/notices/${noticeId}`, {
+            method: 'PATCH',
+            body: JSON.stringify(noticeData)
+        });
+    }
+
+    /**
+     * 공지사항 삭제 (ADMIN 전용)
+     * @param {number} noticeId - 공지사항 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteNotice(noticeId) {
+        return await this.request(`/notices/${noticeId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // ==================== Board Image APIs ====================
+
+    /**
+     * 게시판 이미지 업로드
+     * @param {File} file - 업로드할 이미지 파일
+     * @returns {Promise<Object>} 업로드된 이미지 정보 (imageId 포함)
+     */
+    async uploadBoardImage(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // FormData 전송 시에는 Content-Type 헤더를 자동으로 설정하도록 함
+        const accessToken = localStorage.getItem('accessToken');
+
+        const response = await fetch(`${this.baseURL}/board-images/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw {
+                status: response.status,
+                data: errorData
+            };
+        }
+
+        return await response.json();
+    }
+
+    /**
+     * 게시판 이미지 조회 (Blob)
+     * @param {number} imageId - 이미지 ID
+     * @returns {Promise<string>} Blob URL
+     */
+    async getBoardImage(imageId) {
+        const accessToken = localStorage.getItem('accessToken');
+
+        const response = await fetch(`${this.baseURL}/board-images/${imageId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`이미지 조회 실패: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        return URL.createObjectURL(blob);
+    }
+
+    /**
+     * 게시판 이미지 삭제
+     * @param {number} imageId - 이미지 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteBoardImage(imageId) {
+        return await this.request(`/board-images/${imageId}`, {
+            method: 'DELETE'
+        });
+    }
 }
 
 // Export singleton instance

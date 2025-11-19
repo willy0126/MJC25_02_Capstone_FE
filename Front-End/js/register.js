@@ -1,7 +1,5 @@
 // ==================== 전역 변수 ====================
 let currentStep = 0;
-let isNicknameChecked = false; // 닉네임 중복 확인 여부
-let checkedNickname = ''; // 중복 확인된 닉네임
 
 // ==================== 1단계: 약관 동의 ====================
 
@@ -122,91 +120,6 @@ function verifyCode() {
     showToast('인증이 완료되었습니다.', 'success');
 } */
 
-// 닉네임 중복 확인 (API 미구현으로 비활성화)
-async function checkNickname() {
-    showToast('닉네임 중복 확인 기능은 현재 준비 중입니다.', 'info');
-    return;
-
-    /* // API 구현 후 활성화
-    const nickname = document.getElementById('nickname').value.trim();
-    const checkBtn = document.getElementById('checkNickname');
-
-    if (!nickname) {
-        showToast('닉네임을 입력해주세요.', 'warning');
-        return;
-    }
-
-    // 닉네임 길이 검증 (2-20자)
-    if (nickname.length < 2 || nickname.length > 20) {
-        showToast('닉네임은 2-20자 사이여야 합니다.', 'warning');
-        return;
-    }
-
-    try {
-        // 버튼 비활성화
-        checkBtn.disabled = true;
-        checkBtn.textContent = '확인 중...';
-
-        // API 호출
-        const response = await apiClient.checkNickname(nickname);
-
-        // 백엔드 응답 형식: {success, code, message, data: {available: true/false}}
-        if (response.success && response.data) {
-            if (response.data.available) {
-                showToast('사용 가능한 닉네임입니다.', 'success');
-                // 닉네임 입력란 테두리 초록색으로 표시
-                document.getElementById('nickname').style.borderColor = '#27ae60';
-                // 중복 확인 완료 표시
-                isNicknameChecked = true;
-                checkedNickname = nickname;
-            } else {
-                showToast('이미 사용 중인 닉네임입니다.', 'error');
-                // 닉네임 입력란 테두리 빨간색으로 표시
-                document.getElementById('nickname').style.borderColor = '#e74c3c';
-                // 중복 확인 실패
-                isNicknameChecked = false;
-                checkedNickname = '';
-            }
-        } else {
-            throw new Error(response.message || '닉네임 확인에 실패했습니다.');
-        }
-
-    } catch (error) {
-        console.error('닉네임 중복 확인 실패:', error);
-
-        let errorMessage = '닉네임 확인에 실패했습니다. 다시 시도해주세요.';
-
-        if (error.data && error.data.message) {
-            errorMessage = error.data.message;
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-
-        showToast(errorMessage, 'error');
-        // 닉네임 입력란 테두리 초기화
-        document.getElementById('nickname').style.borderColor = '#ddd';
-        // 중복 확인 실패
-        isNicknameChecked = false;
-        checkedNickname = '';
-
-    } finally {
-        // 버튼 복원
-        checkBtn.disabled = false;
-        checkBtn.textContent = '중복확인';
-    }
-    */
-}
-
-// 닉네임 입력 시 중복 확인 상태 초기화
-function handleNicknameInput() {
-    const nickname = document.getElementById('nickname').value.trim();
-
-    // 닉네임이 변경되면 중복 확인 상태 초기화
-    if (nickname !== checkedNickname) {
-        isNicknameChecked = false;
-        document.getElementById('nickname').style.borderColor = '#ddd';
-    }
-}
 
 // 주소 찾기 - 카카오 주소 검색 API
 function findAddress() {
@@ -310,7 +223,6 @@ function initializeStep2EventListeners() {
     const password = document.getElementById('password');
     const passwordConfirm = document.getElementById('passwordConfirm');
     const phone = document.getElementById('phone');
-    const nickname = document.getElementById('nickname');
 
     // 비밀번호 실시간 검증
     password.addEventListener('input', validatePassword);
@@ -320,13 +232,9 @@ function initializeStep2EventListeners() {
     // 전화번호 자동 포맷팅
     phone.addEventListener('input', formatPhoneNumber);
 
-    // 닉네임 입력 시 중복 확인 상태 초기화
-    nickname.addEventListener('input', handleNicknameInput);
-
     // 버튼 이벤트
     // document.getElementById('sendVerification').addEventListener('click', sendVerificationCode);
     // document.getElementById('verifyCode').addEventListener('click', verifyCode);
-    document.getElementById('checkNickname').addEventListener('click', checkNickname);
     document.getElementById('findAddress').addEventListener('click', findAddress);
 }
 
@@ -560,13 +468,6 @@ async function handleSubmit(e) {
         showToast('필수 입력 항목을 모두 입력해주세요.', 'warning');
         return;
     }
-
-    // 닉네임 중복 확인 검증 (API 미구현으로 비활성화)
-    /* if (!isNicknameChecked || nickname.value.trim() !== checkedNickname) {
-        showToast('닉네임 중복 확인을 먼저 진행해주세요.', 'warning');
-        nickname.focus();
-        return;
-    } */
 
     // 생년월일 가져오기 (백엔드 형식: YYYY-MM-DD)
     const birthValue = birth.value || null;

@@ -135,18 +135,36 @@ function displayUserInfo(user) {
     document.getElementById('userBirth').textContent = user.birth || '-';
     document.getElementById('userAddress').textContent = user.address || '-';
 
-    // 아바타 초기 설정
-    const initial = (user.username || user.email || 'U').charAt(0).toUpperCase();
-    document.getElementById('userInitial').textContent = initial;
+    // 아바타 설정
+    const avatarCircle = document.getElementById('userAvatar');
+    const userInitial = document.getElementById('userInitial');
 
-    // 사용자 색상 표시
+    if (user.profileImg && user.profileImg.trim()) {
+        // SVG 아바타가 있는 경우 - SVG 문자열을 직접 삽입
+        avatarCircle.innerHTML = user.profileImg;
+
+        // SVG 스타일 조정 (아바타 영역에 맞게)
+        const svgElement = avatarCircle.querySelector('svg');
+        if (svgElement) {
+            svgElement.style.width = '100%';
+            svgElement.style.height = '100%';
+            svgElement.style.borderRadius = '50%';
+        }
+    } else {
+        // SVG가 없는 경우 - 초기 문자 표시
+        const initial = (user.username || user.email || 'U').charAt(0).toUpperCase();
+        userInitial.textContent = initial;
+
+        // 사용자 색상을 배경으로 적용
+        if (user.color) {
+            avatarCircle.style.background = user.color;
+        }
+    }
+
+    // 사용자 색상 표시 (색상 인디케이터)
     if (user.color) {
         const colorIndicator = document.getElementById('userColor');
         colorIndicator.style.backgroundColor = user.color;
-
-        // 아바타 배경도 사용자 색상으로 변경
-        const avatarCircle = document.getElementById('userAvatar');
-        avatarCircle.style.background = user.color;
     }
 
     // 활동 내역 표시 (백엔드에서 제공하는 경우)
@@ -204,6 +222,7 @@ function getCurrentUserEmail() {
 
 // ==================== 프로필 수정 ====================
 let selectedColor = '#20B2AA'; // 기본 색상
+let selectedUserAvatar = ''; // 사용자 아바타
 
 function editProfile() {
     // 프로필 수정 모달 표시
@@ -213,6 +232,7 @@ function editProfile() {
     // 현재 사용자 정보 저장
     if (userInfo) {
         selectedColor = userInfo.color || '#20B2AA';
+        selectedUserAvatar = userInfo.profileImg || '';
     }
 
     // 폼 제출 이벤트 등록 (기존 이벤트 리스너 제거 후 재등록)
@@ -249,7 +269,26 @@ function editProfile() {
 
         document.getElementById('editAddress').value = baseAddress;
         document.getElementById('editDetailAddress').value = detailAddress;
+
+        // 아바타 미리보기 설정
+        const userAvatarImg = document.getElementById('userAvatarImg');
+
+        if (selectedUserAvatar && selectedUserAvatar.trim()) {
+            // SVG 문자열을 Blob으로 변환하여 이미지로 표시
+            const blob = new Blob([selectedUserAvatar], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            userAvatarImg.src = url;
+        } else {
+            // 기본 아바타 생성
+            const defaultAvatar = generateDefaultAvatar(userInfo.username || userInfo.email || 'User');
+            userAvatarImg.src = defaultAvatar;
+            selectedUserAvatar = ''; // SVG 문자열이 아닌 URL이므로 비워둠
+        }
     }
+
+    // 아바타 그리드와 새로고침 버튼은 숨김
+    document.getElementById('userAvatarGrid').style.display = 'none';
+    document.getElementById('userAvatarRefreshContainer').style.display = 'none';
 
     // 프로필 수정 모달 이벤트 리스너 등록
     initEditProfileModal();
@@ -329,10 +368,111 @@ function updateColorPreview() {
 
 function closeEditModal() {
     const modal = document.getElementById('editProfileModal');
+    const avatarGrid = document.getElementById('userAvatarGrid');
+    const refreshContainer = document.getElementById('userAvatarRefreshContainer');
+
     modal.style.display = 'none';
+    avatarGrid.style.display = 'none';
+    refreshContainer.style.display = 'none';
 
     // 폼 초기화
     document.getElementById('editProfileForm').reset();
+}
+
+// 사용자 아바타 선택 UI 표시/숨김
+function showUserAvatarSelection() {
+    const avatarGrid = document.getElementById('userAvatarGrid');
+    const refreshContainer = document.getElementById('userAvatarRefreshContainer');
+
+    if (avatarGrid.style.display === 'none' || !avatarGrid.style.display) {
+        // 아바타 그리드 생성
+        generateUserAvatarGrid();
+        avatarGrid.style.display = 'grid';
+        refreshContainer.style.display = 'block';
+    } else {
+        avatarGrid.style.display = 'none';
+        refreshContainer.style.display = 'none';
+    }
+}
+
+// 사용자 아바타 그리드 생성
+function generateUserAvatarGrid() {
+    const avatarGrid = document.getElementById('userAvatarGrid');
+    avatarGrid.innerHTML = '';
+
+    // DiceBear 스타일들 (안정적인 무료 API)
+    const styles = ['avataaars', 'bottts', 'fun-emoji', 'lorelei', 'micah', 'pixel-art'];
+
+    // 랜덤 시드 생성 (고유한 아바타를 위해)
+    const randomSeeds = [];
+    for (let i = 0; i < 6; i++) {
+        randomSeeds.push(Math.random().toString(36).substring(2, 15));
+    }
+
+    // 6개의 아바타 생성
+    randomSeeds.forEach((seed, index) => {
+        const style = styles[index % styles.length];
+        const avatarUrl = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
+
+        const label = document.createElement('label');
+        label.className = 'avatar-option';
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'userAvatar';
+        input.value = avatarUrl;
+
+        input.addEventListener('change', async function() {
+            try {
+                // SVG 문자열 가져오기
+                const response = await fetch(this.value);
+                if (response.ok) {
+                    const svgText = await response.text();
+                    selectedUserAvatar = svgText;
+
+                    // 미리보기 업데이트
+                    const blob = new Blob([svgText], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
+                    document.getElementById('userAvatarImg').src = url;
+                } else {
+                    throw new Error('아바타 로드 실패');
+                }
+            } catch (error) {
+                console.error('아바타 가져오기 실패:', error);
+                showToast('아바타를 불러오는데 실패했습니다.', 'error');
+            }
+        });
+
+        const avatarBox = document.createElement('div');
+        avatarBox.className = 'avatar-box';
+
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = `아바타 ${index + 1}`;
+
+        // 이미지 로드 에러 처리
+        img.onerror = function() {
+            console.error('아바타 로드 실패:', avatarUrl);
+            // 폴백 이미지
+            this.src = generateDefaultAvatar('user-' + index);
+        };
+
+        const span = document.createElement('span');
+        span.className = 'avatar-label';
+        span.textContent = `스타일 ${index + 1}`;
+
+        avatarBox.appendChild(img);
+        avatarBox.appendChild(span);
+        label.appendChild(input);
+        label.appendChild(avatarBox);
+        avatarGrid.appendChild(label);
+    });
+}
+
+// 사용자 아바타 새로고침
+function refreshUserAvatars() {
+    generateUserAvatarGrid();
+    showToast('새로운 아바타를 불러왔습니다!', 'success');
 }
 
 async function handleProfileUpdate(e) {
@@ -360,7 +500,8 @@ async function handleProfileUpdate(e) {
             nickname: nickname || null,
             phone: phone || null,
             address: fullAddress || null,
-            color: selectedColor
+            color: selectedColor,
+            profileImg: selectedUserAvatar || null
         };
 
         const response = await apiClient.updateUserInfo(updateData);

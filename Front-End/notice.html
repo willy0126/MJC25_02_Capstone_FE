@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+<!-- HEAD: 메타데이터 및 스타일시트 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,17 +15,17 @@
     <link rel="stylesheet" href="css/notice.css">
     <link rel="stylesheet" href="css/toast.css">
 </head>
+
+<!-- BODY: 공지사항 게시판 -->
 <body>
     <div id="navbar-placeholder"></div>
 
+    <!-- 공지사항 메인 영역 -->
     <main class="notice-container">
-        <!-- Hero Section -->
         <section class="notice-hero">
             <h1>공지사항</h1>
             <p>책·이음의 새로운 소식과 중요한 공지를 확인하세요.</p>
         </section>
-
-        <!-- Notice Board Section -->
         <section class="notice-board">
             <!-- 검색 및 작성 버튼 영역 -->
             <div class="board-controls">
@@ -63,7 +64,7 @@
         </section>
     </main>
 
-    <!-- 글쓰기/수정 모달 -->
+    <!-- 각종 모달 (글쓰기/수정, 상세보기) -->
     <div class="modal" id="writeModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -95,6 +96,15 @@
                         <textarea id="noticeContent" rows="15" placeholder="내용을 입력하세요" required></textarea>
                     </div>
 
+                    <div class="form-group">
+                        <label for="noticeImage">이미지 첨부 (선택)</label>
+                        <input type="file" id="noticeImage" accept="image/*">
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImg" src="" alt="이미지 미리보기">
+                            <button type="button" class="btn-remove-image" id="removeImageBtn">&times; 이미지 제거</button>
+                        </div>
+                    </div>
+
                     <div class="form-actions">
                         <button type="submit" class="btn-submit">저장</button>
                         <button type="button" class="btn-cancel" id="cancelBtn">취소</button>
@@ -120,6 +130,9 @@
                         <span id="detailDate"></span>
                         <span id="detailViews"></span>
                     </div>
+                    <div class="detail-image" id="detailImage" style="display: none;">
+                        <img id="detailImageContent" src="" alt="공지사항 이미지">
+                    </div>
                     <div class="detail-content" id="detailContent"></div>
                 </div>
                 <div class="detail-actions" id="detailActions" style="display: none;">
@@ -139,6 +152,7 @@
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
 
+    <!-- 애플리케이션 스크립트 -->
     <script src="js/toast.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/constants.js"></script>
