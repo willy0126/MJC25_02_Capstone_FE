@@ -311,6 +311,254 @@ function initTiltedSectionsAnimation() {
   console.log(`✅ Tilted sections 애니메이션 적용: ${tiltedSections.length}개`);
 }
 
+/* ===================================
+   최신 공지사항 로드 및 렌더링
+   =================================== */
+async function loadLatestNotices() {
+  const grid = document.getElementById('latest-notices-grid');
+  if (!grid) {
+    console.error('❌ 공지사항 그리드를 찾을 수 없습니다.');
+    return;
+  }
+
+  try {
+    console.log('📢 최신 공지사항 로딩 중...');
+
+    // API에서 공지사항 가져오기
+    const response = await apiClient.getNotices(0, 3);
+
+    let notices = [];
+    if (response.success && response.data) {
+      notices = Array.isArray(response.data) ? response.data.slice(0, 3) : [];
+    }
+
+    // 하드코딩 데이터 (폴백용)
+    const hardcodedNotices = [
+      {
+        noticeId: 'hard_1',
+        badge: 'important',
+        title: '책·이음 서비스 정기 점검 안내',
+        username: '관리자',
+        createAt: '2025-01-15T09:00:00'
+      },
+      {
+        noticeId: 'hard_2',
+        badge: 'new',
+        title: '2025년 신규 독서 프로그램 안내',
+        username: '관리자',
+        createAt: '2025-01-10T14:30:00'
+      },
+      {
+        noticeId: 'hard_3',
+        badge: 'event',
+        title: '겨울방학 특별 창작 대회 개최',
+        username: '관리자',
+        createAt: '2025-01-05T10:00:00'
+      }
+    ];
+
+    // API 데이터가 없으면 하드코딩 데이터 사용
+    if (notices.length === 0) {
+      notices = hardcodedNotices;
+      console.log('⚠️ API 데이터 없음 - 하드코딩 데이터 사용');
+    }
+
+    renderNotices(notices);
+    console.log(`✅ 최신 공지사항 ${notices.length}개 렌더링 완료`);
+  } catch (error) {
+    console.error('❌ 공지사항 로드 실패:', error);
+
+    // 에러 시 하드코딩 데이터 표시
+    const hardcodedNotices = [
+      {
+        noticeId: 'hard_1',
+        badge: 'important',
+        title: '책·이음 서비스 정기 점검 안내',
+        username: '관리자',
+        createAt: '2025-01-15T09:00:00'
+      },
+      {
+        noticeId: 'hard_2',
+        badge: 'new',
+        title: '2025년 신규 독서 프로그램 안내',
+        username: '관리자',
+        createAt: '2025-01-10T14:30:00'
+      },
+      {
+        noticeId: 'hard_3',
+        badge: 'event',
+        title: '겨울방학 특별 창작 대회 개최',
+        username: '관리자',
+        createAt: '2025-01-05T10:00:00'
+      }
+    ];
+    renderNotices(hardcodedNotices);
+  }
+}
+
+function renderNotices(notices) {
+  const grid = document.getElementById('latest-notices-grid');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+
+  notices.forEach((notice, index) => {
+    const card = document.createElement('div');
+    card.className = 'notice-card reveal-on-scroll';
+    card.style.transitionDelay = `${index * 0.1}s`;
+
+    // 배지 타입 결정
+    const badgeType = notice.badge || 'normal';
+    const badgeText = {
+      'important': '중요',
+      'new': '신규',
+      'event': '이벤트',
+      'normal': '일반'
+    }[badgeType] || '일반';
+
+    // 날짜 포맷팅
+    const date = notice.createAt ? formatNoticeDate(notice.createAt) : '-';
+    const author = notice.username || '관리자';
+
+    card.innerHTML = `
+      <div class="notice-badge ${badgeType}">${badgeText}</div>
+      <div class="notice-title">${notice.title}</div>
+      <div class="notice-meta">
+        <span class="notice-author">${author}</span>
+        <span class="notice-date">${date}</span>
+      </div>
+    `;
+
+    // 클릭 시 공지사항 페이지로 이동 + 해당 글 모달 자동 열기
+    card.addEventListener('click', () => {
+      window.location.href = `notice.html?noticeId=${notice.noticeId}`;
+    });
+
+    grid.appendChild(card);
+
+    // 스크롤 애니메이션 observer 적용
+    scrollObserver.observe(card);
+  });
+}
+
+function formatNoticeDate(isoDate) {
+  if (!isoDate) return '-';
+  const date = new Date(isoDate);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}.${month}.${day}`;
+}
+
+/* ===================================
+   최근 활동 타임라인 로드 및 렌더링
+   =================================== */
+async function loadRecentActivities() {
+  const section = document.getElementById('recentActivitySection');
+  const timeline = document.getElementById('activityTimeline');
+
+  if (!section || !timeline) {
+    console.log('⚠️ 최근 활동 섹션을 찾을 수 없습니다.');
+    return;
+  }
+
+  // 로그인 상태 확인
+  const accessToken = localStorage.getItem('accessToken');
+  if (!accessToken) {
+    section.style.display = 'none';
+    console.log('🔒 로그인하지 않음 - 최근 활동 섹션 숨김');
+    return;
+  }
+
+  section.style.display = 'block';
+  console.log('📊 최근 활동 로딩 중...');
+
+  try {
+    // TODO: 백엔드 API가 준비되면 실제 API 호출로 교체
+    // const response = await apiClient.getRecentActivities();
+    // if (response.success && response.data) {
+    //   renderActivities(response.data);
+    //   return;
+    // }
+
+    // 현재는 목 데이터 사용
+    const mockActivities = [
+      {
+        type: 'reading',
+        icon: '📖',
+        title: '어린왕자',
+        description: '독서를 시작했어요',
+        time: '2시간 전',
+        link: 'calendar.html'
+      },
+      {
+        type: 'complete',
+        icon: '✅',
+        title: '해리포터와 마법사의 돌',
+        description: '독서를 완료했어요',
+        time: '1일 전',
+        link: 'bookcase.html'
+      },
+      {
+        type: 'challenge',
+        icon: '🎯',
+        title: '겨울 독서 챌린지',
+        description: '챌린지에 참여했어요',
+        time: '3일 전',
+        link: 'program.html'
+      }
+    ];
+
+    renderActivities(mockActivities);
+    console.log(`✅ 최근 활동 ${mockActivities.length}개 렌더링 완료`);
+  } catch (error) {
+    console.error('❌ 최근 활동 로드 실패:', error);
+    showEmptyState();
+  }
+}
+
+function renderActivities(activities) {
+  const timeline = document.getElementById('activityTimeline');
+  if (!timeline) return;
+
+  if (!activities || activities.length === 0) {
+    showEmptyState();
+    return;
+  }
+
+  timeline.innerHTML = activities.map(activity => `
+    <div class="activity-item" onclick="location.href='${activity.link}'">
+      <div class="activity-icon type-${activity.type}">
+        ${activity.icon}
+      </div>
+      <div class="activity-content">
+        <div class="activity-title">${activity.title}</div>
+        <div class="activity-description">${activity.description}</div>
+        <div class="activity-time">🕐 ${activity.time}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // 스크롤 애니메이션 적용
+  const activityItems = timeline.querySelectorAll('.activity-item');
+  activityItems.forEach(item => {
+    scrollObserver.observe(item);
+  });
+}
+
+function showEmptyState() {
+  const timeline = document.getElementById('activityTimeline');
+  if (!timeline) return;
+
+  timeline.innerHTML = `
+    <div class="activity-empty">
+      <div class="activity-empty-icon">📚</div>
+      <div class="activity-empty-text">아직 활동 내역이 없어요</div>
+      <div class="activity-empty-desc">책을 읽고 다양한 활동에 참여해보세요!</div>
+    </div>
+  `;
+}
+
 // 페이지 로드 시 모든 초기화 작업 실행
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🎉 DOM 로드 완료 - 초기화 시작');
@@ -320,6 +568,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 인기 도서 로드
   loadTrendingBooks();
+
+  // 최신 공지사항 로드
+  loadLatestNotices();
+
+  // 최근 활동 타임라인 로드
+  loadRecentActivities();
 
   // 스크롤 애니메이션 observer 적용
   const revealElements = document.querySelectorAll('.reveal-on-scroll');

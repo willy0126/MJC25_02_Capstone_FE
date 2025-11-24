@@ -119,6 +119,22 @@
     font-size: 0.9rem;
 }
 
+.btn-retry {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #20B2AA;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-retry:hover {
+    background: #1a9690;
+}
+
 .wishlist-footer {
     padding: 16px;
     border-top: 1px solid #f0f0f0;
@@ -1202,4 +1218,144 @@
     .fc .fc-daygrid-day {
         min-height: 60px;
     }
+}
+
+/* ==================== Custom Select (Reader Dropdown) ==================== */
+
+.schedule-form-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.custom-select {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.custom-select-trigger:hover {
+    border-color: #20B2AA;
+}
+
+.custom-select.open .custom-select-trigger {
+    border-color: #20B2AA;
+}
+
+.custom-select-value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.custom-select-arrow {
+    font-size: 0.7rem;
+    color: #999;
+    transition: transform 0.2s ease;
+}
+
+.custom-select.open .custom-select-arrow {
+    transform: rotate(180deg);
+}
+
+.custom-select-options {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+.custom-select.open .custom-select-options {
+    display: block;
+}
+
+.custom-select-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.custom-select-option:hover {
+    background: #f5f5f5;
+}
+
+.custom-select-option.selected {
+    background: #e8f7f6;
+}
+
+.custom-select-option:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.custom-select-option:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+.option-icon,
+.selected-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.option-text {
+    flex: 1;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.option-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    background: #20B2AA;
+    color: white;
+    border-radius: 10px;
+}
+
+/* Flatpickr Input Style */
+.flatpickr-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.flatpickr-input:hover,
+.flatpickr-input:focus {
+    border-color: #20B2AA;
+    outline: none;
+}
+
+.flatpickr-input::placeholder {
+    color: #999;
 }

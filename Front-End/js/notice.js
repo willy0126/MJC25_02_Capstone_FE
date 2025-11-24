@@ -12,7 +12,7 @@ let selectedImageFile = null; // 선택된 이미지 파일
 let currentImageId = null; // 현재 업로드된 이미지 ID
 
 // Initialize
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // 로그인 사용자 정보 확인
     checkUserAuth();
 
@@ -20,10 +20,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadHardcodedNotices();
 
     // API에서 공지사항 불러오기
-    loadNoticesFromAPI();
+    await loadNoticesFromAPI();
 
     // 이벤트 리스너 등록
     initEventListeners();
+
+    // URL 파라미터 확인 후 해당 공지사항 모달 자동 열기
+    checkAndOpenNoticeFromURL();
 });
 
 // 사용자 권한 확인
@@ -94,10 +97,11 @@ async function loadNoticesFromAPI(page = 0) {
         const response = await apiClient.getNotices(page, itemsPerPage);
 
         if (response.success && response.data) {
-            const pageData = response.data;
+            // 백엔드가 List<NoticeResponse>를 직접 반환하므로 배열로 처리
+            const noticeList = Array.isArray(response.data) ? response.data : [];
 
             // API 데이터 변환 (백엔드 형식 -> 프론트 형식)
-            apiNotices = pageData.content.map(notice => ({
+            apiNotices = noticeList.map(notice => ({
                 id: notice.noticeId,
                 noticeId: notice.noticeId,
                 badge: 'normal', // API에는 badge가 없으므로 기본값
@@ -113,9 +117,9 @@ async function loadNoticesFromAPI(page = 0) {
                 isHardcoded: false
             }));
 
-            // 페이지 정보 저장
-            currentPage = pageData.number + 1; // API는 0부터, UI는 1부터
-            totalPages = pageData.totalPages;
+            // 클라이언트 측 페이지네이션 (백엔드가 전체 목록 반환)
+            totalPages = Math.ceil(apiNotices.length / itemsPerPage);
+            currentPage = page + 1;
 
             // 하드코딩 데이터 + API 데이터 합치기
             notices = [...hardcodedNotices, ...apiNotices];
@@ -363,7 +367,7 @@ async function viewNotice(id) {
                     content: apiNotice.content,
                     author: apiNotice.username || '관리자',
                     date: formatDate(apiNotice.createAt),
-                    boardImage: apiNotice.boardImage
+                    boardImage: apiNotice.boardImage || apiNotice.image || apiNotice.imageFile
                 });
             } else {
                 displayNoticeDetail(notice);
@@ -671,4 +675,24 @@ function removeImage() {
     document.getElementById('noticeImage').value = '';
     document.getElementById('imagePreview').style.display = 'none';
     document.getElementById('previewImg').src = '';
+}
+
+// URL 파라미터에서 noticeId를 읽어서 해당 공지사항 모달 자동 열기
+function checkAndOpenNoticeFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const noticeId = urlParams.get('noticeId');
+
+    if (noticeId) {
+        console.log('[URL] noticeId 파라미터 감지:', noticeId);
+
+        // 약간의 딜레이 후 모달 열기 (렌더링 완료 대기)
+        setTimeout(() => {
+            viewNotice(noticeId);
+
+            // URL에서 파라미터 제거 (히스토리 깔끔하게 유지)
+            const url = new URL(window.location);
+            url.searchParams.delete('noticeId');
+            window.history.replaceState({}, '', url);
+        }, 500);
+    }
 }

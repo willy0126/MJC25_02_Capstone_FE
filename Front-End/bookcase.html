@@ -123,15 +123,13 @@
                         <input type="text" id="editIsbn" name="isbn" placeholder="10자리 또는 13자리 숫자" maxlength="13" pattern="\d*" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <div class="form-group">
-                        <label for="editCoverUrl">책 표지 이미지</label>
+                        <label for="editCoverUrl">책 표지 이미지 URL</label>
                         <div class="cover-upload-section">
                             <div class="cover-preview" id="editCoverPreview">
                                 <span class="cover-placeholder-text">이미지 없음</span>
                             </div>
                             <div class="cover-upload-controls">
-                                <input type="file" id="editCoverFile" accept="image/*" style="display: none;" onchange="previewEditCover(this)">
-                                <button type="button" class="btn-upload-cover" onclick="document.getElementById('editCoverFile').click()">이미지 업로드</button>
-                                <input type="text" id="editCoverUrl" name="coverUrl" placeholder="또는 이미지 URL 입력" onblur="previewEditCoverFromUrl(this.value)">
+                                <input type="text" id="editCoverUrl" name="coverUrl" placeholder="이미지 URL 입력" onblur="previewEditCoverFromUrl(this.value)">
                                 <button type="button" class="btn-remove-cover" onclick="removeEditCover()">제거</button>
                             </div>
                         </div>

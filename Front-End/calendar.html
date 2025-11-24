@@ -16,6 +16,10 @@
     <!-- FullCalendar CSS -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
 
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
+
     <!-- Custom Calendar CSS -->
     <link rel="stylesheet" href="css/calendar.css">
 </head>
@@ -175,18 +179,30 @@
                         <p id="scheduleBookAuthor">저자</p>
                     </div>
                 </div>
-                <div class="schedule-date-info">
+                <div class="schedule-form-info">
+                    <!-- 독자 선택 -->
+                    <div class="form-group">
+                        <label>독자 선택</label>
+                        <div class="custom-select" id="scheduleReaderSelect" data-name="reader">
+                            <input type="hidden" id="scheduleReader" name="reader" value="">
+                            <div class="custom-select-trigger">
+                                <span class="custom-select-value">독자 선택</span>
+                                <span class="custom-select-arrow">▼</span>
+                            </div>
+                            <div class="custom-select-options" id="scheduleReaderOptions">
+                                <!-- 동적으로 생성됨 -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 시작일 -->
                     <div class="form-group">
                         <label>시작일</label>
-                        <input type="date" id="scheduleStartDate" class="form-input">
+                        <input type="text" id="scheduleStartDate" class="form-input flatpickr-input" placeholder="시작일 선택" readonly>
                     </div>
+                    <!-- 종료일 -->
                     <div class="form-group">
-                        <label>상태</label>
-                        <select id="scheduleStatus" class="form-select">
-                            <option value="to_read">읽을 예정</option>
-                            <option value="reading" selected>읽는 중</option>
-                            <option value="completed">완료</option>
-                        </select>
+                        <label>종료일</label>
+                        <input type="text" id="scheduleEndDate" class="form-input flatpickr-input" placeholder="종료일 선택" readonly>
                     </div>
                 </div>
             </div>
@@ -213,6 +229,10 @@
 
     <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
 
     <!-- Calendar Page Script -->
     <script src="js/calendar.js"></script>

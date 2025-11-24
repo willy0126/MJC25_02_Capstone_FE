@@ -428,11 +428,12 @@ class ApiClient {
     async uploadBoardImage(file) {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('usageType', 'BOOK');
 
         // FormData 전송 시에는 Content-Type 헤더를 자동으로 설정하도록 함
         const accessToken = localStorage.getItem('accessToken');
 
-        const response = await fetch(`${this.baseURL}/board-images/upload`, {
+        const response = await fetch(`${this.baseURL}/images/upload`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -459,7 +460,7 @@ class ApiClient {
     async getBoardImage(imageId) {
         const accessToken = localStorage.getItem('accessToken');
 
-        const response = await fetch(`${this.baseURL}/board-images/${imageId}`, {
+        const response = await fetch(`${this.baseURL}/images/${imageId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`
