@@ -12,23 +12,14 @@ class ApiClient {
         return localStorage.getItem('accessToken');
     }
 
-    // Get refresh token from localStorage
-    getRefreshToken() {
-        return localStorage.getItem('refreshToken');
-    }
-
-    // Set tokens in localStorage
-    setTokens(accessToken, refreshToken) {
+    // Set access token in localStorage (refreshToken은 HttpOnly 쿠키로 관리)
+    setAccessToken(accessToken) {
         localStorage.setItem('accessToken', accessToken);
-        if (refreshToken) {
-            localStorage.setItem('refreshToken', refreshToken);
-        }
     }
 
-    // Clear tokens from localStorage
+    // Clear access token from localStorage
     clearTokens() {
         localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
     }
 
     // Make HTTP request with optional authentication
@@ -47,7 +38,8 @@ class ApiClient {
 
         const config = {
             ...options,
-            headers
+            headers,
+            credentials: 'include'  // 쿠키 자동 전송 (refreshToken)
         };
 
         try {
@@ -59,7 +51,7 @@ class ApiClient {
                 if (refreshed) {
                     // Retry the original request with new token
                     headers['Authorization'] = `Bearer ${this.getAccessToken()}`;
-                    const retryResponse = await fetch(url, { ...config, headers });
+                    const retryResponse = await fetch(url, { ...config, headers, credentials: 'include' });
                     return await this.handleResponse(retryResponse);
                 } else {
                     // Refresh failed, logout user
@@ -120,23 +112,22 @@ class ApiClient {
 
     // Refresh access token using refresh token
     async refreshAccessToken() {
-        const refreshToken = this.getRefreshToken();
-        if (!refreshToken) {
-            return false;
-        }
-
         try {
+            // refreshToken은 HttpOnly 쿠키로 자동 전송됨
             const response = await fetch(`${this.baseURL}/auth/refresh`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ refreshToken })
+                credentials: 'include'  // 쿠키 자동 전송
             });
 
             if (response.ok) {
                 const data = await response.json();
-                this.setTokens(data.accessToken, data.refreshToken);
+                // accessToken만 localStorage에 저장 (refreshToken은 쿠키로 관리)
+                if (data.success && data.data) {
+                    this.setAccessToken(data.data);
+                }
                 return true;
             }
             return false;
@@ -154,21 +145,21 @@ class ApiClient {
             skipAuth: true
         });
 
-        // 백엔드 응답 형식: {success, code, message, data: {accessToken, refreshToken, tokenType}}
+        // 백엔드 응답 형식: {success, code, message, data: accessToken}
+        // refreshToken은 Set-Cookie 헤더로 전송됨 (HttpOnly)
         if (response.success && response.data) {
-            // Save tokens to localStorage
-            this.setTokens(response.data.accessToken, response.data.refreshToken);
+            // accessToken만 localStorage에 저장
+            this.setAccessToken(response.data);
         }
 
         return response;
     }
 
     async logout() {
-        const refreshToken = this.getRefreshToken();
         try {
+            // refreshToken은 쿠키로 자동 전송됨
             await this.request('/auth/logout', {
-                method: 'POST',
-                body: JSON.stringify({ refreshToken })
+                method: 'POST'
             });
         } catch (error) {
             console.error('Logout API error:', error);
@@ -227,6 +218,25 @@ class ApiClient {
                 'Authorization': `Bearer ${temporaryToken}`
             },
             skipAuth: true // getAccessToken() 호출 방지
+        });
+    }
+
+    // 회원가입 이메일 인증 - 2단계 프로세스
+    // 1단계: 이메일로 인증 코드 발송
+    async sendSignupVerificationCode(email) {
+        return await this.request('/auth/singup/send-code', {
+            method: 'POST',
+            body: JSON.stringify({ email }),
+            skipAuth: true
+        });
+    }
+
+    // 2단계: 인증 코드 검증
+    async verifySignupCode(email, code) {
+        return await this.request('/auth/singup/verify-code', {
+            method: 'POST',
+            body: JSON.stringify({ email, code }),
+            skipAuth: true
         });
     }
 
@@ -471,6 +481,137 @@ class ApiClient {
      */
     async deleteBoardImage(imageId) {
         return await this.request(`/board-images/${imageId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // ==================== Book APIs ====================
+
+    /**
+     * 도서 등록
+     * @param {Object} bookData - 도서 정보
+     * @param {string} bookData.title - 제목 (필수)
+     * @param {string} bookData.author - 저자 (필수)
+     * @param {string} bookData.publisher - 출판사 (선택)
+     * @param {string} bookData.publicationYear - 출판년도 (선택)
+     * @param {string} bookData.isbn - ISBN (선택)
+     * @param {string} bookData.coverUrl - 표지 이미지 URL (선택)
+     * @param {string} bookData.description - 책 소개 (선택)
+     * @returns {Promise<Object>} 등록된 도서 정보
+     */
+    async createBook(bookData) {
+        return await this.request('/books', {
+            method: 'POST',
+            body: JSON.stringify(bookData)
+        });
+    }
+
+    /**
+     * 도서 목록 조회
+     * @returns {Promise<Array>} 도서 목록
+     */
+    async getBooks() {
+        return await this.request('/books', {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 도서 상세 조회
+     * @param {number} bookId - 도서 ID
+     * @returns {Promise<Object>} 도서 상세 정보
+     */
+    async getBook(bookId) {
+        return await this.request(`/books/${bookId}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 도서 정보 수정
+     * @param {number} bookId - 도서 ID
+     * @param {Object} bookData - 수정할 도서 정보
+     * @returns {Promise<Object>} 수정된 도서 정보
+     */
+    async updateBook(bookId, bookData) {
+        return await this.request(`/books/${bookId}`, {
+            method: 'PUT',
+            body: JSON.stringify(bookData)
+        });
+    }
+
+    /**
+     * 도서 삭제
+     * @param {number} bookId - 도서 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteBook(bookId) {
+        return await this.request(`/books/${bookId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // ==================== Calendar APIs ====================
+
+    /**
+     * 월간 캘린더 데이터 조회
+     * @param {number} year - 연도
+     * @param {number} month - 월 (1-12)
+     * @returns {Promise<Array>} 월간 독서 기록 목록
+     */
+    async getMonthlyCalendar(year, month) {
+        return await this.request(`/calendar/monthly?year=${year}&month=${month}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 일간 독서 기록 조회
+     * @param {string} date - 날짜 (YYYY-MM-DD 형식)
+     * @returns {Promise<Object>} 일간 독서 기록
+     */
+    async getDailyRecords(date) {
+        return await this.request(`/calendar/daily?date=${date}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 독서 일정 등록
+     * @param {Object} scheduleData - 독서 일정 정보
+     * @param {number} scheduleData.bookId - 도서 ID (필수)
+     * @param {string} scheduleData.startDate - 시작일 (필수, YYYY-MM-DD 형식)
+     * @param {string} scheduleData.status - 상태 (필수, 'to_read', 'reading', 'completed')
+     * @param {string} scheduleData.endDate - 완료일 (선택, YYYY-MM-DD 형식)
+     * @returns {Promise<Object>} 등록된 독서 일정
+     */
+    async createReadingSchedule(scheduleData) {
+        return await this.request('/calendar', {
+            method: 'POST',
+            body: JSON.stringify(scheduleData)
+        });
+    }
+
+    /**
+     * 독서 일정 수정
+     * @param {number} scheduleId - 일정 ID
+     * @param {Object} scheduleData - 수정할 독서 일정 정보
+     * @returns {Promise<Object>} 수정된 독서 일정
+     */
+    async updateReadingSchedule(scheduleId, scheduleData) {
+        return await this.request(`/calendar/${scheduleId}`, {
+            method: 'PUT',
+            body: JSON.stringify(scheduleData)
+        });
+    }
+
+    /**
+     * 독서 일정 삭제
+     * @param {number} scheduleId - 일정 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteReadingSchedule(scheduleId) {
+        return await this.request(`/calendar/${scheduleId}`, {
             method: 'DELETE'
         });
     }

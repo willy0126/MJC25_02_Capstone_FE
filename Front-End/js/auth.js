@@ -31,13 +31,6 @@ function isTokenExpired(token) {
 /* ========================================
    로그인 상태 확인 (토큰 만료 체크 포함)
 ======================================== */
-// 원본 함수 (되돌리기용):
-// function isLoggedIn() {
-//     const accessToken = localStorage.getItem('accessToken');
-//     const userInfo = localStorage.getItem('userInfo');
-//     return accessToken !== null && userInfo !== null;
-// }
-
 function isLoggedIn() {
     const accessToken = localStorage.getItem('accessToken');
     const userInfo = localStorage.getItem('userInfo');
@@ -121,14 +114,6 @@ function initAutoLogout() {
 /* ========================================
    로그인 상태 설정
 ======================================== */
-// 원본 함수 (되돌리기용):
-// function setLoginState(userInfo) {
-//     localStorage.setItem('userInfo', JSON.stringify(userInfo));
-//     window.dispatchEvent(new CustomEvent('loginStateChanged', {
-//         detail: { isLoggedIn: true, user: userInfo }
-//     }));
-// }
-
 function setLoginState(userInfo) {
     // accessToken과 refreshToken은 api-client.js에서 관리
     localStorage.setItem('userInfo', JSON.stringify(userInfo));
@@ -144,17 +129,6 @@ function setLoginState(userInfo) {
 /* ========================================
    로그인 상태 초기화 (로그아웃)
 ======================================== */
-// 원본 함수 (되돌리기용):
-// async function clearLoginState() {
-//     if (typeof apiClient !== 'undefined') {
-//         await apiClient.logout();
-//     }
-//     localStorage.removeItem('userInfo');
-//     window.dispatchEvent(new CustomEvent('loginStateChanged', {
-//         detail: { isLoggedIn: false, user: null }
-//     }));
-// }
-
 async function clearLoginState() {
     // 자동 로그아웃 타이머 정리
     if (autoLogoutTimer) {

@@ -25,17 +25,17 @@ DROP TABLE IF EXISTS `contest`;
 DROP TABLE IF EXISTS `package`;
 DROP TABLE IF EXISTS `board`;
 DROP TABLE IF EXISTS `notice`;
-DROP TABLE IF EXISTS `Book`;
+DROP TABLE IF EXISTS `book`;
 DROP TABLE IF EXISTS `reader`;
 DROP TABLE IF EXISTS `children`;
 DROP TABLE IF EXISTS `challenge`;
 DROP TABLE IF EXISTS `package_categories`;
 DROP TABLE IF EXISTS `share_board_image`;
-DROP TABLE IF EXISTS `board_image`;
 DROP TABLE IF EXISTS `image`;
 DROP TABLE IF EXISTS `book_category`;
 DROP TABLE IF EXISTS `refresh_token`;
 DROP TABLE IF EXISTS `user`;
+DROP TABLE IF EXISTS `email_verify`;
 
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
@@ -44,24 +44,33 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Independent Tables (No Foreign Keys)
 -- ========================================
 
+-- email_verify Table (회원가입 이메일 인증용)
+CREATE TABLE `email_verify` (
+  `verify_id` BIGINT NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `code` varchar(255) NOT NULL,
+  `expired_at` DATETIME,
+  PRIMARY KEY (`verify_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- User Table (must be created first as it's referenced by many tables)
 CREATE TABLE `user` (
-    `user_id` bigint NOT NULL AUTO_INCREMENT,
-    `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `birth` date DEFAULT NULL,
-    `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `nickname` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `color` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `profile_img` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `role` enum('ADMIN','USER') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USER',
-    `reset_token` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `reset_token_expiry` datetime DEFAULT NULL,
-    PRIMARY KEY (`user_id`),
-    UNIQUE KEY `email` (`email`),
-    UNIQUE KEY `nickname` (`nickname`)
+  `user_id` bigint NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `birth` date DEFAULT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nickname` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `profile_img` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` enum('ADMIN','USER') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USER',
+  `reset_token` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reset_token_expiry` datetime DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `nickname` (`nickname`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Package Categories Table
@@ -79,14 +88,6 @@ CREATE TABLE `challenge` (
     PRIMARY KEY (`challenge_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Board Image Table
-CREATE TABLE `board_image` (
-    `image_id` BIGINT NOT NULL AUTO_INCREMENT,
-    `file_name` VARCHAR(255) NULL,
-    `file_path` VARCHAR(255) NULL,
-    PRIMARY KEY (`image_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Share Board Image Table
 CREATE TABLE `share_board_image` (
     `image_id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -95,12 +96,13 @@ CREATE TABLE `share_board_image` (
     PRIMARY KEY (`image_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Image Table
+-- Image Table (통합 이미지 테이블)
 CREATE TABLE `image` (
-       `image_id` BIGINT NOT NULL AUTO_INCREMENT,
-       `file_name` VARCHAR(255) NULL,
-       `file_path` VARCHAR(255) NULL,
-       PRIMARY KEY (`image_id`)
+     `image_id` BIGINT NOT NULL AUTO_INCREMENT,
+     `file_name` VARCHAR(255) NULL,
+     `file_path` VARCHAR(255) NULL,
+     `usage_type` VARCHAR(50) NULL,
+     PRIMARY KEY (`image_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ========================================
@@ -135,17 +137,23 @@ CREATE TABLE `reader` (
     CONSTRAINT `fk_reader_children` FOREIGN KEY (`child_id`) REFERENCES `children` (`child_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Book Table (depends on book_category)
-CREATE TABLE `Book` (
+-- Book Table (depends on user and image)
+CREATE TABLE `book` (
     `book_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT NOT NULL,
+    `image_id` BIGINT NULL,
     `title` VARCHAR(255) NOT NULL,
-    `img_url` VARCHAR(500) NULL,
     `author` VARCHAR(100) NULL,
     `publisher` VARCHAR(100) NULL,
+    `isbn13` VARCHAR(15) NULL,
+    `publication_year` VARCHAR(5) NULL,
+    `cover_url` VARCHAR(500) NULL,
+    `description` TEXT NULL,
     PRIMARY KEY (`book_id`),
     KEY `idx_user_id` (`user_id`),
-    CONSTRAINT `fk_Book_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
+    KEY `idx_image_id` (`image_id`),
+    CONSTRAINT `fk_book_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_book_image` FOREIGN KEY (`image_id`) REFERENCES `image` (`image_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Package Table (depends on package_categories and user)
@@ -179,7 +187,7 @@ CREATE TABLE `contest` (
     CONSTRAINT `fk_contest_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Board Table (depends on user and board_image)
+-- Board Table (depends on user and image)
 CREATE TABLE `board` (
     `board_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT NOT NULL,
@@ -192,10 +200,10 @@ CREATE TABLE `board` (
     KEY `idx_user_id` (`user_id`),
     KEY `idx_image_id` (`image_id`),
     CONSTRAINT `fk_board_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_board_image` FOREIGN KEY (`image_id`) REFERENCES `board_image` (`image_id`) ON DELETE SET NULL
+    CONSTRAINT `fk_image` FOREIGN KEY (`image_id`) REFERENCES `image` (`image_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Board Table (depends on user and board_image)
+-- Notice Table (depends on user and image)
 CREATE TABLE `notice` (
   `notice_id` bigint NOT NULL AUTO_INCREMENT,
   `user_id` bigint DEFAULT NULL,
@@ -208,7 +216,7 @@ CREATE TABLE `notice` (
   KEY `fk_notice_user` (`user_id`),
   KEY `fk_notice_image` (`image_id`),
   CONSTRAINT `fk_notice_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_notice_image` FOREIGN KEY (`image_id`) REFERENCES `board_image` (`image_id`) ON DELETE SET NULL
+  CONSTRAINT `fk_notice_image` FOREIGN KEY (`image_id`) REFERENCES `image` (`image_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ========================================
@@ -220,7 +228,7 @@ CREATE TABLE `book_details` (
     `details_id` BIGINT NOT NULL AUTO_INCREMENT,
     `book_id` BIGINT NOT NULL,
     `reader_id` BIGINT NOT NULL,
-    `status` ENUM('to_read', 'reading', 'completed') NOT NULL DEFAULT 'to_read',
+    `reading_status` ENUM('to_read', 'reading', 'completed') NOT NULL DEFAULT 'to_read', -- 251124 reading_status로 컬럼명 변경.
     `start_date` DATE NULL,
     `end_date` DATE NULL,
     `create_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -228,21 +236,21 @@ CREATE TABLE `book_details` (
     PRIMARY KEY (`details_id`),
     KEY `idx_book_id` (`book_id`),
     KEY `idx_reader_id` (`reader_id`),
-    CONSTRAINT `fk_book_details_book` FOREIGN KEY (`book_id`) REFERENCES `Book` (`book_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_book_details_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`) ON DELETE CASCADE,
     CONSTRAINT `fk_book_details_reader` FOREIGN KEY (`reader_id`) REFERENCES `reader` (`reader_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dialogue Table (depends on Book)
+-- Dialogue Table (depends on book)
 CREATE TABLE `dialogue` (
     `dialog_id` BIGINT NOT NULL AUTO_INCREMENT,
     `book_id` BIGINT NOT NULL,
     `create_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`dialog_id`),
     KEY `idx_book_id` (`book_id`),
-    CONSTRAINT `fk_dialogue_book` FOREIGN KEY (`book_id`) REFERENCES `Book` (`book_id`) ON DELETE CASCADE
+    CONSTRAINT `fk_dialogue_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Package Book Table (depends on Book and package)
+-- Package Book Table (depends on book and package)
 CREATE TABLE `package_book` (
     `packageBook_id` BIGINT NOT NULL AUTO_INCREMENT,
     `book_id` BIGINT NOT NULL,
@@ -250,7 +258,7 @@ CREATE TABLE `package_book` (
     PRIMARY KEY (`packageBook_id`),
     KEY `idx_book_id` (`book_id`),
     KEY `idx_package_id` (`package_id`),
-    CONSTRAINT `fk_package_book_book` FOREIGN KEY (`book_id`) REFERENCES `Book` (`book_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_package_book_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`) ON DELETE CASCADE,
     CONSTRAINT `fk_package_book_package` FOREIGN KEY (`package_id`) REFERENCES `package` (`package_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

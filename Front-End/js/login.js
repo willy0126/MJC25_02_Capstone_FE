@@ -85,7 +85,8 @@ async function performLogin(email, password) {
         loginButton.textContent = '로그인 중...';
         loginButton.disabled = true;
 
-        // 백엔드 로그인 API 호출 (백엔드 응답 형식: {success, code, message, data: {accessToken, refreshToken, tokenType}})
+        // 백엔드 로그인 API 호출 (백엔드 응답 형식: {success, code, message, data: accessToken})
+        // refreshToken은 Set-Cookie 헤더로 전송됨 (HttpOnly)
         const loginResponse = await apiClient.login(email, password);
 
         // 로그인 성공 확인
@@ -93,12 +94,9 @@ async function performLogin(email, password) {
             throw new Error(loginResponse.message || '로그인에 실패했습니다.');
         }
 
-        // 토큰은 이미 apiClient.login()에서 localStorage에 저장됨
-        console.log('로그인 성공:', {
-            tokenType: loginResponse.data.tokenType,
-            hasAccessToken: !!loginResponse.data.accessToken,
-            hasRefreshToken: !!loginResponse.data.refreshToken
-        });
+        // accessToken은 apiClient.login()에서 localStorage에 저장됨
+        // refreshToken은 브라우저가 쿠키로 자동 관리
+        console.log('로그인 성공: accessToken 저장됨');
 
         // 사용자 정보 가져오기
         const userInfoResponse = await apiClient.getUserInfo();

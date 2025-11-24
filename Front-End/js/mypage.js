@@ -11,11 +11,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    // 비밀번호 재확인 모달 표시 (백엔드 API 구현 전까지 주석 처리)
-    // showPasswordVerifyModal();
-    // document.getElementById('passwordVerifyForm').addEventListener('submit', handlePasswordVerify);
-
-    // 비밀번호 확인 없이 바로 마이페이지 표시
+    // 마이페이지 표시
     const modal = document.getElementById('passwordVerifyModal');
     const mypageContent = document.getElementById('mypageContent');
     modal.style.display = 'none';
@@ -27,86 +23,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     // 자녀 관리 초기화
     initChildrenManagement();
 });
-
-// ==================== 비밀번호 재확인 (백엔드 API 구현 전까지 주석 처리) ====================
-/*
-function showPasswordVerifyModal() {
-    const modal = document.getElementById('passwordVerifyModal');
-    const mypageContent = document.getElementById('mypageContent');
-
-    modal.style.display = 'flex';
-    mypageContent.style.display = 'none';
-
-    // ESC 키로 모달 닫기 방지
-    document.addEventListener('keydown', preventEscape);
-}
-
-function preventEscape(e) {
-    if (e.key === 'Escape') {
-        e.preventDefault();
-    }
-}
-
-async function handlePasswordVerify(e) {
-    e.preventDefault();
-
-    const password = document.getElementById('verifyPassword').value;
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-
-    try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = '확인 중...';
-
-        // 사용자 이메일 가져오기
-        const email = getCurrentUserEmail();
-        if (!email) {
-            throw new Error('사용자 정보를 찾을 수 없습니다.');
-        }
-
-        // 백엔드에 비밀번호 확인 요청
-        const response = await apiClient.verifyPassword({ email, password });
-
-        if (response.success) {
-            isPasswordVerified = true;
-            hidePasswordVerifyModal();
-            await loadUserInfo();
-            showToast('비밀번호가 확인되었습니다.', 'success');
-        } else {
-            throw new Error(response.message || '비밀번호가 일치하지 않습니다.');
-        }
-
-    } catch (error) {
-        console.error('비밀번호 확인 실패:', error);
-
-        let errorMessage = '비밀번호 확인에 실패했습니다.';
-        if (error.message) {
-            errorMessage = error.message;
-        } else if (error.data && error.data.message) {
-            errorMessage = error.data.message;
-        }
-
-        showToast(errorMessage, 'error');
-        document.getElementById('verifyPassword').value = '';
-        document.getElementById('verifyPassword').focus();
-
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-    }
-}
-
-function hidePasswordVerifyModal() {
-    const modal = document.getElementById('passwordVerifyModal');
-    const mypageContent = document.getElementById('mypageContent');
-
-    modal.style.display = 'none';
-    mypageContent.style.display = 'block';
-
-    // ESC 키 이벤트 제거
-    document.removeEventListener('keydown', preventEscape);
-}
-*/
 
 // ==================== 사용자 정보 로드 ====================
 async function loadUserInfo() {
