@@ -22,7 +22,7 @@ function initSmoothScroll() {
         smooth: true,
         smoothMobile: false, // 모바일에서는 비활성화 (성능 이슈 방지)
         multiplier: 0.9, // 스크롤 속도
-        lerp: 0.025, // 부드러움 정도
+        lerp: 0.125, // 부드러움 정도
         class: 'is-inview',
         touchMultiplier: 2.5, // 터치 감도
         smartphone: {

@@ -24,16 +24,18 @@ DROP TABLE IF EXISTS `book_details`;
 DROP TABLE IF EXISTS `contest`;
 DROP TABLE IF EXISTS `package`;
 DROP TABLE IF EXISTS `board`;
-DROP TABLE IF EXISTS `Book`;
+DROP TABLE IF EXISTS `notice`;
+DROP TABLE IF EXISTS `book`;
 DROP TABLE IF EXISTS `reader`;
 DROP TABLE IF EXISTS `children`;
 DROP TABLE IF EXISTS `challenge`;
 DROP TABLE IF EXISTS `package_categories`;
 DROP TABLE IF EXISTS `share_board_image`;
-DROP TABLE IF EXISTS `board_image`;
+DROP TABLE IF EXISTS `image`;
 DROP TABLE IF EXISTS `book_category`;
 DROP TABLE IF EXISTS `refresh_token`;
 DROP TABLE IF EXISTS `user`;
+DROP TABLE IF EXISTS `email_verify`;
 
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
@@ -42,28 +44,34 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Independent Tables (No Foreign Keys)
 -- ========================================
 
--- User Table (must be created first as it's referenced by many tables)
-CREATE TABLE `user` (
-    `user_id` BIGINT NOT NULL AUTO_INCREMENT,
-    `email` VARCHAR(255) NOT NULL UNIQUE,
-    `username` VARCHAR(20) NOT NULL,
-    `password` VARCHAR(255) NOT NULL,
-    `birth` DATE NULL,
-    `phone` VARCHAR(20) NULL,
-    `nickname` VARCHAR(20) NULL UNIQUE,
-    `color` VARCHAR(10) NULL,
-    `address` VARCHAR(255) NULL,
-    `profile_img` VARCHAR(255) NULL,
-    `role` ENUM('ADMIN', 'USER') NOT NULL DEFAULT 'USER',
-    PRIMARY KEY (`user_id`)
+-- email_verify Table (회원가입 이메일 인증용)
+CREATE TABLE `email_verify` (
+  `verify_id` BIGINT NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `code` varchar(255) NOT NULL,
+  `expired_at` DATETIME,
+  PRIMARY KEY (`verify_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Book Category Table
-CREATE TABLE `book_category` (
-    `category_id` BIGINT NOT NULL AUTO_INCREMENT,
-    `category_name` VARCHAR(255) NOT NULL,
-    PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- User Table (must be created first as it's referenced by many tables)
+CREATE TABLE `user` (
+  `user_id` bigint NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `birth` date DEFAULT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nickname` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `profile_img` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` enum('ADMIN','USER') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USER',
+  `reset_token` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reset_token_expiry` datetime DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `nickname` (`nickname`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Package Categories Table
 CREATE TABLE `package_categories` (
@@ -80,20 +88,21 @@ CREATE TABLE `challenge` (
     PRIMARY KEY (`challenge_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Board Image Table
-CREATE TABLE `board_image` (
-    `image_id` BIGINT NOT NULL AUTO_INCREMENT,
-    `file_name` VARCHAR(255) NULL,
-    `file_path` VARCHAR(255) NULL,
-    PRIMARY KEY (`image_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Share Board Image Table
 CREATE TABLE `share_board_image` (
     `image_id` BIGINT NOT NULL AUTO_INCREMENT,
     `file_name` VARCHAR(255) NULL,
     `file_path` VARCHAR(255) NULL,
     PRIMARY KEY (`image_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Image Table (통합 이미지 테이블)
+CREATE TABLE `image` (
+     `image_id` BIGINT NOT NULL AUTO_INCREMENT,
+     `file_name` VARCHAR(255) NULL,
+     `file_path` VARCHAR(255) NULL,
+     `usage_type` VARCHAR(50) NULL,
+     PRIMARY KEY (`image_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ========================================
@@ -119,24 +128,32 @@ CREATE TABLE `children` (
 CREATE TABLE `reader` (
     `reader_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT NOT NULL,
-    `type` ENUM('adult', 'child') NOT NULL,
+    `child_id` BIGINT NULL,
+    `reader_type` ENUM('adult', 'child') NOT NULL,
     PRIMARY KEY (`reader_id`),
     KEY `idx_user_id` (`user_id`),
-    CONSTRAINT `fk_reader_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
+    KEY `idx_child_id` (`child_id`),
+    CONSTRAINT `fk_reader_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_reader_children` FOREIGN KEY (`child_id`) REFERENCES `children` (`child_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Book Table (depends on book_category)
-CREATE TABLE `Book` (
+-- Book Table (depends on user and image)
+CREATE TABLE `book` (
     `book_id` BIGINT NOT NULL AUTO_INCREMENT,
-    `category_id` BIGINT NULL,
+    `user_id` BIGINT NOT NULL,
+    `image_id` BIGINT NULL,
     `title` VARCHAR(255) NOT NULL,
-    `img_url` VARCHAR(500) NULL,
     `author` VARCHAR(100) NULL,
     `publisher` VARCHAR(100) NULL,
-    `isbn` VARCHAR(20) NULL,
+    `isbn13` VARCHAR(15) NULL,
+    `publication_year` VARCHAR(5) NULL,
+    `cover_url` VARCHAR(500) NULL,
+    `description` TEXT NULL,
     PRIMARY KEY (`book_id`),
-    KEY `idx_category_id` (`category_id`),
-    CONSTRAINT `fk_book_category` FOREIGN KEY (`category_id`) REFERENCES `book_category` (`category_id`) ON DELETE SET NULL
+    KEY `idx_user_id` (`user_id`),
+    KEY `idx_image_id` (`image_id`),
+    CONSTRAINT `fk_book_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_book_image` FOREIGN KEY (`image_id`) REFERENCES `image` (`image_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Package Table (depends on package_categories and user)
@@ -170,7 +187,7 @@ CREATE TABLE `contest` (
     CONSTRAINT `fk_contest_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Board Table (depends on user and board_image)
+-- Board Table (depends on user and image)
 CREATE TABLE `board` (
     `board_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT NOT NULL,
@@ -183,8 +200,24 @@ CREATE TABLE `board` (
     KEY `idx_user_id` (`user_id`),
     KEY `idx_image_id` (`image_id`),
     CONSTRAINT `fk_board_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_board_image` FOREIGN KEY (`image_id`) REFERENCES `board_image` (`image_id`) ON DELETE SET NULL
+    CONSTRAINT `fk_image` FOREIGN KEY (`image_id`) REFERENCES `image` (`image_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Notice Table (depends on user and image)
+CREATE TABLE `notice` (
+  `notice_id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint DEFAULT NULL,
+  `image_id` bigint DEFAULT NULL,
+  `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` varchar(2000) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `create_at` datetime(6) DEFAULT NULL,
+  `update_at` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`notice_id`),
+  KEY `fk_notice_user` (`user_id`),
+  KEY `fk_notice_image` (`image_id`),
+  CONSTRAINT `fk_notice_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_notice_image` FOREIGN KEY (`image_id`) REFERENCES `image` (`image_id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ========================================
 -- Second Level Dependencies
@@ -195,33 +228,29 @@ CREATE TABLE `book_details` (
     `details_id` BIGINT NOT NULL AUTO_INCREMENT,
     `book_id` BIGINT NOT NULL,
     `reader_id` BIGINT NOT NULL,
-    `status` ENUM('to_read', 'reading', 'completed', 'on_hold', 'dropped') NOT NULL DEFAULT 'to_read',
-    `rating` TINYINT NULL CHECK (rating >= 1 AND rating <= 5),
-    `review` TEXT NULL,
+    `reading_status` ENUM('to_read', 'reading', 'completed') NOT NULL DEFAULT 'to_read', -- 251124 reading_status로 컬럼명 변경.
     `start_date` DATE NULL,
     `end_date` DATE NULL,
-    `page_count` INT NULL,
-    `favorite` BOOLEAN NOT NULL DEFAULT FALSE,
     `create_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `update_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`details_id`),
     KEY `idx_book_id` (`book_id`),
     KEY `idx_reader_id` (`reader_id`),
-    CONSTRAINT `fk_book_details_book` FOREIGN KEY (`book_id`) REFERENCES `Book` (`book_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_book_details_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`) ON DELETE CASCADE,
     CONSTRAINT `fk_book_details_reader` FOREIGN KEY (`reader_id`) REFERENCES `reader` (`reader_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dialogue Table (depends on Book)
+-- Dialogue Table (depends on book)
 CREATE TABLE `dialogue` (
     `dialog_id` BIGINT NOT NULL AUTO_INCREMENT,
     `book_id` BIGINT NOT NULL,
     `create_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`dialog_id`),
     KEY `idx_book_id` (`book_id`),
-    CONSTRAINT `fk_dialogue_book` FOREIGN KEY (`book_id`) REFERENCES `Book` (`book_id`) ON DELETE CASCADE
+    CONSTRAINT `fk_dialogue_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Package Book Table (depends on Book and package)
+-- Package Book Table (depends on book and package)
 CREATE TABLE `package_book` (
     `packageBook_id` BIGINT NOT NULL AUTO_INCREMENT,
     `book_id` BIGINT NOT NULL,
@@ -229,7 +258,7 @@ CREATE TABLE `package_book` (
     PRIMARY KEY (`packageBook_id`),
     KEY `idx_book_id` (`book_id`),
     KEY `idx_package_id` (`package_id`),
-    CONSTRAINT `fk_package_book_book` FOREIGN KEY (`book_id`) REFERENCES `Book` (`book_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_package_book_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`) ON DELETE CASCADE,
     CONSTRAINT `fk_package_book_package` FOREIGN KEY (`package_id`) REFERENCES `package` (`package_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -441,8 +470,17 @@ CREATE TABLE `refresh_token` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (2,'admin1@admin.com','admin1','$2a$10$UX7LPes/mDVlBOlpoZRl/u/6wRLongxZVEBrJN4a6XGdBXxjqL5Km','2000-01-01','010-1111-1111','admin1','#FFFFFF','admin',NULL,'ADMIN'),
-                          (3,'admin2@admin.com','admin2','$2a$10$rP.0wpQ5KDjGhqvAceh5YO.poPHgikyHNlmMaLMJ.2rtZ9LX.2XG.','2000-01-01','010-1111-1111','admin2','#FFFFFF','admin',NULL,'ADMIN'),
-                          (4,'admin3@admin.com','admin3','$2a$10$tDI0SWtroMdOpduPIQd2zOKVnvCDzx1qK7KSo.ZzrsF6s4IQE5W66','2000-01-01','010-1111-1111','admin3','#FFFFFF','admin',NULL,'ADMIN');
+INSERT INTO `user` VALUES (2,'admin1@admin.com','admin1','$2a$10$UX7LPes/mDVlBOlpoZRl/u/6wRLongxZVEBrJN4a6XGdBXxjqL5Km','2000-01-01','010-1111-1111','admin1','#FFFFFF','admin',NULL,'ADMIN',NULL,NULL),
+                          (3,'admin2@admin.com','admin2','$2a$10$rP.0wpQ5KDjGhqvAceh5YO.poPHgikyHNlmMaLMJ.2rtZ9LX.2XG.','2000-01-01','010-1111-1111','admin2','#FFFFFF','admin',NULL,'ADMIN',NULL,NULL),
+                          (4,'admin3@admin.com','admin3','$2a$10$tDI0SWtroMdOpduPIQd2zOKVnvCDzx1qK7KSo.ZzrsF6s4IQE5W66','2000-01-01','010-1111-1111','admin3','#FFFFFF','admin',NULL,'ADMIN',NULL,NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+LOCK TABLES `children` WRITE;
+/*!40000 ALTER TABLE `children` DISABLE KEYS */;
+INSERT INTO `children` VALUES (1, 2,'child1', '2018-05-15', 'M', 1, 'http://example.com/profiles/example.jpg', '#FF5733'),
+                              (2, 2,'child2', '2019-05-15', 'F', 2, 'http://example.com/profiles/example.jpg', '#FF5733'),
+                              (3, 3,'child3', '2017-05-15', 'M', 1, 'http://example.com/profiles/example.jpg', '#FF5733');
+/*!40000 ALTER TABLE `children` ENABLE KEYS */;
 UNLOCK TABLES;

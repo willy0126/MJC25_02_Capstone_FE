@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독서 캘린더 | 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/toast.css">
+
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+
+    <!-- Custom Calendar CSS -->
+    <link rel="stylesheet" href="css/calendar.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main class="calendar-container">
+        <!-- Hero Section -->
+        <section class="calendar-hero">
+            <h1>독서 캘린더</h1>
+            <p class="hero-description">책을 드래그하여 독서 일정을 등록해보세요</p>
+        </section>
+
+        <!-- Calendar Wrapper (3 columns) -->
+        <section class="calendar-wrapper-3col">
+            <!-- 왼쪽: 읽고 싶은 책 (Draggable) -->
+            <aside class="book-wishlist" id="bookWishlist">
+                <div class="wishlist-header">
+                    <h3>📚 내 책장</h3>
+                    <button class="btn-refresh-books" id="refreshBooks" title="새로고침">↻</button>
+                </div>
+                <div class="wishlist-content" id="wishlistContent">
+                    <div class="wishlist-loading">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                <div class="wishlist-footer">
+                    <a href="bookcase.html" class="btn-add-book">+ 책 추가하기</a>
+                </div>
+            </aside>
+
+            <!-- 가운데: FullCalendar -->
+            <div class="fullcalendar-container">
+                <div id="fullCalendar"></div>
+            </div>
+
+            <!-- 오른쪽: 선택된 날짜의 독서 기록 -->
+            <aside class="daily-records" id="dailyRecords">
+                <div class="records-header">
+                    <h3 id="selectedDate">날짜를 선택하세요</h3>
+                </div>
+                <div class="records-content" id="recordsContent">
+                    <div class="empty-records">
+                        <p>캘린더에서 날짜를 선택하면</p>
+                        <p>해당 날짜의 독서 기록을 확인할 수 있습니다.</p>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <!-- 독서 통계 요약 -->
+        <section class="reading-summary">
+            <h3>이번 달 독서 현황</h3>
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-icon">📚</div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="totalBooks">0</span>
+                        <span class="summary-label">읽은 책</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">📖</div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="readingBooks">0</span>
+                        <span class="summary-label">읽는 중</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">📅</div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="readingDays">0</span>
+                        <span class="summary-label">독서일</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 독서 기록 상세 모달 -->
+    <div class="modal" id="recordDetailModal" style="display: none;">
+        <div class="modal-content record-detail-modal">
+            <button class="modal-close" id="recordDetailModalClose">&times;</button>
+            <div class="record-detail-content">
+                <div class="record-book-cover" id="recordCover">
+                    <div class="book-cover-placeholder">
+                        <h3 id="recordCoverTitle">책 제목</h3>
+                    </div>
+                </div>
+                <div class="record-book-info">
+                    <h2 id="recordTitle">책 제목</h2>
+                    <p class="record-author" id="recordAuthor">저자</p>
+
+                    <!-- 보기 모드 -->
+                    <div id="recordViewMode">
+                        <div class="record-status">
+                            <span class="status-badge" id="recordStatus">읽는 중</span>
+                        </div>
+                        <div class="record-dates">
+                            <div class="date-item">
+                                <span class="date-label">시작일</span>
+                                <span class="date-value" id="recordStartDate">-</span>
+                            </div>
+                            <div class="date-item">
+                                <span class="date-label">완료일</span>
+                                <span class="date-value" id="recordEndDate">-</span>
+                            </div>
+                        </div>
+                        <div class="record-actions">
+                            <button type="button" class="btn-edit" id="recordEditBtn">수정</button>
+                            <button type="button" class="btn-delete" id="recordDeleteBtn">삭제</button>
+                        </div>
+                    </div>
+
+                    <!-- 수정 모드 -->
+                    <div id="recordEditMode" style="display: none;">
+                        <div class="form-group">
+                            <label>상태</label>
+                            <select id="editRecordStatus" class="form-select">
+                                <option value="to_read">읽을 예정</option>
+                                <option value="reading">읽는 중</option>
+                                <option value="completed">완료</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>시작일</label>
+                            <input type="date" id="editRecordStartDate" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>완료일</label>
+                            <input type="date" id="editRecordEndDate" class="form-input">
+                        </div>
+                        <div class="record-actions">
+                            <button type="button" class="btn-cancel" id="editCancelBtn">취소</button>
+                            <button type="button" class="btn-confirm" id="editSaveBtn">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 독서 일정 등록 확인 모달 -->
+    <div class="modal" id="scheduleModal" style="display: none;">
+        <div class="modal-content schedule-modal">
+            <div class="modal-header">
+                <h2>독서 일정 등록</h2>
+                <button class="modal-close" id="scheduleModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="schedule-book-info">
+                    <div class="schedule-book-cover" id="scheduleBookCover"></div>
+                    <div class="schedule-book-details">
+                        <h3 id="scheduleBookTitle">책 제목</h3>
+                        <p id="scheduleBookAuthor">저자</p>
+                    </div>
+                </div>
+                <div class="schedule-date-info">
+                    <div class="form-group">
+                        <label>시작일</label>
+                        <input type="date" id="scheduleStartDate" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>상태</label>
+                        <select id="scheduleStatus" class="form-select">
+                            <option value="to_read">읽을 예정</option>
+                            <option value="reading" selected>읽는 중</option>
+                            <option value="completed">완료</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" id="scheduleCancel">취소</button>
+                <button type="button" class="btn-confirm" id="scheduleConfirm">등록</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Core Scripts -->
+    <script src="js/env-config.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+    <!-- Calendar Page Script -->
+    <script src="js/calendar.js"></script>
+</body>
+</html>

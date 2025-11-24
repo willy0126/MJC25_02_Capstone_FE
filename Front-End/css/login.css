@@ -146,7 +146,6 @@ body:has(.login-container) {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 18px;
     font-size: 17px;
     color: #222;
     margin-bottom: 2px;
@@ -167,7 +166,7 @@ body:has(.login-container) {
 }
 
 .signup {
-    margin-top: 5px;
+    margin-top: 20px;
     font-size: 15px;
     color: #222;
 }

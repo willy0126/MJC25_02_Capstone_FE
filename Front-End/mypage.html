@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+<!-- HEAD: 메타데이터 및 스타일시트 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,18 +14,16 @@
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/mypage.css">
     <link rel="stylesheet" href="css/toast.css">
-
-    <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
-
-    <!-- 카카오 주소 검색 API -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
+
+<!-- BODY: 마이페이지 메인 -->
 <body>
     <div id="navbar-placeholder"></div>
 
-    <!-- 비밀번호 재확인 모달 -->
+    <!-- 비밀번호 재확인 -->
     <div id="passwordVerifyModal" class="modal">
         <div class="modal-content">
             <h2>비밀번호 확인</h2>
@@ -42,7 +41,7 @@
         </div>
     </div>
 
-    <!-- 마이페이지 메인 컨텐츠 -->
+    <!-- 프로필 및 자녀 관리 섹션 -->
     <main class="mypage-container" id="mypageContent" style="display: none;">
         <div class="mypage-header">
             <h1>마이페이지</h1>
@@ -137,7 +136,7 @@
 
     <div id="footer-placeholder"></div>
 
-    <!-- 회원 탈퇴 확인 모달 -->
+    <!-- 각종 모달 (회원탈퇴, 프로필수정, 로그아웃, 비밀번호재설정, 자녀관리) -->
     <div id="deleteAccountModal" class="modal" style="display: none;">
         <div class="modal-content delete-modal">
             <h2>회원 탈퇴</h2>
@@ -197,6 +196,26 @@
                             <span>선택된 색상:</span>
                             <div class="color-preview" id="selectedColorPreview"></div>
                             <span class="color-hex" id="selectedColorHex">#20B2AA</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>프로필 아바타</label>
+                    <div class="avatar-selector">
+                        <div class="avatar-preview-container">
+                            <div class="avatar-preview" id="userAvatarPreview">
+                                <img id="userAvatarImg" src="" alt="아바타 미리보기">
+                            </div>
+                            <button type="button" class="btn-change-avatar" onclick="showUserAvatarSelection()">아바타 변경</button>
+                        </div>
+                        <div class="avatar-grid" id="userAvatarGrid" style="display: none;">
+                            <!-- 아바타 옵션들이 JavaScript로 동적 생성 -->
+                        </div>
+                        <div class="avatar-refresh-container" id="userAvatarRefreshContainer" style="display: none; margin-top: 10px; text-align: center;">
+                            <button type="button" class="btn-secondary" onclick="refreshUserAvatars()">
+                                🔄 다른 아바타 보기
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -345,11 +364,11 @@
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
 
-    <!-- 스크립트 -->
-    <!-- Flatpickr JS -->
+    <!-- 외부 라이브러리 -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
 
+    <!-- 애플리케이션 스크립트 -->
     <script src="js/toast.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/constants.js"></script>
