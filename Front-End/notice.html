@@ -6,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공지사항 - 책·이음</title>
     <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
@@ -44,7 +43,6 @@
                     <thead>
                         <tr>
                             <th class="col-num">번호</th>
-                            <th class="col-badge">구분</th>
                             <th class="col-title">제목</th>
                             <th class="col-author">작성자</th>
                             <th class="col-date">작성일</th>
@@ -74,17 +72,6 @@
             <div class="modal-body">
                 <form id="noticeForm">
                     <input type="hidden" id="noticeId" value="">
-
-                    <div class="form-group">
-                        <label for="noticeBadge">구분</label>
-                        <select id="noticeBadge" required>
-                            <option value="">선택하세요</option>
-                            <option value="important">중요</option>
-                            <option value="new">신규</option>
-                            <option value="event">이벤트</option>
-                            <option value="normal">일반</option>
-                        </select>
-                    </div>
 
                     <div class="form-group">
                         <label for="noticeTitle">제목</label>
@@ -123,7 +110,6 @@
             </div>
             <div class="modal-body">
                 <div class="notice-detail">
-                    <div class="detail-badge" id="detailBadge"></div>
                     <h3 class="detail-title" id="detailTitle"></h3>
                     <div class="detail-meta">
                         <span id="detailAuthor"></span>

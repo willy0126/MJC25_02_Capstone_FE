@@ -97,8 +97,17 @@ async function loadNoticesFromAPI(page = 0) {
         const response = await apiClient.getNotices(page, itemsPerPage);
 
         if (response.success && response.data) {
-            // 백엔드가 List<NoticeResponse>를 직접 반환하므로 배열로 처리
-            const noticeList = Array.isArray(response.data) ? response.data : [];
+            // 백엔드가 페이지네이션 응답 반환: { content: [...], totalPages, totalElements, ... }
+            let noticeList = [];
+
+            if (Array.isArray(response.data)) {
+                // 배열로 직접 반환하는 경우
+                noticeList = response.data;
+            } else if (response.data.content && Array.isArray(response.data.content)) {
+                // 페이지네이션 객체로 반환하는 경우
+                noticeList = response.data.content;
+                totalPages = response.data.totalPages || 1;
+            }
 
             // API 데이터 변환 (백엔드 형식 -> 프론트 형식)
             apiNotices = noticeList.map(notice => ({
@@ -113,12 +122,14 @@ async function loadNoticesFromAPI(page = 0) {
                 createAt: notice.createAt,
                 updateAt: notice.updateAt,
                 views: 0, // API에 조회수가 없으므로 기본값
-                boardImage: notice.boardImage,
+                boardImage: notice.boardImage || notice.imageFile,
                 isHardcoded: false
             }));
 
-            // 클라이언트 측 페이지네이션 (백엔드가 전체 목록 반환)
-            totalPages = Math.ceil(apiNotices.length / itemsPerPage);
+            // 페이지네이션 정보 업데이트
+            if (!response.data.totalPages) {
+                totalPages = Math.ceil(apiNotices.length / itemsPerPage);
+            }
             currentPage = page + 1;
 
             // 하드코딩 데이터 + API 데이터 합치기
@@ -205,12 +216,11 @@ function renderNotices(filteredNotices = null) {
 
         // 테이블 렌더링
         if (currentNotices.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>검색 결과가 없습니다.</p></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>검색 결과가 없습니다.</p></td></tr>';
         } else {
             tbody.innerHTML = currentNotices.map((notice, index) => `
                 <tr onclick="viewNotice('${notice.id}')">
                     <td>${noticesToRender.length - (startIndex + index)}</td>
-                    <td><span class="badge badge-${notice.badge}">${getBadgeText(notice.badge)}</span></td>
                     <td style="text-align: left;">${notice.title}</td>
                     <td>${notice.author}</td>
                     <td>${notice.date}</td>
@@ -224,12 +234,11 @@ function renderNotices(filteredNotices = null) {
     } else {
         // 일반 목록 표시
         if (noticesToRender.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>등록된 공지사항이 없습니다.</p></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>등록된 공지사항이 없습니다.</p></td></tr>';
         } else {
             tbody.innerHTML = noticesToRender.map((notice, index) => `
                 <tr onclick="viewNotice('${notice.id}')">
                     <td>${noticesToRender.length - index}</td>
-                    <td><span class="badge badge-${notice.badge}">${getBadgeText(notice.badge)}</span></td>
                     <td style="text-align: left;">${notice.title}</td>
                     <td>${notice.author}</td>
                     <td>${notice.date}</td>
@@ -383,11 +392,6 @@ async function viewNotice(id) {
 
 // 공지사항 상세 정보 표시
 function displayNoticeDetail(notice) {
-    // 배지
-    const badgeEl = document.getElementById('detailBadge');
-    badgeEl.className = `detail-badge badge badge-${notice.badge}`;
-    badgeEl.textContent = getBadgeText(notice.badge);
-
     // 제목, 작성자, 날짜, 조회수
     document.getElementById('detailTitle').textContent = notice.title;
     document.getElementById('detailAuthor').textContent = `작성자: ${notice.author}`;
@@ -560,7 +564,6 @@ function handleEdit() {
 
     document.getElementById('modalTitle').textContent = '공지사항 수정';
     document.getElementById('noticeId').value = notice.noticeId;
-    document.getElementById('noticeBadge').value = notice.badge || 'normal';
     document.getElementById('noticeTitle').value = notice.title;
     document.getElementById('noticeContent').value = notice.content;
 

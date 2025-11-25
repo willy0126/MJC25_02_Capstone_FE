@@ -36,6 +36,17 @@ async function loadReadersForEdit() {
 }
 
 /* ========================================
+   한글 서수 변환
+======================================== */
+function getKoreanOrdinal(num) {
+    const ordinals = ['', '첫째', '둘째', '셋째', '넷째', '다섯째', '여섯째', '일곱째', '여덟째', '아홉째', '열째'];
+    if (num >= 1 && num <= 10) {
+        return ordinals[num];
+    }
+    return `${num}째`;
+}
+
+/* ========================================
    독자 선택 드롭다운 채우기
 ======================================== */
 function populateEditReaderSelect() {
@@ -61,11 +72,38 @@ function populateEditReaderSelect() {
     // 자녀 추가
     if (childrenData && childrenData.length > 0) {
         childrenData.forEach(child => {
+            const childId = child.childId || child.id;
+            const childName = child.childName || child.name || '자녀';
+            const birthOrder = child.birthOrder;
+
+            // 나이 계산 (childBirth가 있는 경우)
+            let age = null;
+            if (child.childBirth) {
+                const birthDate = new Date(child.childBirth);
+                const today = new Date();
+                age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+            }
+
+            // 표시 텍스트 생성
+            let displayText = childName;
+            if (birthOrder) {
+                const orderText = getKoreanOrdinal(birthOrder);
+                displayText = `${childName} (자녀, ${orderText})`;
+            } else if (age !== null) {
+                displayText = `${childName} (자녀, ${age}세)`;
+            } else {
+                displayText = `${childName} (자녀)`;
+            }
+
             const option = document.createElement('option');
-            option.value = `child_${child.childId}`;
-            option.textContent = `${child.name} (자녀, ${child.age}세)`;
+            option.value = `child_${childId}`;
+            option.textContent = displayText;
             option.dataset.type = 'child';
-            option.dataset.userId = child.childId;
+            option.dataset.userId = childId;
             option.dataset.color = child.color || '#FF6B6B';
             readerSelect.appendChild(option);
         });
@@ -148,82 +186,20 @@ function initEditDatePickers() {
    기존 독서 일정 불러오기
 ======================================== */
 async function loadExistingSchedule(bookId) {
-    try {
-        // 일정 초기화
-        const readerSelect = document.getElementById('editReader');
-        const colorIndicator = document.getElementById('editReaderColorIndicator');
+    // 일정 초기화
+    const readerSelect = document.getElementById('editReader');
+    const colorIndicator = document.getElementById('editReaderColorIndicator');
 
-        if (readerSelect) readerSelect.value = '';
-        if (editStartPicker) editStartPicker.clear();
-        if (editEndPicker) editEndPicker.clear();
-        if (colorIndicator) {
-            colorIndicator.innerHTML = '';
-            colorIndicator.style.display = 'none';
-        }
-
-        // API 호출하여 해당 책의 독서 일정 조회
-        // GET /api/calendar?bookId={bookId} 또는 GET /api/calendar/book/{bookId}
-        let response;
-        try {
-            // 방법 1: Query parameter
-            response = await apiClient.request(`/calendar?bookId=${bookId}`, {
-                method: 'GET'
-            });
-        } catch (error1) {
-            try {
-                // 방법 2: Path parameter
-                response = await apiClient.request(`/calendar/book/${bookId}`, {
-                    method: 'GET'
-                });
-            } catch (error2) {
-                console.log('기존 독서 일정 없음');
-                return;
-            }
-        }
-
-        // 응답 데이터 추출
-        let schedules = [];
-        if (response.success && response.data) {
-            schedules = Array.isArray(response.data) ? response.data : [response.data];
-        } else if (Array.isArray(response)) {
-            schedules = response;
-        }
-
-        if (schedules.length > 0) {
-            // 가장 최근 일정 사용
-            const schedule = schedules[0];
-
-            // 독자 선택
-            if (schedule.userId || schedule.childId) {
-                const userId = schedule.userId || schedule.childId;
-
-                // userId가 본인인지 자녀인지 확인
-                if (currentUserInfo && userId === currentUserInfo.userId) {
-                    readerSelect.value = `user_${userId}`;
-                } else {
-                    // 자녀 찾기
-                    const child = childrenData.find(c => c.childId === userId);
-                    if (child) {
-                        readerSelect.value = `child_${userId}`;
-                    }
-                }
-                // 색상 아이콘 업데이트
-                updateReaderColorIndicator();
-            }
-
-            // 날짜
-            if (schedule.startDate && editStartPicker) {
-                editStartPicker.setDate(schedule.startDate);
-            }
-            if (schedule.endDate && editEndPicker) {
-                editEndPicker.setDate(schedule.endDate);
-            }
-        }
-
-    } catch (error) {
-        console.error('기존 독서 일정 불러오기 실패:', error);
-        // 에러가 발생해도 모달은 정상 표시
+    if (readerSelect) readerSelect.value = '';
+    if (editStartPicker) editStartPicker.clear();
+    if (editEndPicker) editEndPicker.clear();
+    if (colorIndicator) {
+        colorIndicator.innerHTML = '';
+        colorIndicator.style.display = 'none';
     }
+
+    // 기존 독서 일정 API가 없으므로 초기화만 수행
+    // 새로운 일정은 도서 수정 시 함께 저장됨
 }
 
 /* ========================================
@@ -245,10 +221,10 @@ function collectScheduleData() {
     const readerType = selectedOption.dataset.type;
 
     if (readerType === 'user') {
-        // 본인인 경우 userId 사용 (백엔드에서 childId 0 또는 userId로 처리)
-        childId = parseInt(selectedOption.dataset.userId);
+        // 본인인 경우 childId를 null로 설정 (백엔드에서 ADULT 타입으로 처리)
+        childId = null;
     } else if (readerType === 'child') {
-        // 자녀인 경우 childId 사용
+        // 자녀인 경우 childId 사용 (dataset.userId에 childId가 저장됨)
         childId = parseInt(selectedOption.dataset.userId);
     }
 
@@ -272,15 +248,9 @@ function collectScheduleData() {
 function getBookDetailsUpdate() {
     const scheduleData = collectScheduleData();
 
-    console.log('🔍 collectScheduleData() 결과:', scheduleData);
-
     if (!scheduleData) {
-        // 일정 정보가 없으면 빈 배열 반환
-        console.log('⚠️ 독서 일정 데이터 없음');
         return [];
     }
 
-    // bookDetailsUpdate는 배열 형식
-    console.log('✅ bookDetailsUpdate 생성:', [scheduleData]);
     return [scheduleData];
 }

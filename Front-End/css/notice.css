@@ -134,55 +134,28 @@
 
 .col-num {
     width: 80px;
-}
-
-.col-badge {
-    width: 100px;
+    text-align: center;
 }
 
 .col-title {
     text-align: left !important;
+    min-width: 300px;
+    padding-left: 180px !important;
 }
 
 .col-author {
     width: 120px;
+    text-align: center;
 }
 
 .col-date {
-    width: 120px;
+    width: 130px;
+    text-align: center;
 }
 
 .col-views {
     width: 100px;
-}
-
-/* Badge Styles */
-.badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.badge-important {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
-    color: white;
-}
-
-.badge-new {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.badge-event {
-    background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
-    color: white;
-}
-
-.badge-normal {
-    background: #e0e0e0;
-    color: #666;
+    text-align: center;
 }
 
 /* Pagination */

@@ -329,7 +329,12 @@ async function loadLatestNotices() {
 
     let notices = [];
     if (response.success && response.data) {
-      notices = Array.isArray(response.data) ? response.data.slice(0, 3) : [];
+      // 페이지네이션 응답 처리: { content: [...], totalPages, ... }
+      if (Array.isArray(response.data)) {
+        notices = response.data.slice(0, 3);
+      } else if (response.data.content && Array.isArray(response.data.content)) {
+        notices = response.data.content.slice(0, 3);
+      }
     }
 
     // 하드코딩 데이터 (폴백용)
