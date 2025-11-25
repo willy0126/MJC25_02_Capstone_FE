@@ -1572,3 +1572,149 @@
 .custom-select-options::-webkit-scrollbar-thumb:hover {
     background: #a0aec0;
 }
+
+/* ========================================
+   독서 일정 설정 섹션
+======================================== */
+.reading-schedule-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid #e2e8f0;
+}
+
+.reading-schedule-section .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.reading-schedule-section .section-description {
+    font-size: 14px;
+    color: #718096;
+    margin-bottom: 20px;
+}
+
+.reading-schedule-section .form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2d3748;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reading-schedule-section .form-select:focus {
+    outline: none;
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
+}
+
+.reading-schedule-section .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.reading-schedule-section .form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2d3748;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reading-schedule-section .form-input:focus {
+    outline: none;
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
+}
+
+.reading-schedule-section .form-input.flatpickr-input {
+    cursor: pointer;
+}
+
+.schedule-info-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 15px;
+    background-color: #e6f7f7;
+    border-left: 4px solid #20B2AA;
+    border-radius: 6px;
+    margin-top: 15px;
+}
+
+.schedule-info-box .info-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.schedule-info-box span:last-child {
+    font-size: 13px;
+    color: #2d3748;
+    line-height: 1.5;
+}
+
+/* Flatpickr 커스터마이징 */
+.flatpickr-calendar {
+    font-family: 'Paperlogy', sans-serif;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.flatpickr-day.selected {
+    background: #20B2AA;
+    border-color: #20B2AA;
+}
+
+.flatpickr-day.selected:hover {
+    background: #1a9d96;
+    border-color: #1a9d96;
+}
+
+/* 독자 선택 색상 아이콘 */
+.reader-select-wrapper {
+    position: relative;
+}
+
+.reader-color-indicator {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background-color: #f7fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.color-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.color-badge-text {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.color-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
+}

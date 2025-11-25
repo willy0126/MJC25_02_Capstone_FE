@@ -138,6 +138,43 @@
                         <label for="editDescription">책 소개</label>
                         <textarea id="editDescription" name="description" placeholder="책에 대한 간단한 소개를 입력하세요" rows="3"></textarea>
                     </div>
+
+                    <!-- 독서 일정 설정 섹션 -->
+                    <div class="reading-schedule-section">
+                        <h3 class="section-title">📅 독서 일정 설정</h3>
+                        <p class="section-description">독서 일정을 설정하면 캘린더에서 확인할 수 있습니다.</p>
+
+                        <div class="form-group">
+                            <label for="editReader">독자 선택</label>
+                            <div class="reader-select-wrapper">
+                                <select id="editReader" name="reader" class="form-select">
+                                    <option value="">선택 안 함</option>
+                                    <!-- 본인과 자녀 목록이 동적으로 추가됩니다 -->
+                                </select>
+                                <div class="reader-color-indicator" id="editReaderColorIndicator">
+                                    <!-- 선택된 독자의 색상 표시 -->
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editStartDate">시작일</label>
+                                <input type="text" id="editStartDate" name="startDate" class="form-input flatpickr-input" placeholder="시작일 선택" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEndDate">완료일</label>
+                                <input type="text" id="editEndDate" name="endDate" class="form-input flatpickr-input" placeholder="완료일 선택" readonly>
+                            </div>
+                        </div>
+
+                        <div class="schedule-info-box">
+                            <span class="info-icon">ℹ️</span>
+                            <span>독서 일정을 설정하면 캘린더 페이지에서 자동으로 확인할 수 있습니다.</span>
+                        </div>
+                    </div>
+
                     <div class="form-actions">
                         <button type="button" class="btn-cancel" onclick="closeEditBookModal()">취소</button>
                         <button type="submit" class="btn-confirm">저장</button>
@@ -254,5 +291,6 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
     <script src="js/bookcase.js"></script>
+    <script src="js/bookcase-schedule.js"></script>
 </body>
 </html>

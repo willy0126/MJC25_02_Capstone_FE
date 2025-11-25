@@ -464,7 +464,7 @@ function closeBookDetailModal() {
 /* ========================================
    모달 열기/닫기 - 도서 수정
 ======================================== */
-function openEditBookModal(bookId) {
+async function openEditBookModal(bookId) {
     const modal = document.getElementById('editBookModal');
     const book = booksData.find(b => (b.bookId || b.id) == bookId);
 
@@ -493,6 +493,15 @@ function openEditBookModal(bookId) {
             coverPreview.innerHTML = '<span class="cover-placeholder-text">이미지 없음</span>';
         }
     }
+
+    // 독자 목록 로드 및 설정
+    await loadReadersForEdit();
+
+    // 날짜 선택기 초기화
+    initEditDatePickers();
+
+    // 기존 독서 일정이 있으면 불러오기
+    await loadExistingSchedule(bookId);
 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -627,8 +636,18 @@ async function submitEditBook() {
         coverUrl: coverUrl
     };
 
+    // 독서 일정 데이터 추가 (bookcase-schedule.js)
+    const bookDetailsUpdate = getBookDetailsUpdate();
+    if (bookDetailsUpdate.length > 0) {
+        updateData.bookDetailsUpdate = bookDetailsUpdate;
+    }
+
+    console.log('📚 도서 수정 요청 데이터:', updateData);
+    console.log('📅 독서 일정 데이터:', bookDetailsUpdate);
+
     try {
         const response = await apiClient.updateBook(currentBookId, updateData);
+        console.log('✅ Book API 응답:', response);
 
         // 로컬 데이터 업데이트
         const bookIndex = booksData.findIndex(b => (b.bookId || b.id) == currentBookId);
