@@ -428,11 +428,12 @@ class ApiClient {
     async uploadBoardImage(file) {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('usageType', 'BOOK');
 
         // FormData 전송 시에는 Content-Type 헤더를 자동으로 설정하도록 함
         const accessToken = localStorage.getItem('accessToken');
 
-        const response = await fetch(`${this.baseURL}/board-images/upload`, {
+        const response = await fetch(`${this.baseURL}/images/upload`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -459,7 +460,7 @@ class ApiClient {
     async getBoardImage(imageId) {
         const accessToken = localStorage.getItem('accessToken');
 
-        const response = await fetch(`${this.baseURL}/board-images/${imageId}`, {
+        const response = await fetch(`${this.baseURL}/images/${imageId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -560,7 +561,8 @@ class ApiClient {
      * @returns {Promise<Array>} 월간 독서 기록 목록
      */
     async getMonthlyCalendar(year, month) {
-        return await this.request(`/calendar/monthly?year=${year}&month=${month}`, {
+        // Swagger: GET /api/calendar/{year}/{month}
+        return await this.request(`/calendar/${year}/${month}`, {
             method: 'GET'
         });
     }
@@ -571,50 +573,22 @@ class ApiClient {
      * @returns {Promise<Object>} 일간 독서 기록
      */
     async getDailyRecords(date) {
-        return await this.request(`/calendar/daily?date=${date}`, {
+        // Swagger: GET /api/calendar/date?date={date}
+        return await this.request(`/calendar/date?date=${date}`, {
             method: 'GET'
         });
     }
 
-    /**
-     * 독서 일정 등록
-     * @param {Object} scheduleData - 독서 일정 정보
-     * @param {number} scheduleData.bookId - 도서 ID (필수)
-     * @param {string} scheduleData.startDate - 시작일 (필수, YYYY-MM-DD 형식)
-     * @param {string} scheduleData.status - 상태 (필수, 'to_read', 'reading', 'completed')
-     * @param {string} scheduleData.endDate - 완료일 (선택, YYYY-MM-DD 형식)
-     * @returns {Promise<Object>} 등록된 독서 일정
-     */
-    async createReadingSchedule(scheduleData) {
-        return await this.request('/calendar', {
-            method: 'POST',
-            body: JSON.stringify(scheduleData)
-        });
-    }
+    /* ========================================
+       독서 일정 API
 
-    /**
-     * 독서 일정 수정
-     * @param {number} scheduleId - 일정 ID
-     * @param {Object} scheduleData - 수정할 독서 일정 정보
-     * @returns {Promise<Object>} 수정된 독서 일정
-     */
-    async updateReadingSchedule(scheduleId, scheduleData) {
-        return await this.request(`/calendar/${scheduleId}`, {
-            method: 'PUT',
-            body: JSON.stringify(scheduleData)
-        });
-    }
+       독서 일정은 Book API를 통해 저장됩니다.
+       - 저장: PUT /api/books/{bookId} (bookDetailsUpdate 포함)
+       - 조회: GET /api/calendar/{year}/{month}
+       - 조회: GET /api/calendar/date?date={date}
 
-    /**
-     * 독서 일정 삭제
-     * @param {number} scheduleId - 일정 ID
-     * @returns {Promise<Object>} 삭제 결과
-     */
-    async deleteReadingSchedule(scheduleId) {
-        return await this.request(`/calendar/${scheduleId}`, {
-            method: 'DELETE'
-        });
-    }
+       별도의 Calendar POST/PUT/DELETE API는 사용하지 않습니다.
+    ======================================== */
 }
 
 // Export singleton instance

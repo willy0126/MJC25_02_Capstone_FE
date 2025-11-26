@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>나의 책장 | 책·이음</title>
     <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
@@ -123,15 +122,13 @@
                         <input type="text" id="editIsbn" name="isbn" placeholder="10자리 또는 13자리 숫자" maxlength="13" pattern="\d*" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <div class="form-group">
-                        <label for="editCoverUrl">책 표지 이미지</label>
+                        <label for="editCoverUrl">책 표지 이미지 URL</label>
                         <div class="cover-upload-section">
                             <div class="cover-preview" id="editCoverPreview">
                                 <span class="cover-placeholder-text">이미지 없음</span>
                             </div>
                             <div class="cover-upload-controls">
-                                <input type="file" id="editCoverFile" accept="image/*" style="display: none;" onchange="previewEditCover(this)">
-                                <button type="button" class="btn-upload-cover" onclick="document.getElementById('editCoverFile').click()">이미지 업로드</button>
-                                <input type="text" id="editCoverUrl" name="coverUrl" placeholder="또는 이미지 URL 입력" onblur="previewEditCoverFromUrl(this.value)">
+                                <input type="text" id="editCoverUrl" name="coverUrl" placeholder="이미지 URL 입력" onblur="previewEditCoverFromUrl(this.value)">
                                 <button type="button" class="btn-remove-cover" onclick="removeEditCover()">제거</button>
                             </div>
                         </div>
@@ -140,6 +137,43 @@
                         <label for="editDescription">책 소개</label>
                         <textarea id="editDescription" name="description" placeholder="책에 대한 간단한 소개를 입력하세요" rows="3"></textarea>
                     </div>
+
+                    <!-- 독서 일정 설정 섹션 -->
+                    <div class="reading-schedule-section">
+                        <h3 class="section-title">📅 독서 일정 설정</h3>
+                        <p class="section-description">독서 일정을 설정하면 캘린더에서 확인할 수 있습니다.</p>
+
+                        <div class="form-group">
+                            <label for="editReader">독자 선택</label>
+                            <div class="reader-select-wrapper">
+                                <select id="editReader" name="reader" class="form-select">
+                                    <option value="">선택 안 함</option>
+                                    <!-- 본인과 자녀 목록이 동적으로 추가됩니다 -->
+                                </select>
+                                <div class="reader-color-indicator" id="editReaderColorIndicator">
+                                    <!-- 선택된 독자의 색상 표시 -->
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editStartDate">시작일</label>
+                                <input type="text" id="editStartDate" name="startDate" class="form-input flatpickr-input" placeholder="시작일 선택" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEndDate">완료일</label>
+                                <input type="text" id="editEndDate" name="endDate" class="form-input flatpickr-input" placeholder="완료일 선택" readonly>
+                            </div>
+                        </div>
+
+                        <div class="schedule-info-box">
+                            <span class="info-icon">ℹ️</span>
+                            <span>독서 일정을 설정하면 캘린더 페이지에서 자동으로 확인할 수 있습니다.</span>
+                        </div>
+                    </div>
+
                     <div class="form-actions">
                         <button type="button" class="btn-cancel" onclick="closeEditBookModal()">취소</button>
                         <button type="submit" class="btn-confirm">저장</button>
@@ -256,5 +290,6 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
     <script src="js/bookcase.js"></script>
+    <script src="js/bookcase-schedule.js"></script>
 </body>
 </html>

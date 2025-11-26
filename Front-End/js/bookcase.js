@@ -464,7 +464,7 @@ function closeBookDetailModal() {
 /* ========================================
    모달 열기/닫기 - 도서 수정
 ======================================== */
-function openEditBookModal(bookId) {
+async function openEditBookModal(bookId) {
     const modal = document.getElementById('editBookModal');
     const book = booksData.find(b => (b.bookId || b.id) == bookId);
 
@@ -483,10 +483,8 @@ function openEditBookModal(bookId) {
     // 책 표지 이미지 설정
     const coverPreview = document.getElementById('editCoverPreview');
     const coverUrlInput = document.getElementById('editCoverUrl');
-    const coverFileInput = document.getElementById('editCoverFile');
 
     if (coverUrlInput) coverUrlInput.value = book.coverUrl || '';
-    if (coverFileInput) coverFileInput.value = '';
 
     if (coverPreview) {
         if (book.coverUrl) {
@@ -495,6 +493,15 @@ function openEditBookModal(bookId) {
             coverPreview.innerHTML = '<span class="cover-placeholder-text">이미지 없음</span>';
         }
     }
+
+    // 독자 목록 로드 및 설정
+    await loadReadersForEdit();
+
+    // 날짜 선택기 초기화
+    initEditDatePickers();
+
+    // 기존 독서 일정이 있으면 불러오기
+    await loadExistingSchedule(bookId);
 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -520,59 +527,17 @@ function closeEditBookModal() {
 }
 
 /* ========================================
-   도서 표지 이미지 프리뷰 (파일 선택)
-======================================== */
-function previewEditCover(input) {
-    const coverPreview = document.getElementById('editCoverPreview');
-    const coverUrlInput = document.getElementById('editCoverUrl');
-
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-
-        // 파일 크기 체크 (5MB 이하)
-        if (file.size > 5 * 1024 * 1024) {
-            showToast('이미지 크기는 5MB 이하만 가능합니다.', 'warning');
-            input.value = '';
-            return;
-        }
-
-        // 이미지 파일 형식 체크
-        if (!file.type.startsWith('image/')) {
-            showToast('이미지 파일만 업로드 가능합니다.', 'warning');
-            input.value = '';
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            if (coverPreview) {
-                coverPreview.innerHTML = `<img src="${e.target.result}" alt="책 표지 미리보기">`;
-            }
-            // 파일을 선택하면 URL 입력창 비우기
-            if (coverUrlInput) {
-                coverUrlInput.value = '';
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-/* ========================================
    도서 표지 이미지 제거
 ======================================== */
 function removeEditCover() {
     const coverPreview = document.getElementById('editCoverPreview');
     const coverUrlInput = document.getElementById('editCoverUrl');
-    const coverFileInput = document.getElementById('editCoverFile');
 
     if (coverPreview) {
         coverPreview.innerHTML = '<span class="cover-placeholder-text">이미지 없음</span>';
     }
     if (coverUrlInput) {
         coverUrlInput.value = '';
-    }
-    if (coverFileInput) {
-        coverFileInput.value = '';
     }
 }
 
@@ -581,7 +546,6 @@ function removeEditCover() {
 ======================================== */
 function previewEditCoverFromUrl(url) {
     const coverPreview = document.getElementById('editCoverPreview');
-    const coverFileInput = document.getElementById('editCoverFile');
 
     if (!url || !url.trim()) {
         return;
@@ -590,17 +554,12 @@ function previewEditCoverFromUrl(url) {
     url = url.trim();
 
     // URL 형식 간단히 검증
-    if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('data:')) {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
         return;
     }
 
     if (coverPreview) {
         coverPreview.innerHTML = `<img src="${url}" alt="책 표지 미리보기" onerror="this.parentElement.innerHTML='<span class=\\'cover-placeholder-text\\'>이미지 로드 실패</span>'">`;
-    }
-
-    // URL로 프리뷰하면 파일 선택 초기화
-    if (coverFileInput) {
-        coverFileInput.value = '';
     }
 }
 
@@ -659,31 +618,12 @@ async function submitEditBook() {
         return;
     }
 
-    // 책 표지 이미지 URL 가져오기
+    // 책 표지 이미지 URL 가져오기 (URL 입력만 지원)
     let coverUrl = document.getElementById('editCoverUrl').value.trim();
-    const coverFileInput = document.getElementById('editCoverFile');
 
-    // 파일이 선택된 경우 - 서버에 업로드
-    if (coverFileInput && coverFileInput.files && coverFileInput.files[0]) {
-        try {
-            showToast('이미지 업로드 중...', 'info');
-            const uploadResult = await apiClient.uploadBoardImage(coverFileInput.files[0]);
-            console.log('[DEBUG] 이미지 업로드 결과:', uploadResult);
-
-            // 업로드된 이미지 URL 사용 (imageId 또는 imageUrl 반환에 따라 처리)
-            if (uploadResult.imageId) {
-                // imageId가 반환된 경우 - API URL 구성
-                coverUrl = `/api/board-images/${uploadResult.imageId}`;
-            } else if (uploadResult.imageUrl || uploadResult.url) {
-                // 직접 URL이 반환된 경우
-                coverUrl = uploadResult.imageUrl || uploadResult.url;
-            }
-        } catch (uploadError) {
-            console.error('이미지 업로드 실패:', uploadError);
-            showToast('이미지 업로드에 실패했습니다. 기존 이미지를 유지합니다.', 'warning');
-            // 업로드 실패 시 기존 이미지 URL 유지
-            coverUrl = book.coverUrl || '';
-        }
+    // URL이 입력되지 않은 경우 기존 이미지 URL 유지
+    if (!coverUrl) {
+        coverUrl = book.coverUrl || '';
     }
 
     const updateData = {
@@ -696,8 +636,18 @@ async function submitEditBook() {
         coverUrl: coverUrl
     };
 
+    // 독서 일정 데이터 추가 (bookcase-schedule.js)
+    const bookDetailsUpdate = getBookDetailsUpdate();
+    if (bookDetailsUpdate.length > 0) {
+        updateData.bookDetailsUpdate = bookDetailsUpdate;
+    }
+
+    console.log('📚 도서 수정 요청 데이터:', updateData);
+    console.log('📅 독서 일정 데이터:', bookDetailsUpdate);
+
     try {
         const response = await apiClient.updateBook(currentBookId, updateData);
+        console.log('✅ Book API 응답:', response);
 
         // 로컬 데이터 업데이트
         const bookIndex = booksData.findIndex(b => (b.bookId || b.id) == currentBookId);

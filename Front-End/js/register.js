@@ -467,124 +467,11 @@ function formatPhoneNumber(event) {
     input.value = formatted;
 }
 
-// ==================== 닉네임 중복 검사 ====================
-
-let nicknameCheckTimeout = null;
-let isNicknameAvailable = false;
-
-// 닉네임 실시간 중복 검사
-async function checkNicknameAvailability() {
-    const nicknameInput = document.getElementById('nickname');
-    const nickname = nicknameInput.value.trim();
-
-    // 기존 타임아웃 취소 (debounce)
-    if (nicknameCheckTimeout) {
-        clearTimeout(nicknameCheckTimeout);
-    }
-
-    // 닉네임이 비어있으면 초기화
-    if (!nickname) {
-        nicknameInput.style.borderColor = '#ddd';
-        isNicknameAvailable = false;
-        removeNicknameStatus();
-        return;
-    }
-
-    // 닉네임 길이 검사 (2~20자)
-    if (nickname.length < 2) {
-        nicknameInput.style.borderColor = '#e74c3c';
-        showNicknameStatus('닉네임은 2자 이상이어야 합니다.', 'error');
-        isNicknameAvailable = false;
-        return;
-    }
-
-    if (nickname.length > 20) {
-        nicknameInput.style.borderColor = '#e74c3c';
-        showNicknameStatus('닉네임은 20자 이하여야 합니다.', 'error');
-        isNicknameAvailable = false;
-        return;
-    }
-
-    // 300ms 후에 API 호출 (debounce)
-    nicknameCheckTimeout = setTimeout(async () => {
-        try {
-            showNicknameStatus('확인 중...', 'info');
-
-            const response = await apiClient.checkNickname(nickname, false);
-
-            if (response.success) {
-                // 사용 가능한 닉네임
-                nicknameInput.style.borderColor = '#27ae60';
-                showNicknameStatus('사용 가능한 닉네임입니다.', 'success');
-                isNicknameAvailable = true;
-            } else {
-                // 이미 사용 중인 닉네임
-                nicknameInput.style.borderColor = '#e74c3c';
-                showNicknameStatus('이미 사용 중인 닉네임입니다.', 'error');
-                isNicknameAvailable = false;
-            }
-        } catch (error) {
-            console.error('닉네임 중복 확인 실패:', error);
-
-            // 에러 응답에서 메시지 추출
-            if (error.status === 409 || (error.data && error.data.code === 'USER004')) {
-                nicknameInput.style.borderColor = '#e74c3c';
-                showNicknameStatus('이미 사용 중인 닉네임입니다.', 'error');
-                isNicknameAvailable = false;
-            } else {
-                // API 오류 시 일단 통과 (회원가입 시 백엔드에서 최종 검증)
-                nicknameInput.style.borderColor = '#ddd';
-                removeNicknameStatus();
-                isNicknameAvailable = true;
-            }
-        }
-    }, 300);
-}
-
-// 닉네임 상태 메시지 표시
-function showNicknameStatus(message, type) {
-    let statusEl = document.getElementById('nicknameStatus');
-
-    if (!statusEl) {
-        statusEl = document.createElement('span');
-        statusEl.id = 'nicknameStatus';
-        statusEl.className = 'validation-message';
-        const nicknameInput = document.getElementById('nickname');
-        nicknameInput.parentNode.appendChild(statusEl);
-    }
-
-    statusEl.textContent = message;
-    statusEl.style.display = 'block';
-
-    switch (type) {
-        case 'success':
-            statusEl.style.color = '#27ae60';
-            break;
-        case 'error':
-            statusEl.style.color = '#e74c3c';
-            break;
-        case 'info':
-            statusEl.style.color = '#3498db';
-            break;
-        default:
-            statusEl.style.color = '#666';
-    }
-}
-
-// 닉네임 상태 메시지 제거
-function removeNicknameStatus() {
-    const statusEl = document.getElementById('nicknameStatus');
-    if (statusEl) {
-        statusEl.style.display = 'none';
-    }
-}
-
 // 2단계 이벤트 리스너 등록
 function initializeStep2EventListeners() {
     const password = document.getElementById('password');
     const passwordConfirm = document.getElementById('passwordConfirm');
     const phone = document.getElementById('phone');
-    const nickname = document.getElementById('nickname');
 
     // 비밀번호 실시간 검증
     password.addEventListener('input', validatePassword);
@@ -593,9 +480,6 @@ function initializeStep2EventListeners() {
 
     // 전화번호 자동 포맷팅
     phone.addEventListener('input', formatPhoneNumber);
-
-    // 닉네임 실시간 중복 검사
-    nickname.addEventListener('input', checkNicknameAvailability);
 
     // 버튼 이벤트
     document.getElementById('sendVerification').addEventListener('click', sendVerificationCode);

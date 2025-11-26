@@ -9,94 +9,18 @@ let wishlistBooks = []; // 내 책장의 책 목록
 let draggableInstance = null; // Draggable 인스턴스
 let pendingSchedule = null; // 등록 대기 중인 스케줄 정보
 let currentViewingRecord = null; // 현재 보고 있는 기록 (수정/삭제용)
+let currentCalendarYear = null; // 현재 캘린더 연도
+let currentCalendarMonth = null; // 현재 캘린더 월
+let dailyRecordsCache = {}; // 일간 기록 캐시 { 'YYYY-MM-DD': [records] }
 
-// ==================== Mock 모드 설정 ====================
-// 백엔드 API가 구현될 때까지 Mock 데이터로 테스트
-let USE_MOCK_DATA = true; // false로 변경하면 실제 API 사용
-let mockScheduleIdCounter = 100;
+// 독자 데이터 (본인 + 자녀)
+let currentUserInfo = null;
+let childrenData = [];
+let selectedReaderColor = '#20B2AA'; // 선택된 독자의 색상
 
-// Mock 독서 일정 데이터
-let mockCalendarData = [
-    {
-        scheduleId: 1,
-        bookId: 1,
-        title: '클린 코드',
-        author: '로버트 C. 마틴',
-        coverUrl: 'https://image.aladin.co.kr/product/56/9/cover500/8966260950_1.jpg',
-        status: 'completed',
-        date: getTodayOffset(-5),
-        startDate: getTodayOffset(-10),
-        endDate: getTodayOffset(-5)
-    },
-    {
-        scheduleId: 2,
-        bookId: 2,
-        title: '모던 자바스크립트',
-        author: '니콜라스 자카스',
-        coverUrl: 'https://image.aladin.co.kr/product/30574/6/cover500/k582835618_1.jpg',
-        status: 'reading',
-        date: getTodayOffset(0),
-        startDate: getTodayOffset(-3),
-        endDate: null
-    },
-    {
-        scheduleId: 3,
-        bookId: 3,
-        title: '리팩터링',
-        author: '마틴 파울러',
-        coverUrl: 'https://image.aladin.co.kr/product/21169/6/cover500/k342630735_1.jpg',
-        status: 'to_read',
-        date: getTodayOffset(3),
-        startDate: getTodayOffset(3),
-        endDate: null
-    },
-    {
-        scheduleId: 4,
-        bookId: 4,
-        title: '이펙티브 자바',
-        author: '조슈아 블로크',
-        coverUrl: 'https://image.aladin.co.kr/product/26962/2/cover500/k412637564_1.jpg',
-        status: 'reading',
-        date: getTodayOffset(-2),
-        startDate: getTodayOffset(-7),
-        endDate: null
-    }
-];
-
-// Mock 책장 데이터 (드래그용)
-const mockWishlistBooks = [
-    {
-        bookId: 101,
-        title: '객체지향의 사실과 오해',
-        author: '조영호',
-        coverUrl: 'https://image.aladin.co.kr/product/5765/53/cover500/8998139766_1.jpg'
-    },
-    {
-        bookId: 102,
-        title: '자바의 정석',
-        author: '남궁성',
-        coverUrl: 'https://image.aladin.co.kr/product/29904/57/cover500/8994492046_2.jpg'
-    },
-    {
-        bookId: 103,
-        title: '스프링 부트와 AWS',
-        author: '이동욱',
-        coverUrl: 'https://image.aladin.co.kr/product/22109/98/cover500/k892532741_1.jpg'
-    },
-    {
-        bookId: 104,
-        title: 'HTTP 완벽 가이드',
-        author: '데이빗 고울리',
-        coverUrl: 'https://image.aladin.co.kr/product/5460/61/cover500/8966261264_1.jpg'
-    }
-];
-
-// 오늘 날짜 기준 오프셋 계산
-function getTodayOffset(days) {
-    const date = new Date();
-    date.setDate(date.getDate() + days);
-    return date.toISOString().split('T')[0];
-}
+// Flatpickr 인스턴스
+let scheduleStartPicker = null;
+let scheduleEndPicker = null;
 
 // ==================== 초기화 ====================
 
@@ -104,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeFullCalendar();
     initializeDraggable();
     loadWishlistBooks();
+    loadReadersData(); // 독자 데이터 로드
     setupEventListeners();
 });
 
@@ -167,23 +92,20 @@ function initializeFullCalendar() {
             highlightSelectedDate(info.dateStr);
         },
 
-        // 이벤트 클릭
+        // 이벤트 클릭 (날짜 선택 및 상세 기록 로드)
         eventClick: function(info) {
-            const bookId = info.event.extendedProps.bookId;
             const dateStr = info.event.startStr.split('T')[0];
             selectDate(dateStr);
             highlightSelectedDate(dateStr);
-
-            // 약간의 딜레이 후 상세 모달 열기
-            setTimeout(() => {
-                openRecordDetail(bookId);
-            }, 100);
+            // 월간 캘린더에서는 독자별 색상만 표시하므로,
+            // 클릭 시 해당 날짜의 상세 기록을 사이드바에서 확인하도록 함
         },
 
         // 이벤트 렌더링 커스터마이징
         eventDidMount: function(info) {
-            // 툴팁 추가
-            info.el.title = `${info.event.title} - ${getStatusText(info.event.extendedProps.status)}`;
+            // 툴팁 추가 (독자 이름)
+            const readerName = info.event.extendedProps?.readerName || info.event.title;
+            info.el.title = `${readerName} - 독서 중`;
         },
 
         // 월 변경 시
@@ -279,32 +201,23 @@ function setupEventListeners() {
     const cancelBtn = document.getElementById('editCancelBtn');
     const saveBtn = document.getElementById('editSaveBtn');
 
-    console.log('[DEBUG] recordEditBtn:', editBtn);
-    console.log('[DEBUG] recordDeleteBtn:', deleteBtn);
-    console.log('[DEBUG] editCancelBtn:', cancelBtn);
-    console.log('[DEBUG] editSaveBtn:', saveBtn);
-
     if (editBtn) {
         editBtn.addEventListener('click', () => {
-            console.log('[DEBUG] 수정 버튼 클릭됨');
             switchToEditMode();
         });
     }
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
-            console.log('[DEBUG] 삭제 버튼 클릭됨');
             deleteSchedule();
         });
     }
     if (cancelBtn) {
         cancelBtn.addEventListener('click', () => {
-            console.log('[DEBUG] 취소 버튼 클릭됨');
             switchToViewMode();
         });
     }
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
-            console.log('[DEBUG] 저장 버튼 클릭됨');
             saveScheduleEdit();
         });
     }
@@ -315,7 +228,7 @@ function setupEventListeners() {
 
 // ==================== 책장 데이터 로드 ====================
 
-// 내 책장의 책 목록 로드
+// 내 책장의 책 목록 로드 (항상 실제 API 사용)
 async function loadWishlistBooks() {
     const contentEl = document.getElementById('wishlistContent');
     if (!contentEl) return;
@@ -327,32 +240,37 @@ async function loadWishlistBooks() {
         </div>
     `;
 
-    // Mock 모드인 경우
-    if (USE_MOCK_DATA) {
-        // 약간의 딜레이로 로딩 효과
-        await new Promise(resolve => setTimeout(resolve, 300));
-        wishlistBooks = [...mockWishlistBooks];
-        renderWishlistBooks();
-        console.log('[Mock Mode] 책장 데이터 로드됨:', wishlistBooks.length, '권');
-        return;
-    }
-
     try {
+        // 실제 API에서 책장 데이터 로드
         const response = await apiClient.getBooks();
 
-        if (response.success && response.data) {
+        // 응답 형식에 따라 처리
+        if (Array.isArray(response)) {
+            // 배열로 직접 반환되는 경우
+            wishlistBooks = response;
+        } else if (response.success && response.data) {
+            // { success: true, data: [...] } 형식
             wishlistBooks = response.data;
-            renderWishlistBooks();
+        } else if (response.data) {
+            // { data: [...] } 형식
+            wishlistBooks = response.data;
         } else {
-            throw new Error('책 목록 로드 실패');
+            throw new Error('책 목록 응답 형식 오류');
         }
+
+        renderWishlistBooks();
+
     } catch (error) {
         console.error('책장 데이터 로드 실패:', error);
 
-        // API 실패 시 Mock 데이터로 폴백
-        console.log('[Fallback] Mock 책장 데이터 사용');
-        wishlistBooks = [...mockWishlistBooks];
-        renderWishlistBooks();
+        // API 실패 시 빈 목록 또는 에러 메시지 표시
+        contentEl.innerHTML = `
+            <div class="wishlist-empty">
+                <p>책장 데이터를 불러올 수 없습니다.</p>
+                <p style="font-size: 12px; color: #888;">책장 페이지에서 책을 추가해주세요.</p>
+                <button class="btn-retry" onclick="loadWishlistBooks()">다시 시도</button>
+            </div>
+        `;
     }
 }
 
@@ -422,129 +340,82 @@ async function fetchEvents(info, successCallback, failureCallback) {
     const year = midDate.getFullYear();
     const month = midDate.getMonth() + 1;
 
-    // Mock 모드인 경우
-    if (USE_MOCK_DATA) {
-        const mockData = getMockMonthlyData(year, month);
-        processCalendarData(mockData);
-        successCallback(allEvents);
-        updateMonthlySummary(mockData);
-        console.log('[Mock Mode] 캘린더 데이터 로드됨:', mockData.length, '개');
-        return;
-    }
+    // 현재 연/월 저장
+    currentCalendarYear = year;
+    currentCalendarMonth = month;
 
     try {
         const response = await apiClient.getMonthlyCalendar(year, month);
 
-        if (response.success && response.data) {
-            processCalendarData(response.data);
-            successCallback(allEvents);
-            updateMonthlySummary(response.data);
-        } else {
-            throw new Error('데이터 로드 실패');
+        // 응답 형식에 따라 처리
+        // 백엔드 응답: [{ day: number, readers: [{ readerId, color, readerName }] }]
+        let calendarData = [];
+        if (Array.isArray(response)) {
+            calendarData = response;
+        } else if (response.success && response.data) {
+            calendarData = response.data;
+        } else if (response.data) {
+            calendarData = response.data;
         }
+
+        processCalendarData(calendarData, year, month);
+        successCallback(allEvents);
+        updateMonthlySummary(calendarData);
     } catch (error) {
         console.error('월간 캘린더 데이터 로드 실패:', error);
-
-        // API 실패 시 Mock 데이터로 폴백
-        console.log('[Fallback] Mock 데이터 사용');
-        const mockData = getMockMonthlyData(year, month);
-        processCalendarData(mockData);
-        successCallback(allEvents);
-        updateMonthlySummary(mockData);
+        // 실패 시 빈 데이터로 처리
+        processCalendarData([], year, month);
+        successCallback([]);
+        updateMonthlySummary([]);
     }
 }
 
-// 캘린더 데이터 처리 (공통)
-function processCalendarData(records) {
+// 캘린더 데이터 처리 (백엔드 응답 형식에 맞춤)
+// 백엔드 응답: [{ day: number, readers: [{ readerId, color, readerName }] }]
+function processCalendarData(dayDataList, year, month) {
     monthlyRecords = {};
     const events = [];
 
-    records.forEach(record => {
-        const date = record.date;
-        if (!monthlyRecords[date]) {
-            monthlyRecords[date] = [];
+    dayDataList.forEach(dayData => {
+        // day 숫자를 YYYY-MM-DD 형식으로 변환
+        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(dayData.day).padStart(2, '0')}`;
+
+        if (!monthlyRecords[dateStr]) {
+            monthlyRecords[dateStr] = [];
         }
-        monthlyRecords[date].push(record);
-        events.push(convertToEvent(record));
+
+        // 각 독자별로 이벤트 생성 (색상 표시용)
+        if (dayData.readers && dayData.readers.length > 0) {
+            dayData.readers.forEach((reader, index) => {
+                const eventData = {
+                    date: dateStr,
+                    readerId: reader.readerId,
+                    readerName: reader.readerName,
+                    color: reader.color || '#20B2AA'
+                };
+                monthlyRecords[dateStr].push(eventData);
+                events.push(convertToEvent(eventData, index));
+            });
+        }
     });
 
     allEvents = events;
 }
 
-// Mock 월간 데이터 조회
-function getMockMonthlyData(year, month) {
-    const monthStr = `${year}-${String(month).padStart(2, '0')}`;
-
-    // 기본 Mock 데이터를 현재 조회 월에 맞게 동적 생성
-    const baseMockData = [
-        {
-            scheduleId: 1,
-            bookId: 1,
-            title: '클린 코드',
-            author: '로버트 C. 마틴',
-            coverUrl: 'https://image.aladin.co.kr/product/56/9/cover500/8966260950_1.jpg',
-            status: 'completed',
-            date: `${monthStr}-05`,
-            startDate: `${monthStr}-01`,
-            endDate: `${monthStr}-05`
-        },
-        {
-            scheduleId: 2,
-            bookId: 2,
-            title: '모던 자바스크립트',
-            author: '니콜라스 자카스',
-            coverUrl: 'https://image.aladin.co.kr/product/30574/6/cover500/k582835618_1.jpg',
-            status: 'reading',
-            date: `${monthStr}-15`,
-            startDate: `${monthStr}-10`,
-            endDate: null
-        },
-        {
-            scheduleId: 3,
-            bookId: 3,
-            title: '리팩터링',
-            author: '마틴 파울러',
-            coverUrl: 'https://image.aladin.co.kr/product/21169/6/cover500/k342630735_1.jpg',
-            status: 'to_read',
-            date: `${monthStr}-20`,
-            startDate: `${monthStr}-20`,
-            endDate: null
-        }
-    ];
-
-    // 사용자가 추가한 일정 필터링
-    const userAdded = mockCalendarData
-        .filter(r => r.scheduleId > 100)  // 사용자 추가 일정만
-        .filter(r => r.date && r.date.startsWith(monthStr));
-
-    const result = [...baseMockData, ...userAdded];
-    console.log('[Mock Debug] 조회:', monthStr, '기본:', baseMockData.length, '추가:', userAdded.length);
-    return result;
-}
-
-// 레코드를 FullCalendar 이벤트로 변환
-function convertToEvent(record) {
-    const statusColors = {
-        'completed': '#27ae60',  // 초록색 - 완료
-        'reading': '#f39c12',    // 주황색 - 읽는 중
-        'to_read': '#95a5a6'     // 회색 - 읽을 예정
-    };
-
+// 레코드를 FullCalendar 이벤트로 변환 (독자 색상 기반)
+function convertToEvent(record, index = 0) {
     return {
-        id: `${record.bookId}-${record.date}`,
-        title: record.title,
+        id: `${record.date}-reader-${record.readerId || index}`,
+        title: record.readerName || '독서 중',
         start: record.date,
-        end: record.endDate || record.date,
-        backgroundColor: statusColors[record.status] || '#20B2AA',
-        borderColor: statusColors[record.status] || '#20B2AA',
+        backgroundColor: record.color || '#20B2AA',
+        borderColor: record.color || '#20B2AA',
         textColor: '#ffffff',
+        display: 'block',
         extendedProps: {
-            bookId: record.bookId,
-            author: record.author,
-            status: record.status,
-            coverUrl: record.coverUrl,
-            startDate: record.startDate,
-            endDate: record.endDate
+            readerId: record.readerId,
+            readerName: record.readerName,
+            color: record.color
         }
     };
 }
@@ -584,30 +455,36 @@ async function loadDailyRecords(dateStr) {
     // 로딩 표시
     recordsContent.innerHTML = '<div class="loading-spinner"></div>';
 
-    // Mock 모드 또는 로컬 데이터 사용
-    if (USE_MOCK_DATA) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        const localRecords = monthlyRecords[dateStr] || [];
-        renderDailyRecords(localRecords);
-        return;
-    }
-
     try {
         const response = await apiClient.getDailyRecords(dateStr);
 
-        if (response.success && response.data) {
-            renderDailyRecords(response.data.records || []);
+        // 백엔드 응답 형식: { date: LocalDate, records: [{ detailsId, reader, book, startDate, endDate }] }
+        let records = [];
+        if (response.records) {
+            records = response.records;
+        } else if (response.success && response.data) {
+            records = response.data.records || response.data || [];
+        } else if (response.data) {
+            records = response.data.records || response.data || [];
+        } else if (Array.isArray(response)) {
+            records = response;
         }
+
+        // 캐시에 저장
+        dailyRecordsCache[dateStr] = records;
+
+        renderDailyRecords(records, dateStr);
     } catch (error) {
         console.error('일간 기록 로드 실패:', error);
-        // 로컬 데이터 사용 (폴백)
-        const localRecords = monthlyRecords[dateStr] || [];
-        renderDailyRecords(localRecords);
+        // 캐시된 데이터 사용 (폴백)
+        const cachedRecords = dailyRecordsCache[dateStr] || [];
+        renderDailyRecords(cachedRecords, dateStr);
     }
 }
 
-// 일간 기록 렌더링
-function renderDailyRecords(records) {
+// 일간 기록 렌더링 (백엔드 응답 형식에 맞춤)
+// 백엔드 응답: { detailsId, reader: {...}, book: {...}, startDate, endDate }
+function renderDailyRecords(records, dateStr) {
     const recordsContent = document.getElementById('recordsContent');
 
     if (!records || records.length === 0) {
@@ -619,48 +496,87 @@ function renderDailyRecords(records) {
         return;
     }
 
-    recordsContent.innerHTML = records.map(record => `
-        <div class="record-item" data-book-id="${record.bookId}" onclick="openRecordDetail(${record.bookId})">
+    recordsContent.innerHTML = records.map(record => {
+        // 백엔드 응답 구조에서 데이터 추출
+        const book = record.book || {};
+        const reader = record.reader || {};
+        const bookId = book.bookId || record.bookId;
+        const title = book.title || record.title || '제목 없음';
+        const author = book.author || record.author || '작자 미상';
+        const detailsId = record.detailsId;
+
+        // 이미지 URL 추출 (백엔드 image 객체 구조에 맞춤)
+        let coverUrl = '';
+        if (book.image) {
+            coverUrl = book.image.imageUrl || book.image.url || '';
+        } else if (record.coverUrl) {
+            coverUrl = record.coverUrl;
+        }
+
+        // 독서 상태 계산 (시작일/종료일 기반)
+        const today = new Date().toISOString().split('T')[0];
+        const startDate = record.startDate || '';
+        const endDate = record.endDate || '';
+        let status = 'reading';
+        if (endDate && endDate < today) {
+            status = 'completed';
+        } else if (startDate > today) {
+            status = 'to_read';
+        }
+
+        return `
+        <div class="record-item" data-details-id="${detailsId}" data-book-id="${bookId}" onclick="openRecordDetail(${detailsId}, '${dateStr}')">
             <div class="record-item-cover">
-                ${record.coverUrl
-                    ? `<img src="${record.coverUrl}" alt="${record.title}">`
-                    : `<div class="cover-placeholder">${record.title.substring(0, 4)}</div>`
+                ${coverUrl
+                    ? `<img src="${coverUrl}" alt="${escapeHtml(title)}">`
+                    : `<div class="cover-placeholder">${title.substring(0, 4)}</div>`
                 }
             </div>
             <div class="record-item-info">
-                <div class="record-item-title">${record.title}</div>
-                <div class="record-item-author">${record.author || '작자 미상'}</div>
-                <span class="record-item-status ${record.status}">${getStatusText(record.status)}</span>
+                <div class="record-item-title">${escapeHtml(title)}</div>
+                <div class="record-item-author">${escapeHtml(author)}</div>
+                <div class="record-item-reader" style="color: ${reader.color || '#666'};">
+                    <span class="reader-dot" style="background: ${reader.color || '#20B2AA'};"></span>
+                    ${escapeHtml(reader.readerName || '본인')}
+                </div>
+                <span class="record-item-status ${status}">${getStatusText(status)}</span>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 // ==================== 통계 ====================
 
-// 월간 요약 업데이트
-function updateMonthlySummary(records) {
-    if (!records || records.length === 0) {
+// 월간 요약 업데이트 (백엔드 응답 형식에 맞춤)
+// 백엔드 응답: [{ day: number, readers: [...] }]
+function updateMonthlySummary(dayDataList) {
+    if (!dayDataList || dayDataList.length === 0) {
         document.getElementById('totalBooks').textContent = '0';
         document.getElementById('readingBooks').textContent = '0';
         document.getElementById('readingDays').textContent = '0';
         return;
     }
 
-    // 고유한 책 ID로 중복 제거
-    const uniqueBooks = new Map();
-    records.forEach(record => {
-        if (!uniqueBooks.has(record.bookId)) {
-            uniqueBooks.set(record.bookId, record);
+    // 고유한 독자 ID 수집
+    const uniqueReaders = new Set();
+    let totalReadingEntries = 0;
+
+    dayDataList.forEach(dayData => {
+        if (dayData.readers && dayData.readers.length > 0) {
+            dayData.readers.forEach(reader => {
+                uniqueReaders.add(reader.readerId);
+                totalReadingEntries++;
+            });
         }
     });
 
-    const completedBooks = [...uniqueBooks.values()].filter(r => r.status === 'completed').length;
-    const readingBooks = [...uniqueBooks.values()].filter(r => r.status === 'reading').length;
-    const readingDays = Object.keys(monthlyRecords).length;
+    // 독서일 수 = 기록이 있는 날의 수
+    const readingDays = dayDataList.length;
 
-    document.getElementById('totalBooks').textContent = completedBooks;
-    document.getElementById('readingBooks').textContent = readingBooks;
+    // 월간 캘린더 API는 책 정보가 없으므로, 독자 수와 독서일만 표시
+    document.getElementById('totalBooks').textContent = uniqueReaders.size; // 활동한 독자 수
+    document.getElementById('readingBooks').textContent = totalReadingEntries; // 총 독서 기록 수
     document.getElementById('readingDays').textContent = readingDays;
 }
 
@@ -669,22 +585,20 @@ function updateMonthlySummaryFromEvents(year, month) {
     const monthStr = `${year}-${String(month).padStart(2, '0')}`;
     const monthEvents = allEvents.filter(e => e.start && e.start.startsWith(monthStr));
 
-    const uniqueBooks = new Map();
+    // 고유한 독자 ID 수집
+    const uniqueReaders = new Set();
     monthEvents.forEach(event => {
-        const bookId = event.extendedProps?.bookId;
-        if (bookId && !uniqueBooks.has(bookId)) {
-            uniqueBooks.set(bookId, event.extendedProps);
+        const readerId = event.extendedProps?.readerId;
+        if (readerId) {
+            uniqueReaders.add(readerId);
         }
     });
-
-    const completedBooks = [...uniqueBooks.values()].filter(r => r.status === 'completed').length;
-    const readingBooks = [...uniqueBooks.values()].filter(r => r.status === 'reading').length;
 
     // 독서일 계산
     const datesWithEvents = new Set(monthEvents.map(e => e.start));
 
-    document.getElementById('totalBooks').textContent = completedBooks;
-    document.getElementById('readingBooks').textContent = readingBooks;
+    document.getElementById('totalBooks').textContent = uniqueReaders.size;
+    document.getElementById('readingBooks').textContent = monthEvents.length;
     document.getElementById('readingDays').textContent = datesWithEvents.size;
 }
 
@@ -710,8 +624,19 @@ function openScheduleModal(bookData, dropDate) {
 
     document.getElementById('scheduleBookTitle').textContent = bookData.title;
     document.getElementById('scheduleBookAuthor').textContent = bookData.author || '작자 미상';
-    document.getElementById('scheduleStartDate').value = dropDate;
-    document.getElementById('scheduleStatus').value = 'reading'; // 기본값
+
+    // 독자 선택 드롭다운 초기화
+    initReaderDropdown();
+
+    // 독자 선택 초기화 (본인 선택)
+    const hiddenInput = document.getElementById('scheduleReader');
+    const valueDisplay = document.querySelector('#scheduleReaderSelect .custom-select-value');
+    if (hiddenInput) hiddenInput.value = '';
+    if (valueDisplay) valueDisplay.innerHTML = '독자 선택';
+    selectedReaderColor = '#20B2AA';
+
+    // Flatpickr 초기화
+    initScheduleDatePickers(dropDate);
 
     // 모달 표시
     document.getElementById('scheduleModal').style.display = 'flex';
@@ -728,65 +653,44 @@ async function confirmSchedule() {
     if (!pendingSchedule) return;
 
     const startDate = document.getElementById('scheduleStartDate').value;
-    const status = document.getElementById('scheduleStatus').value;
+    const endDate = document.getElementById('scheduleEndDate').value;
+    const readerValue = document.getElementById('scheduleReader').value;
 
+    // 유효성 검사
     if (!startDate) {
         showToast('시작일을 선택해주세요.', 'error');
         return;
     }
 
+    if (!endDate) {
+        showToast('종료일을 선택해주세요.', 'error');
+        return;
+    }
+
+    if (!readerValue) {
+        showToast('독자를 선택해주세요.', 'error');
+        return;
+    }
+
+    // childId 설정 (본인이면 null, 자녀면 childId)
+    const childId = readerValue === 'user' ? null : parseInt(readerValue);
+
     const confirmBtn = document.getElementById('scheduleConfirm');
     confirmBtn.disabled = true;
     confirmBtn.textContent = '등록 중...';
 
-    // Mock 모드인 경우
-    if (USE_MOCK_DATA) {
-        await new Promise(resolve => setTimeout(resolve, 500)); // 로딩 효과
-
-        // Mock 데이터에 새 일정 추가
-        const newSchedule = {
-            scheduleId: ++mockScheduleIdCounter,
-            bookId: pendingSchedule.bookId,
-            title: pendingSchedule.title,
-            author: pendingSchedule.author,
-            coverUrl: pendingSchedule.coverUrl,
-            status: status,
-            date: startDate,
-            startDate: startDate,
-            endDate: status === 'completed' ? startDate : null
-        };
-
-        mockCalendarData.push(newSchedule);
-        console.log('[Mock Mode] 새 일정 추가됨:', newSchedule);
-        console.log('[Mock Mode] 새 일정 date 값:', startDate, '타입:', typeof startDate);
-        console.log('[Mock Mode] 현재 mockCalendarData 길이:', mockCalendarData.length);
-
-        showToast('독서 일정이 등록되었습니다!', 'success');
-        closeScheduleModal();
-
-        // 캘린더 새로고침
-        console.log('[Mock Mode] refetchEvents 호출');
-        calendar.refetchEvents();
-
-        // 해당 날짜 선택
-        selectDate(startDate);
-        highlightSelectedDate(startDate);
-
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = '등록';
-        return;
-    }
-
     try {
+        // 백엔드 API 요청 데이터 (status는 백엔드에서 자동 계산)
         const scheduleData = {
             bookId: pendingSchedule.bookId,
+            childId: childId,
             startDate: startDate,
-            status: status
+            endDate: endDate
         };
 
         const response = await apiClient.createReadingSchedule(scheduleData);
 
-        if (response.success) {
+        if (response.success || response.scheduleId || response.data) {
             showToast('독서 일정이 등록되었습니다!', 'success');
             closeScheduleModal();
 
@@ -810,41 +714,75 @@ async function confirmSchedule() {
 
 // ==================== 기록 상세 모달 ====================
 
-// 기록 상세 모달 열기
-function openRecordDetail(bookId) {
-    // 현재 선택된 날짜의 기록에서 해당 책 찾기
-    const records = monthlyRecords[selectedDate] || [];
-    const record = records.find(r => r.bookId === bookId);
+// 기록 상세 모달 열기 (detailsId 기반)
+function openRecordDetail(detailsId, dateStr) {
+    // 캐시된 일간 기록에서 해당 detailsId 찾기
+    const targetDate = dateStr || selectedDate;
+    const records = dailyRecordsCache[targetDate] || [];
+    const record = records.find(r => r.detailsId === detailsId);
 
     if (!record) {
         showToast('기록을 찾을 수 없습니다.', 'error');
         return;
     }
 
+    // 백엔드 응답 구조에서 데이터 추출
+    const book = record.book || {};
+    const reader = record.reader || {};
+
+    // 이미지 URL 추출
+    let coverUrl = '';
+    if (book.image) {
+        coverUrl = book.image.imageUrl || book.image.url || '';
+    }
+
+    // 독서 상태 계산
+    const today = new Date().toISOString().split('T')[0];
+    const startDate = record.startDate || '';
+    const endDate = record.endDate || '';
+    let status = 'reading';
+    if (endDate && endDate < today) {
+        status = 'completed';
+    } else if (startDate > today) {
+        status = 'to_read';
+    }
+
     // 현재 보고 있는 기록 저장 (수정/삭제용)
-    currentViewingRecord = { ...record, viewDate: selectedDate };
+    currentViewingRecord = {
+        detailsId: record.detailsId,
+        scheduleId: record.detailsId, // API 호출용
+        bookId: book.bookId,
+        title: book.title || '제목 없음',
+        author: book.author || '작자 미상',
+        coverUrl: coverUrl,
+        status: status,
+        startDate: startDate,
+        endDate: endDate,
+        reader: reader,
+        viewDate: targetDate
+    };
 
     // 모달 내용 업데이트
     const coverEl = document.getElementById('recordCover');
-    if (record.coverUrl) {
-        coverEl.innerHTML = `<img src="${record.coverUrl}" alt="${record.title}">`;
+    if (coverUrl) {
+        coverEl.innerHTML = `<img src="${coverUrl}" alt="${escapeHtml(currentViewingRecord.title)}">`;
     } else {
         coverEl.innerHTML = `
             <div class="book-cover-placeholder">
-                <h3>${record.title}</h3>
+                <h3>${escapeHtml(currentViewingRecord.title)}</h3>
             </div>
         `;
     }
 
-    document.getElementById('recordTitle').textContent = record.title;
-    document.getElementById('recordAuthor').textContent = record.author || '작자 미상';
+    document.getElementById('recordTitle').textContent = currentViewingRecord.title;
+    document.getElementById('recordAuthor').textContent = currentViewingRecord.author;
 
     const statusBadge = document.getElementById('recordStatus');
-    statusBadge.textContent = getStatusText(record.status);
-    statusBadge.className = `status-badge ${record.status}`;
+    statusBadge.textContent = getStatusText(status);
+    statusBadge.className = `status-badge ${status}`;
 
-    document.getElementById('recordStartDate').textContent = record.startDate || '-';
-    document.getElementById('recordEndDate').textContent = record.endDate || '-';
+    document.getElementById('recordStartDate').textContent = startDate || '-';
+    document.getElementById('recordEndDate').textContent = endDate || '-';
 
     // 항상 보기 모드로 시작
     switchToViewMode();
@@ -920,38 +858,6 @@ async function saveScheduleEdit() {
     saveBtn.disabled = true;
     saveBtn.textContent = '저장 중...';
 
-    // Mock 모드인 경우
-    if (USE_MOCK_DATA) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Mock 데이터에서 해당 기록 찾아서 수정
-        const scheduleIndex = mockCalendarData.findIndex(r => r.scheduleId === currentViewingRecord.scheduleId);
-        if (scheduleIndex !== -1) {
-            mockCalendarData[scheduleIndex] = {
-                ...mockCalendarData[scheduleIndex],
-                status: newStatus,
-                startDate: newStartDate,
-                endDate: newEndDate || null,
-                date: newStartDate // 표시 날짜도 시작일로 업데이트
-            };
-            console.log('[Mock Mode] 일정 수정됨:', mockCalendarData[scheduleIndex]);
-        }
-
-        showToast('독서 일정이 수정되었습니다!', 'success');
-        closeRecordDetailModal();
-
-        // 캘린더 새로고침
-        calendar.refetchEvents();
-
-        // 해당 날짜 선택
-        selectDate(newStartDate);
-        highlightSelectedDate(newStartDate);
-
-        saveBtn.disabled = false;
-        saveBtn.textContent = '저장';
-        return;
-    }
-
     try {
         const scheduleData = {
             status: newStatus,
@@ -961,7 +867,7 @@ async function saveScheduleEdit() {
 
         const response = await apiClient.updateReadingSchedule(currentViewingRecord.scheduleId, scheduleData);
 
-        if (response.success) {
+        if (response.success || response.data) {
             showToast('독서 일정이 수정되었습니다!', 'success');
             closeRecordDetailModal();
 
@@ -995,37 +901,10 @@ async function deleteSchedule() {
     deleteBtn.disabled = true;
     deleteBtn.textContent = '삭제 중...';
 
-    // Mock 모드인 경우
-    if (USE_MOCK_DATA) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Mock 데이터에서 해당 기록 삭제
-        const scheduleIndex = mockCalendarData.findIndex(r => r.scheduleId === currentViewingRecord.scheduleId);
-        if (scheduleIndex !== -1) {
-            mockCalendarData.splice(scheduleIndex, 1);
-            console.log('[Mock Mode] 일정 삭제됨, scheduleId:', currentViewingRecord.scheduleId);
-        }
-
-        showToast('독서 일정이 삭제되었습니다.', 'success');
-        closeRecordDetailModal();
-
-        // 캘린더 새로고침
-        calendar.refetchEvents();
-
-        // 해당 날짜 다시 로드
-        if (selectedDate) {
-            loadDailyRecords(selectedDate);
-        }
-
-        deleteBtn.disabled = false;
-        deleteBtn.textContent = '삭제';
-        return;
-    }
-
     try {
         const response = await apiClient.deleteReadingSchedule(currentViewingRecord.scheduleId);
 
-        if (response.success) {
+        if (response.success || response.data || response.message === 'success') {
             showToast('독서 일정이 삭제되었습니다.', 'success');
             closeRecordDetailModal();
 
@@ -1064,4 +943,230 @@ function getStatusText(status) {
         'to_read': '읽을 예정'
     };
     return statusMap[status] || status;
+}
+
+// ==================== 독자 데이터 로드 ====================
+
+async function loadReadersData() {
+    try {
+        // 사용자 정보 로드
+        const userResponse = await apiClient.getUserInfo();
+        if (userResponse.success && userResponse.data) {
+            currentUserInfo = userResponse.data;
+        } else if (userResponse && !userResponse.success) {
+            currentUserInfo = null;
+        } else {
+            currentUserInfo = userResponse;
+        }
+    } catch (error) {
+        console.error('사용자 정보 로드 실패:', error);
+        currentUserInfo = null;
+    }
+
+    try {
+        // 자녀 목록 로드
+        const childrenResponse = await apiClient.getChildren();
+
+        if (childrenResponse.success && childrenResponse.data) {
+            childrenData = childrenResponse.data;
+        } else if (childrenResponse.data && Array.isArray(childrenResponse.data)) {
+            childrenData = childrenResponse.data;
+        } else if (Array.isArray(childrenResponse)) {
+            childrenData = childrenResponse;
+        } else {
+            childrenData = [];
+        }
+    } catch (error) {
+        console.error('자녀 목록 로드 실패:', error);
+        childrenData = [];
+    }
+
+}
+
+// ==================== 한글 서수 변환 ====================
+
+function getKoreanOrdinal(num) {
+    const ordinals = ['', '첫째', '둘째', '셋째', '넷째', '다섯째', '여섯째', '일곱째', '여덟째', '아홉째', '열째'];
+    if (num >= 1 && num <= 10) {
+        return ordinals[num];
+    }
+    return `${num}째`;
+}
+
+// ==================== 독자 선택 드롭다운 ====================
+
+function initReaderDropdown() {
+    const optionsContainer = document.getElementById('scheduleReaderOptions');
+    const selectEl = document.getElementById('scheduleReaderSelect');
+
+    if (!optionsContainer) return;
+
+    // 옵션 초기화
+    optionsContainer.innerHTML = '';
+
+    // 본인 옵션
+    if (currentUserInfo) {
+        const userName = currentUserInfo.nickname || currentUserInfo.username || currentUserInfo.name || '본인';
+        const userColor = currentUserInfo.color || '#20B2AA';
+        optionsContainer.innerHTML += `
+            <div class="custom-select-option" data-value="user" data-color="${userColor}">
+                <span class="option-icon" style="background: ${userColor};"></span>
+                <span class="option-text">${userName}</span>
+                <span class="option-badge">본인</span>
+            </div>
+        `;
+    }
+
+    // 자녀 옵션
+    if (childrenData && childrenData.length > 0) {
+        childrenData.forEach(child => {
+            const childId = child.childId || child.id;
+            const childName = child.childName || child.name || '자녀';
+            const childColor = child.color || '#FFB6C1';
+            const birthOrder = child.birthOrder;
+
+            // 나이 계산 (childBirth가 있는 경우)
+            let age = '';
+            if (child.childBirth) {
+                const birthDate = new Date(child.childBirth);
+                const today = new Date();
+                age = today.getFullYear() - birthDate.getFullYear();
+                // 생일이 아직 안 지났으면 1살 빼기
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+            }
+
+            // 표시 형식: "이름 (자녀, N째)" 또는 "이름 (자녀, N세)"
+            let displayText = childName;
+            if (birthOrder) {
+                const orderText = getKoreanOrdinal(birthOrder);
+                displayText = `${childName} (자녀, ${orderText})`;
+            } else if (age) {
+                displayText = `${childName} (자녀, ${age}세)`;
+            } else {
+                displayText = `${childName} (자녀)`;
+            }
+            optionsContainer.innerHTML += `
+                <div class="custom-select-option" data-value="${childId}" data-color="${childColor}">
+                    <span class="option-icon" style="background: ${childColor};"></span>
+                    <span class="option-text">${displayText}</span>
+                </div>
+            `;
+        });
+    }
+
+    // 커스텀 드롭다운 이벤트 초기화
+    initCustomDropdownEvents(selectEl);
+}
+
+function initCustomDropdownEvents(selectEl) {
+    if (!selectEl) return;
+
+    const trigger = selectEl.querySelector('.custom-select-trigger');
+    const optionItems = selectEl.querySelectorAll('.custom-select-option');
+    const hiddenInput = selectEl.querySelector('input[type="hidden"]');
+    const valueDisplay = selectEl.querySelector('.custom-select-value');
+
+    // 트리거 클릭 시 드롭다운 열기/닫기
+    trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+
+        // 다른 열린 드롭다운 닫기
+        document.querySelectorAll('.custom-select.open').forEach(el => {
+            if (el !== selectEl) {
+                el.classList.remove('open');
+            }
+        });
+
+        selectEl.classList.toggle('open');
+    });
+
+    // 옵션 선택
+    optionItems.forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.stopPropagation();
+
+            const value = this.getAttribute('data-value');
+            const text = this.querySelector('.option-text').textContent;
+            const color = this.getAttribute('data-color') || '#20B2AA';
+
+            // hidden input 값 업데이트
+            hiddenInput.value = value;
+
+            // 선택된 독자의 색상 저장
+            selectedReaderColor = color;
+
+            // 표시 텍스트 업데이트 (색상 아이콘 포함)
+            valueDisplay.innerHTML = `
+                <span class="selected-icon" style="background: ${color};"></span>
+                ${text}
+            `;
+
+            // 선택된 상태 표시
+            optionItems.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+
+            // 드롭다운 닫기
+            selectEl.classList.remove('open');
+        });
+    });
+}
+
+// 문서 클릭 시 드롭다운 닫기 (전역)
+document.addEventListener('click', function() {
+    document.querySelectorAll('.custom-select.open').forEach(el => {
+        el.classList.remove('open');
+    });
+});
+
+// ==================== Flatpickr 초기화 ====================
+
+function initScheduleDatePickers(dropDate) {
+    const startInput = document.getElementById('scheduleStartDate');
+    const endInput = document.getElementById('scheduleEndDate');
+
+    // 기존 인스턴스 제거
+    if (scheduleStartPicker) {
+        scheduleStartPicker.destroy();
+    }
+    if (scheduleEndPicker) {
+        scheduleEndPicker.destroy();
+    }
+
+    const flatpickrConfig = {
+        locale: 'ko',
+        dateFormat: 'Y-m-d',
+        allowInput: false,
+        disableMobile: true
+    };
+
+    // 시작일 picker
+    if (startInput) {
+        scheduleStartPicker = flatpickr(startInput, {
+            ...flatpickrConfig,
+            defaultDate: dropDate,
+            onChange: function(selectedDates, dateStr) {
+                // 종료일의 최소값을 시작일로 설정
+                if (scheduleEndPicker) {
+                    scheduleEndPicker.set('minDate', dateStr);
+                    // 종료일이 시작일보다 이전이면 초기화
+                    const endDate = scheduleEndPicker.selectedDates[0];
+                    if (endDate && endDate < selectedDates[0]) {
+                        scheduleEndPicker.clear();
+                    }
+                }
+            }
+        });
+    }
+
+    // 종료일 picker
+    if (endInput) {
+        scheduleEndPicker = flatpickr(endInput, {
+            ...flatpickrConfig,
+            defaultDate: dropDate,
+            minDate: dropDate
+        });
+    }
 }

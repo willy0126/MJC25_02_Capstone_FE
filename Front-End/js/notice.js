@@ -12,7 +12,7 @@ let selectedImageFile = null; // 선택된 이미지 파일
 let currentImageId = null; // 현재 업로드된 이미지 ID
 
 // Initialize
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // 로그인 사용자 정보 확인
     checkUserAuth();
 
@@ -20,10 +20,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadHardcodedNotices();
 
     // API에서 공지사항 불러오기
-    loadNoticesFromAPI();
+    await loadNoticesFromAPI();
 
     // 이벤트 리스너 등록
     initEventListeners();
+
+    // URL 파라미터 확인 후 해당 공지사항 모달 자동 열기
+    checkAndOpenNoticeFromURL();
 });
 
 // 사용자 권한 확인
@@ -94,10 +97,20 @@ async function loadNoticesFromAPI(page = 0) {
         const response = await apiClient.getNotices(page, itemsPerPage);
 
         if (response.success && response.data) {
-            const pageData = response.data;
+            // 백엔드가 페이지네이션 응답 반환: { content: [...], totalPages, totalElements, ... }
+            let noticeList = [];
+
+            if (Array.isArray(response.data)) {
+                // 배열로 직접 반환하는 경우
+                noticeList = response.data;
+            } else if (response.data.content && Array.isArray(response.data.content)) {
+                // 페이지네이션 객체로 반환하는 경우
+                noticeList = response.data.content;
+                totalPages = response.data.totalPages || 1;
+            }
 
             // API 데이터 변환 (백엔드 형식 -> 프론트 형식)
-            apiNotices = pageData.content.map(notice => ({
+            apiNotices = noticeList.map(notice => ({
                 id: notice.noticeId,
                 noticeId: notice.noticeId,
                 badge: 'normal', // API에는 badge가 없으므로 기본값
@@ -109,13 +122,15 @@ async function loadNoticesFromAPI(page = 0) {
                 createAt: notice.createAt,
                 updateAt: notice.updateAt,
                 views: 0, // API에 조회수가 없으므로 기본값
-                boardImage: notice.boardImage,
+                boardImage: notice.boardImage || notice.imageFile,
                 isHardcoded: false
             }));
 
-            // 페이지 정보 저장
-            currentPage = pageData.number + 1; // API는 0부터, UI는 1부터
-            totalPages = pageData.totalPages;
+            // 페이지네이션 정보 업데이트
+            if (!response.data.totalPages) {
+                totalPages = Math.ceil(apiNotices.length / itemsPerPage);
+            }
+            currentPage = page + 1;
 
             // 하드코딩 데이터 + API 데이터 합치기
             notices = [...hardcodedNotices, ...apiNotices];
@@ -201,12 +216,11 @@ function renderNotices(filteredNotices = null) {
 
         // 테이블 렌더링
         if (currentNotices.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>검색 결과가 없습니다.</p></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>검색 결과가 없습니다.</p></td></tr>';
         } else {
             tbody.innerHTML = currentNotices.map((notice, index) => `
                 <tr onclick="viewNotice('${notice.id}')">
                     <td>${noticesToRender.length - (startIndex + index)}</td>
-                    <td><span class="badge badge-${notice.badge}">${getBadgeText(notice.badge)}</span></td>
                     <td style="text-align: left;">${notice.title}</td>
                     <td>${notice.author}</td>
                     <td>${notice.date}</td>
@@ -220,12 +234,11 @@ function renderNotices(filteredNotices = null) {
     } else {
         // 일반 목록 표시
         if (noticesToRender.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>등록된 공지사항이 없습니다.</p></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>등록된 공지사항이 없습니다.</p></td></tr>';
         } else {
             tbody.innerHTML = noticesToRender.map((notice, index) => `
                 <tr onclick="viewNotice('${notice.id}')">
                     <td>${noticesToRender.length - index}</td>
-                    <td><span class="badge badge-${notice.badge}">${getBadgeText(notice.badge)}</span></td>
                     <td style="text-align: left;">${notice.title}</td>
                     <td>${notice.author}</td>
                     <td>${notice.date}</td>
@@ -363,7 +376,7 @@ async function viewNotice(id) {
                     content: apiNotice.content,
                     author: apiNotice.username || '관리자',
                     date: formatDate(apiNotice.createAt),
-                    boardImage: apiNotice.boardImage
+                    boardImage: apiNotice.boardImage || apiNotice.image || apiNotice.imageFile
                 });
             } else {
                 displayNoticeDetail(notice);
@@ -379,11 +392,6 @@ async function viewNotice(id) {
 
 // 공지사항 상세 정보 표시
 function displayNoticeDetail(notice) {
-    // 배지
-    const badgeEl = document.getElementById('detailBadge');
-    badgeEl.className = `detail-badge badge badge-${notice.badge}`;
-    badgeEl.textContent = getBadgeText(notice.badge);
-
     // 제목, 작성자, 날짜, 조회수
     document.getElementById('detailTitle').textContent = notice.title;
     document.getElementById('detailAuthor').textContent = `작성자: ${notice.author}`;
@@ -556,7 +564,6 @@ function handleEdit() {
 
     document.getElementById('modalTitle').textContent = '공지사항 수정';
     document.getElementById('noticeId').value = notice.noticeId;
-    document.getElementById('noticeBadge').value = notice.badge || 'normal';
     document.getElementById('noticeTitle').value = notice.title;
     document.getElementById('noticeContent').value = notice.content;
 
@@ -671,4 +678,24 @@ function removeImage() {
     document.getElementById('noticeImage').value = '';
     document.getElementById('imagePreview').style.display = 'none';
     document.getElementById('previewImg').src = '';
+}
+
+// URL 파라미터에서 noticeId를 읽어서 해당 공지사항 모달 자동 열기
+function checkAndOpenNoticeFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const noticeId = urlParams.get('noticeId');
+
+    if (noticeId) {
+        console.log('[URL] noticeId 파라미터 감지:', noticeId);
+
+        // 약간의 딜레이 후 모달 열기 (렌더링 완료 대기)
+        setTimeout(() => {
+            viewNotice(noticeId);
+
+            // URL에서 파라미터 제거 (히스토리 깔끔하게 유지)
+            const url = new URL(window.location);
+            url.searchParams.delete('noticeId');
+            window.history.replaceState({}, '', url);
+        }, 500);
+    }
 }

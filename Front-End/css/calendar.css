@@ -119,6 +119,22 @@
     font-size: 0.9rem;
 }
 
+.btn-retry {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #20B2AA;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-retry:hover {
+    background: #1a9690;
+}
+
 .wishlist-footer {
     padding: 16px;
     border-top: 1px solid #f0f0f0;
@@ -327,24 +343,25 @@
 }
 
 .schedule-date-info label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
 }
 
 .form-input,
 .form-select {
-    padding: 12px 16px;
-    border: 2px solid #e0e0e0;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
     border-radius: 10px;
-    font-size: 1rem;
+    font-size: 14px;
+    font-family: 'Paperlogy', sans-serif;
     transition: border-color 0.2s ease;
+    outline: none;
 }
 
 .form-input:focus,
 .form-select:focus {
-    outline: none;
-    border-color: #20B2AA;
+    border-color: #00b493;
 }
 
 .schedule-modal .modal-footer {
@@ -357,37 +374,37 @@
 }
 
 .btn-cancel {
-    padding: 12px 24px;
-    border: 2px solid #e0e0e0;
+    padding: 14px 20px;
+    border: none;
     border-radius: 10px;
-    background: white;
-    color: #666;
-    font-size: 0.95rem;
-    font-weight: 600;
+    background: #f8f9fa;
+    color: #4a5568;
+    font-size: 15px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: 'Paperlogy', sans-serif;
 }
 
 .btn-cancel:hover {
-    border-color: #999;
-    color: #333;
+    background: #e9ecef;
 }
 
 .btn-confirm {
-    padding: 12px 24px;
+    padding: 14px 20px;
     border: none;
     border-radius: 10px;
-    background: linear-gradient(135deg, #20B2AA 0%, #1a9690 100%);
+    background: #00b493;
     color: white;
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: 'Paperlogy', sans-serif;
 }
 
 .btn-confirm:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3);
+    background: #00957a;
 }
 
 /* FullCalendar Container */
@@ -542,9 +559,12 @@
     border-radius: 50%;
     width: 28px;
     height: 28px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
+    margin: 6px;
+    line-height: 1;
 }
 
 /* 선택된 날짜 */
@@ -736,7 +756,22 @@
 .record-item-author {
     font-size: 0.8rem;
     color: #666;
+    margin-bottom: 4px;
+}
+
+.record-item-reader {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
     margin-bottom: 8px;
+}
+
+.reader-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .record-item-status {
@@ -971,19 +1006,19 @@
 .btn-edit {
     flex: 1;
     padding: 12px 20px;
-    border: 2px solid #20B2AA;
-    border-radius: 10px;
-    background: white;
-    color: #20B2AA;
-    font-size: 0.95rem;
-    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    background: #00b493;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: 'Paperlogy', sans-serif;
 }
 
 .btn-edit:hover {
-    background: #20B2AA;
-    color: white;
+    background: #00957a;
 }
 
 .btn-edit:disabled {
@@ -994,19 +1029,19 @@
 .btn-delete {
     flex: 1;
     padding: 12px 20px;
-    border: 2px solid #e74c3c;
-    border-radius: 10px;
-    background: white;
-    color: #e74c3c;
-    font-size: 0.95rem;
-    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    background: #e63946;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: 'Paperlogy', sans-serif;
 }
 
 .btn-delete:hover {
-    background: #e74c3c;
-    color: white;
+    background: #d62828;
 }
 
 .btn-delete:disabled {
@@ -1016,32 +1051,33 @@
 
 /* Edit Mode Form */
 #recordEditMode .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 #recordEditMode .form-group label {
     display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
     margin-bottom: 8px;
 }
 
 #recordEditMode .form-input,
 #recordEditMode .form-select {
     width: 100%;
-    padding: 12px 14px;
-    border: 2px solid #e0e0e0;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
     border-radius: 10px;
-    font-size: 0.95rem;
+    font-size: 14px;
+    font-family: 'Paperlogy', sans-serif;
     transition: border-color 0.2s ease;
     box-sizing: border-box;
+    outline: none;
 }
 
 #recordEditMode .form-input:focus,
 #recordEditMode .form-select:focus {
-    outline: none;
-    border-color: #20B2AA;
+    border-color: #00b493;
 }
 
 /* ==================== Loading State ==================== */
@@ -1202,4 +1238,157 @@
     .fc .fc-daygrid-day {
         min-height: 60px;
     }
+
+    .fc .fc-day-today .fc-daygrid-day-number {
+        width: 24px;
+        height: 24px;
+        margin: 3px;
+    }
+}
+
+/* ==================== Custom Select (Reader Dropdown) ==================== */
+
+.schedule-form-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.custom-select {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.custom-select-trigger:hover {
+    border-color: #00b493;
+}
+
+.custom-select.open .custom-select-trigger {
+    border-color: #00b493;
+}
+
+.custom-select-value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #2d3748;
+}
+
+.custom-select-arrow {
+    font-size: 0.7rem;
+    color: #999;
+    transition: transform 0.2s ease;
+}
+
+.custom-select.open .custom-select-arrow {
+    transform: rotate(180deg);
+}
+
+.custom-select-options {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+.custom-select.open .custom-select-options {
+    display: block;
+}
+
+.custom-select-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #4a5568;
+    transition: all 0.15s ease;
+}
+
+.custom-select-option:hover {
+    background: #f0fdf9;
+    color: #00b493;
+}
+
+.custom-select-option.selected {
+    background: #e6f7f4;
+    color: #00b493;
+    font-weight: 500;
+}
+
+.custom-select-option:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.custom-select-option:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+.option-icon,
+.selected-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.option-text {
+    flex: 1;
+    font-size: 13px;
+    color: #2d3748;
+}
+
+.option-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: #e6f7f4;
+    color: #00b493;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+/* Flatpickr Input Style */
+.flatpickr-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Paperlogy', sans-serif;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.flatpickr-input:hover,
+.flatpickr-input:focus {
+    border-color: #00b493;
+    outline: none;
+}
+
+.flatpickr-input::placeholder {
+    color: #999;
 }
