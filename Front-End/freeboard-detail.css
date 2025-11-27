@@ -1,0 +1,485 @@
+/* 게시글 상세 페이지 전체 래퍼 */
+.detail-wrapper {
+    max-width: 900px;
+    margin: 100px auto 60px; /* margin-top 추가로 제목이 헤더에 겹치지 않도록 */
+    padding: 0 20px 40px;
+    min-height: calc(100vh - 200px);
+    border-radius: 12px; /* 전체 래퍼에 둥근 모서리 추가 */
+    background-color: #f9f9f9; /* 배경 색상 추가 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+}
+
+/* 헤더 */
+.detail-header {
+    border-bottom: 2px solid #2c3e50;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.detail-header h2 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    line-height: 1.4;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 제목에 부드러운 그림자 */
+}
+
+/* 게시글 내용 */
+.detail-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px; /* 둥글게 처리 */
+    border: 1px solid #e1e8ed;
+    min-height: 200px;
+    line-height: 1.8;
+    font-size: 16px;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+}
+
+/* 수정 섹션 */
+.edit-section {
+    margin-bottom: 20px;
+    border-radius: 12px;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.edit-section input[type="text"],
+.edit-section textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px; /* 둥글게 처리 */
+    font-size: 14px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.edit-section input[type="text"] {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.edit-section textarea {
+    min-height: 250px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.6;
+}
+
+.edit-section button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px; /* 둥글게 처리 */
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 8px;
+    transition: background 0.3s ease;
+}
+
+/* 수정, 취소 버튼의 색상 */
+.edit-section #saveBtn {
+    background: #3498db;
+    color: white;
+}
+
+.edit-section #saveBtn:hover {
+    background: #2980b9;
+}
+
+.edit-section #cancelBtn {
+    background: #95a5a6;
+    color: white;
+}
+
+.edit-section #cancelBtn:hover {
+    background: #7f8c8d;
+}
+
+/* 버튼 영역 */
+.detail-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 0;
+    border-top: 1px solid #e1e8ed;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.detail-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 12px; /* 둥글게 처리 */
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* 목록으로 버튼 */
+.back-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    position: absolute;
+    left: 0;
+    border-radius: 12px; /* 둥글게 처리 */
+}
+
+.back-btn:hover {
+    background: linear-gradient(135deg, #5f6fee 0%, #6a4b9b 100%);
+}
+
+/* 수정 버튼 */
+.edit-btn {
+    background-color: #20B2AA;
+    color: #fff;
+    border-radius: 12px; /* 둥글게 처리 */
+}
+
+.edit-btn:hover {
+    background-color: #1c8c83;
+}
+
+/* 삭제 버튼 */
+.delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+    border-radius: 12px; /* 둥글게 처리 */
+}
+
+.delete-btn:hover {
+    background-color: #d02a38;
+}
+
+/* ================================================= */
+/* ⭐️ 댓글 섹션 (Reply로 변경됨) ⭐️ */
+/* ================================================= */
+
+.replies-section {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    /* Flexbox 설정: 목록과 입력창의 순서를 바꾸기 위함 */
+    display: flex; 
+    flex-direction: column;
+}
+
+.replies-section h3 {
+    font-size: 20px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+    order: 0; /* 항상 최상단에 유지 */
+}
+
+/* 2. 댓글 목록 (.replies-list) - 작성 폼 위에 배치 */
+.replies-list {
+    order: 1; /* 목록을 위로 */
+    
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px; /* 입력창과 목록 사이 간격 */
+    padding-top: 10px;
+}
+
+/* 1. 댓글 입력창 (.reply-input) - 작성 폼을 더 작게, 목록 아래에 배치 */
+.reply-input {
+    order: 2; /* 입력창을 아래로 */
+    
+    background: #f4f7f9; /* 배경색 변경하여 목록과 구분 */
+    padding: 15px; /* 패딩을 줄여서 작게 보이게 함 */
+    border-radius: 12px;
+    margin-bottom: 0; 
+    border: 1px solid #e1e8ed;
+    
+    /* Flexbox를 사용하여 textarea와 버튼을 깔끔하게 정렬 */
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    gap: 10px; /* 요소 사이 간격 */
+}
+
+.reply-input textarea {
+    width: 100%;
+    min-height: 50px; /* 높이를 더 작게 줄임 */
+    max-height: 150px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: vertical;
+    box-sizing: border-box;
+    font-family: inherit;
+    line-height: 1.5;
+    margin-bottom: 0; /* float 제거로 마진 제거 */
+}
+
+.reply-input textarea:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.reply-input button {
+    /* float: right 제거 및 정렬 */
+    float: none; 
+    align-self: flex-end; /* 버튼을 오른쪽 끝으로 정렬 */
+    width: 120px; /* 버튼 너비를 고정하여 작게 만듦 */
+    padding: 8px 15px; 
+    
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.reply-input button:hover {
+    background: #2980b9;
+}
+
+/* 댓글 목록 항목 */
+.reply-item {
+    background: white;
+    padding: 20px;
+    border-radius: 12px; 
+    border: 1px solid #e1e8ed;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.reply-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.reply-author {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.reply-date {
+    color: #95a5a6;
+    font-size: 12px;
+}
+
+.reply-content {
+    color: #34495e;
+    line-height: 1.6;
+    font-size: 14px;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.reply-actions {
+    display: flex;
+    gap: 8px;
+    /* 버튼 정렬을 오른쪽으로 변경 */
+    justify-content: flex-end; 
+}
+
+.reply-actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 12px; /* 둥글게 처리 */
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+/* 댓글 수정/삭제 버튼 */
+.reply-edit-btn {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
+.reply-edit-btn:hover {
+    background: #bdc3c7;
+}
+
+.reply-delete-btn {
+    background: #ffebee;
+    color: #e74c3c;
+}
+
+.reply-delete-btn:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+/* 댓글 없음 메시지 */
+.no-replies { /* 클래스 이름도 변경했습니다 */
+    text-align: center;
+    padding: 40px;
+    color: #95a5a6;
+    font-size: 14px;
+}
+
+/* 삭제 모달 (댓글과 무관하므로 유지) */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px; /* 둥글게 처리 */
+    max-width: 500px;
+    width: 90%;
+}
+
+.delete-modal h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+.warning-box {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px; /* 둥글게 처리 */
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.warning-box p {
+    margin: 5px 0;
+    color: #856404;
+}
+
+.post-title-display {
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.confirm-message {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px; /* 둥글게 처리 */
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.btn-cancel {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
+.btn-cancel:hover {
+    background: #bdc3c7;
+}
+
+.btn-delete-confirm {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-delete-confirm:hover {
+    background: #c0392b;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .detail-wrapper {
+        margin-top: 80px;
+        padding: 0 15px 30px;
+    }
+
+    .detail-header h2 {
+        font-size: 22px;
+    }
+
+    .detail-content {
+        padding: 20px;
+        font-size: 15px;
+    }
+
+    .detail-buttons {
+        flex-direction: column;
+        gap: 10px;
+        position: static;
+    }
+
+    .detail-buttons button {
+        width: 100%;
+    }
+
+    .replies-section {
+        padding: 20px 15px;
+    }
+
+    .reply-input {
+        padding: 15px;
+    }
+
+    .reply-item {
+        padding: 15px;
+    }
+}
+
+/* ================================================= */
+/* ⭐️ 댓글 삭제 모달 (Reply Delete Modal) ⭐️ */
+/* ================================================= */
+
+/* 댓글 삭제 모달 컨텐츠 (게시글 모달과 기본 스타일 통일) */
+/* .modal-content 및 .modal 클래스는 기존 CSS에서 재사용됩니다. */
+
+.reply-modal h2 {
+    /* 게시글 삭제 모달과 동일한 제목 스타일 적용 */
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+/* 댓글 제목 표시 영역 스타일 */
+.reply-title-display { 
+    font-weight: 600;
+    margin-top: 10px;
+    /* 댓글 내용이 길 경우를 대비해 폰트 크기 조정 가능 */
+    font-size: 14px; 
+    color: #34495e; 
+    /* 긴 내용이 한 줄로 표시되지 않도록 텍스트 처리 */
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* 모달 버튼 스타일은 기존 .modal-buttons, .btn-cancel, .btn-delete-confirm 클래스를 재사용합니다. */
+/* 이로 인해 게시글 삭제 모달과 댓글 삭제 모달의 버튼 모양이 일관성을 가집니다. */
