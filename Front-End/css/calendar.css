@@ -891,6 +891,10 @@
 }
 
 /* Record Detail Modal */
+.record-detail-modal {
+    max-width: 550px;
+}
+
 .record-detail-content {
     display: flex;
     gap: 24px;
@@ -929,6 +933,7 @@
 
 .record-book-info {
     flex: 1;
+    min-width: 0;
 }
 
 .record-book-info h2 {
@@ -936,6 +941,8 @@
     font-weight: 700;
     color: #333;
     margin-bottom: 8px;
+    word-break: keep-all;
+    overflow-wrap: break-word;
 }
 
 .record-author {
@@ -987,6 +994,8 @@
 .date-label {
     color: #666;
     font-size: 0.9rem;
+    flex-shrink: 0;
+    min-width: 50px;
 }
 
 .date-value {

@@ -5,6 +5,35 @@ let booksData = []; // 도서 데이터 저장
 let currentBookId = null; // 현재 선택된 도서 ID (DB ID)
 let childrenData = []; // 자녀 목록 데이터
 let currentUserInfo = null; // 현재 사용자 정보
+let manualBookImageId = null; // 직접 입력 도서의 업로드된 이미지 ID
+let editBookImageId = null; // 수정 모달의 업로드된 이미지 ID
+let editImageRemoved = false; // 수정 모달에서 이미지가 명시적으로 제거되었는지
+
+/* ========================================
+   readerId 캐시 (localStorage)
+======================================== */
+const READER_CACHE_KEY = 'readerIdCache';
+
+function saveReaderIdToCache(readerName, readerId) {
+    if (!readerName || !readerId) return;
+    try {
+        const cache = JSON.parse(localStorage.getItem(READER_CACHE_KEY) || '{}');
+        cache[readerName] = readerId;
+        localStorage.setItem(READER_CACHE_KEY, JSON.stringify(cache));
+    } catch (e) {
+        console.log('[Cache] 저장 실패:', e);
+    }
+}
+
+function getReaderIdFromCache(readerName) {
+    if (!readerName) return null;
+    try {
+        const cache = JSON.parse(localStorage.getItem(READER_CACHE_KEY) || '{}');
+        return cache[readerName] || null;
+    } catch (e) {
+        return null;
+    }
+}
 
 /* ========================================
    페이지 초기화
@@ -81,6 +110,34 @@ function renderBooksGrid() {
     });
 
     updateBookCount(booksData.length);
+
+    // 인증이 필요한 이미지들 로드
+    loadAuthenticatedImages();
+}
+
+/* ========================================
+   인증이 필요한 이미지 로드
+======================================== */
+async function loadAuthenticatedImages() {
+    const authImages = document.querySelectorAll('img.auth-image[data-image-id]');
+
+    for (const img of authImages) {
+        const imageId = img.dataset.imageId;
+        if (!imageId) continue;
+
+        try {
+            const blobUrl = await apiClient.getBoardImage(imageId);
+            img.src = blobUrl;
+        } catch (error) {
+            console.error(`이미지 로드 실패 (ID: ${imageId}):`, error);
+            // 실패 시 placeholder 표시
+            const parent = img.parentElement;
+            if (parent) {
+                const title = img.alt || '이미지';
+                parent.innerHTML = `<div class="book-cover-placeholder blue"><h3>${title}</h3></div>`;
+            }
+        }
+    }
 }
 
 /* ========================================
@@ -92,9 +149,16 @@ function createBookElement(book) {
     bookItem.setAttribute('data-category', 'literature');
     bookItem.setAttribute('data-book-id', book.bookId || book.id);
 
-    const coverHtml = book.coverUrl
-        ? `<img src="${book.coverUrl}" alt="${book.title}" style="width: 100%; height: 100%; object-fit: cover;">`
-        : `<div class="book-cover-placeholder blue"><h3>${book.title}</h3></div>`;
+    // 이미지 URL 결정: imageId가 있으면 API로 불러오고, 없으면 coverUrl 사용
+    let coverHtml;
+    if (book.image?.imageId) {
+        // imageId가 있으면 인증된 요청으로 이미지 로드 (나중에 비동기로 교체)
+        coverHtml = `<img data-image-id="${book.image.imageId}" alt="${book.title}" style="width: 100%; height: 100%; object-fit: cover;" class="auth-image">`;
+    } else if (book.coverUrl) {
+        coverHtml = `<img src="${book.coverUrl}" alt="${book.title}" style="width: 100%; height: 100%; object-fit: cover;">`;
+    } else {
+        coverHtml = `<div class="book-cover-placeholder blue"><h3>${book.title}</h3></div>`;
+    }
 
     const meta = [book.author, book.publisher, book.publicationYear]
         .filter(Boolean)
@@ -259,6 +323,9 @@ function initAddBookModal() {
             submitManualBook();
         });
     }
+
+    // 표지 업로드 초기화
+    initCoverUpload();
 }
 
 /* ========================================
@@ -330,6 +397,9 @@ function initEditBookModal() {
             submitEditBook();
         });
     }
+
+    // 수정 모달 표지 업로드 초기화
+    initEditCoverUpload();
 }
 
 /* ========================================
@@ -387,6 +457,9 @@ function closeAddBookModal() {
             coverTitle.textContent = '책 제목';
         }
 
+        // 업로드된 표지 이미지 초기화
+        removeCoverImage();
+
         // 모든 flatpickr 인스턴스 정리
         clearAllDatePickers();
 
@@ -420,7 +493,7 @@ function clearAllDatePickers() {
 /* ========================================
    모달 열기/닫기 - 도서 상세보기
 ======================================== */
-function openBookDetailModal(bookId) {
+async function openBookDetailModal(bookId) {
     const modal = document.getElementById('bookDetailModal');
     const book = booksData.find(b => (b.bookId || b.id) == bookId);
 
@@ -430,7 +503,17 @@ function openBookDetailModal(bookId) {
 
     // 커버 이미지
     const coverContainer = document.getElementById('detailCover');
-    if (book.coverUrl) {
+    if (book.image?.imageId) {
+        // 인증된 요청으로 이미지 로드
+        coverContainer.innerHTML = `<div class="book-cover-placeholder blue"><h3>로딩중...</h3></div>`;
+        try {
+            const blobUrl = await apiClient.getBoardImage(book.image.imageId);
+            coverContainer.innerHTML = `<img src="${blobUrl}" alt="${book.title}">`;
+        } catch (error) {
+            console.error('상세보기 이미지 로드 실패:', error);
+            coverContainer.innerHTML = `<div class="book-cover-placeholder blue"><h3>${book.title}</h3></div>`;
+        }
+    } else if (book.coverUrl) {
         coverContainer.innerHTML = `<img src="${book.coverUrl}" alt="${book.title}">`;
     } else {
         coverContainer.innerHTML = `
@@ -483,12 +566,28 @@ async function openEditBookModal(bookId) {
     // 책 표지 이미지 설정
     const coverPreview = document.getElementById('editCoverPreview');
     const coverUrlInput = document.getElementById('editCoverUrl');
+    const fileInput = document.getElementById('editCoverInput');
+
+    // 기존 업로드 이미지 ID 설정 (있는 경우)
+    editBookImageId = book.image?.imageId || null;
+    editImageRemoved = false; // 이미지 제거 플래그 초기화
 
     if (coverUrlInput) coverUrlInput.value = book.coverUrl || '';
+    if (fileInput) fileInput.value = '';
 
     if (coverPreview) {
-        if (book.coverUrl) {
-            coverPreview.innerHTML = `<img src="${book.coverUrl}" alt="${book.title}" onerror="this.parentElement.innerHTML='<span class=\\'cover-placeholder-text\\'>이미지 로드 실패</span>'">`;
+        if (book.image?.imageId) {
+            // 인증된 요청으로 이미지 로드
+            coverPreview.innerHTML = '<span class="cover-placeholder-text">로딩중...</span>';
+            try {
+                const blobUrl = await apiClient.getBoardImage(book.image.imageId);
+                coverPreview.innerHTML = `<img src="${blobUrl}" alt="${book.title}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            } catch (error) {
+                console.error('수정모달 이미지 로드 실패:', error);
+                coverPreview.innerHTML = '<span class="cover-placeholder-text">이미지 로드 실패</span>';
+            }
+        } else if (book.coverUrl) {
+            coverPreview.innerHTML = `<img src="${book.coverUrl}" alt="${book.title}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.innerHTML='<span class=\\'cover-placeholder-text\\'>이미지 로드 실패</span>'">`;
         } else {
             coverPreview.innerHTML = '<span class="cover-placeholder-text">이미지 없음</span>';
         }
@@ -523,6 +622,12 @@ function closeEditBookModal() {
         if (coverPreview) {
             coverPreview.innerHTML = '<span class="cover-placeholder-text">이미지 없음</span>';
         }
+
+        // 파일 입력 및 이미지 ID 초기화
+        const fileInput = document.getElementById('editCoverInput');
+        if (fileInput) fileInput.value = '';
+        editBookImageId = null;
+        editImageRemoved = false;
     }
 }
 
@@ -618,11 +723,11 @@ async function submitEditBook() {
         return;
     }
 
-    // 책 표지 이미지 URL 가져오기 (URL 입력만 지원)
+    // 책 표지 이미지 URL 가져오기
     let coverUrl = document.getElementById('editCoverUrl').value.trim();
 
-    // URL이 입력되지 않은 경우 기존 이미지 URL 유지
-    if (!coverUrl) {
+    // URL이 입력되지 않은 경우 기존 이미지 URL 유지 (이미지가 제거되지 않았고 업로드 이미지도 없을 때만)
+    if (!coverUrl && !editBookImageId && !editImageRemoved) {
         coverUrl = book.coverUrl || '';
     }
 
@@ -636,9 +741,109 @@ async function submitEditBook() {
         coverUrl: coverUrl
     };
 
-    // 독서 일정 데이터 추가 (bookcase-schedule.js)
+    // 이미지 처리 로직
+    if (editImageRemoved) {
+        // 사용자가 명시적으로 이미지 제거 → imageId를 0으로 전송 (백엔드에서 0이면 이미지 제거 처리 필요)
+        updateData.imageId = 0;
+        updateData.coverUrl = '';
+        console.log('[Edit] 이미지 제거 요청 (imageId: 0)');
+    } else if (editBookImageId) {
+        // 새 이미지 업로드됨
+        updateData.imageId = editBookImageId;
+        updateData.coverUrl = '';
+    } else if (book.image?.imageId && !coverUrl) {
+        // 기존 업로드 이미지 유지 (새 URL이 없을 때)
+        updateData.imageId = book.image.imageId;
+    }
+
+    // 독서 일정 데이터 추가 (bookcase-schedule.js) - 다중 독자 지원
     const bookDetailsUpdate = getBookDetailsUpdate();
+
+    console.log('[Debug] bookDetailsUpdate:', bookDetailsUpdate);
+
+    // 각 일정 항목에 대해 readerId 검색
     if (bookDetailsUpdate.length > 0) {
+        // 먼저 모든 도서의 bookDetails를 한 번에 수집
+        let allBookDetails = [];
+
+        // 현재 도서 정보 조회
+        try {
+            const currentBookRes = await apiClient.getBook(currentBookId);
+            const currentBookData = currentBookRes.data || currentBookRes;
+            const currentDetails = currentBookData.bookDetails || [];
+            allBookDetails.push(...currentDetails);
+
+            // 캐시에 저장
+            currentDetails.forEach(d => {
+                if (d.readerResponse?.readerName && d.readerResponse?.readerId) {
+                    saveReaderIdToCache(d.readerResponse.readerName, d.readerResponse.readerId);
+                }
+            });
+        } catch (e) {
+            console.log('[Debug] 현재 도서 조회 실패:', e);
+        }
+
+        // 각 일정 항목 처리
+        for (let i = 0; i < bookDetailsUpdate.length; i++) {
+            const schedule = bookDetailsUpdate[i];
+
+            // 자녀 일정인 경우에만 readerId 검색
+            if (schedule.childId) {
+                const childInfo = childrenData.find(c => (c.childId || c.id) === schedule.childId);
+                const readerName = childInfo?.childName || childInfo?.name;
+
+                if (readerName) {
+                    let existingReaderId = null;
+
+                    // 1. 이미 수집한 bookDetails에서 찾기
+                    const matchingDetail = allBookDetails.find(d =>
+                        d.readerResponse?.readerName === readerName
+                    );
+                    if (matchingDetail?.readerResponse?.readerId) {
+                        existingReaderId = matchingDetail.readerResponse.readerId;
+                    }
+
+                    // 2. 다른 도서에서 찾기 (못 찾은 경우)
+                    if (!existingReaderId) {
+                        for (const otherBook of booksData) {
+                            const otherBookId = otherBook.bookId || otherBook.id;
+                            if (otherBookId === currentBookId) continue;
+
+                            try {
+                                const otherBookRes = await apiClient.getBook(otherBookId);
+                                const otherBookData = otherBookRes.data || otherBookRes;
+                                const otherDetails = otherBookData.bookDetails || [];
+
+                                const matching = otherDetails.find(d =>
+                                    d.readerResponse?.readerName === readerName
+                                );
+                                if (matching?.readerResponse?.readerId) {
+                                    existingReaderId = matching.readerResponse.readerId;
+                                    saveReaderIdToCache(readerName, existingReaderId);
+                                    break;
+                                }
+                            } catch (e) {
+                                // 무시
+                            }
+                        }
+                    }
+
+                    // 3. localStorage 캐시에서 찾기
+                    if (!existingReaderId) {
+                        existingReaderId = getReaderIdFromCache(readerName);
+                    }
+
+                    // readerId 추가
+                    if (existingReaderId) {
+                        schedule.readerId = existingReaderId;
+                        console.log(`[Debug] 독자 ${i + 1} (${readerName}): readerId = ${existingReaderId}`);
+                    } else {
+                        console.log(`[Debug] 독자 ${i + 1} (${readerName}): readerId를 찾지 못함`);
+                    }
+                }
+            }
+        }
+
         updateData.bookDetailsUpdate = bookDetailsUpdate;
     }
 
@@ -649,11 +854,17 @@ async function submitEditBook() {
         const response = await apiClient.updateBook(currentBookId, updateData);
         console.log('✅ Book API 응답:', response);
 
-        // 로컬 데이터 업데이트
+        // 로컬 데이터 업데이트 (서버 응답 데이터 사용)
         const bookIndex = booksData.findIndex(b => (b.bookId || b.id) == currentBookId);
         if (bookIndex !== -1) {
-            booksData[bookIndex] = { ...booksData[bookIndex], ...updateData };
+            // 서버 응답에서 업데이트된 도서 데이터 사용
+            const updatedBook = response.data || response;
+            booksData[bookIndex] = { ...booksData[bookIndex], ...updatedBook };
         }
+
+        // 이미지 관련 플래그 초기화
+        editBookImageId = null;
+        editImageRemoved = false;
 
         // 그리드 다시 렌더링
         renderBooksGrid();
@@ -886,6 +1097,257 @@ async function addBookFromSearch(title, author, publisher, year, isbn, coverUrl,
 }
 
 /* ========================================
+   표지 이미지 업로드 초기화
+======================================== */
+function initCoverUpload() {
+    const uploadBtn = document.getElementById('btnUploadCover');
+    const removeBtn = document.getElementById('btnRemoveCover');
+    const fileInput = document.getElementById('manualCoverInput');
+
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', function() {
+            fileInput?.click();
+        });
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener('change', handleCoverFileSelect);
+    }
+
+    if (removeBtn) {
+        removeBtn.addEventListener('click', removeCoverImage);
+    }
+}
+
+/* ========================================
+   표지 파일 선택 처리
+======================================== */
+async function handleCoverFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 파일 유형 검증
+    if (!file.type.startsWith('image/')) {
+        showToast('이미지 파일만 업로드할 수 있습니다.', 'warning');
+        return;
+    }
+
+    // 파일 크기 검증 (5MB 제한)
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('파일 크기는 5MB 이하여야 합니다.', 'warning');
+        return;
+    }
+
+    // 미리보기 표시
+    showCoverPreview(file);
+
+    // 서버에 업로드
+    await uploadCoverImage(file);
+}
+
+/* ========================================
+   표지 미리보기 표시
+======================================== */
+function showCoverPreview(file) {
+    const placeholder = document.getElementById('manualCoverPlaceholder');
+    const previewImg = document.getElementById('manualCoverImage');
+    const removeBtn = document.getElementById('btnRemoveCover');
+
+    if (!placeholder || !previewImg) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        previewImg.src = e.target.result;
+        previewImg.style.display = 'block';
+        placeholder.style.display = 'none';
+        if (removeBtn) removeBtn.style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+}
+
+/* ========================================
+   표지 이미지 서버 업로드
+======================================== */
+async function uploadCoverImage(file) {
+    try {
+        showToast('이미지 업로드 중...', 'info');
+
+        const response = await apiClient.uploadBoardImage(file);
+        console.log('[Cover] 업로드 응답:', response);
+
+        // ApiResponse 형식: { success: true, data: { imageId, fileName, ... } }
+        let imageId = null;
+        if (response && response.data && response.data.imageId) {
+            imageId = response.data.imageId;
+        } else if (response && response.imageId) {
+            // 직접 응답인 경우
+            imageId = response.imageId;
+        }
+
+        if (imageId) {
+            manualBookImageId = imageId;
+            showToast('표지 이미지가 업로드되었습니다.', 'success');
+            console.log('[Cover] 업로드 완료, imageId:', manualBookImageId);
+        } else {
+            throw new Error('이미지 ID를 받지 못했습니다.');
+        }
+    } catch (error) {
+        console.error('표지 이미지 업로드 실패:', error);
+        showToast('이미지 업로드에 실패했습니다.', 'error');
+        // 실패 시 미리보기 초기화
+        removeCoverImage();
+    }
+}
+
+/* ========================================
+   표지 이미지 제거
+======================================== */
+function removeCoverImage() {
+    const placeholder = document.getElementById('manualCoverPlaceholder');
+    const previewImg = document.getElementById('manualCoverImage');
+    const removeBtn = document.getElementById('btnRemoveCover');
+    const fileInput = document.getElementById('manualCoverInput');
+
+    if (previewImg) {
+        previewImg.src = '';
+        previewImg.style.display = 'none';
+    }
+    if (placeholder) {
+        placeholder.style.display = 'flex';
+    }
+    if (removeBtn) {
+        removeBtn.style.display = 'none';
+    }
+    if (fileInput) {
+        fileInput.value = '';
+    }
+
+    manualBookImageId = null;
+    console.log('[Cover] 이미지 제거됨');
+}
+
+/* ========================================
+   수정 모달 표지 이미지 업로드 초기화
+======================================== */
+function initEditCoverUpload() {
+    const uploadBtn = document.getElementById('btnEditUploadCover');
+    const removeBtn = document.getElementById('btnEditRemoveCover');
+    const fileInput = document.getElementById('editCoverInput');
+
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', function() {
+            fileInput?.click();
+        });
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener('change', handleEditCoverFileSelect);
+    }
+
+    if (removeBtn) {
+        removeBtn.addEventListener('click', removeEditCoverImage);
+    }
+}
+
+/* ========================================
+   수정 모달 표지 파일 선택 처리
+======================================== */
+async function handleEditCoverFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 파일 유형 검증
+    if (!file.type.startsWith('image/')) {
+        showToast('이미지 파일만 업로드할 수 있습니다.', 'warning');
+        return;
+    }
+
+    // 파일 크기 검증 (5MB 제한)
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('파일 크기는 5MB 이하여야 합니다.', 'warning');
+        return;
+    }
+
+    // 미리보기 표시
+    showEditCoverPreview(file);
+
+    // 서버에 업로드
+    await uploadEditCoverImage(file);
+}
+
+/* ========================================
+   수정 모달 표지 미리보기 표시
+======================================== */
+function showEditCoverPreview(file) {
+    const previewContainer = document.getElementById('editCoverPreview');
+    if (!previewContainer) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        previewContainer.innerHTML = `<img src="${e.target.result}" alt="표지 미리보기" style="width: 100%; height: 100%; object-fit: cover;">`;
+    };
+    reader.readAsDataURL(file);
+}
+
+/* ========================================
+   수정 모달 표지 이미지 서버 업로드
+======================================== */
+async function uploadEditCoverImage(file) {
+    try {
+        showToast('이미지 업로드 중...', 'info');
+
+        const response = await apiClient.uploadBoardImage(file);
+        console.log('[EditCover] 업로드 응답:', response);
+
+        // ApiResponse 형식: { success: true, data: { imageId, fileName, ... } }
+        let imageId = null;
+        if (response && response.data && response.data.imageId) {
+            imageId = response.data.imageId;
+        } else if (response && response.imageId) {
+            imageId = response.imageId;
+        }
+
+        if (imageId) {
+            editBookImageId = imageId;
+            // URL 입력 필드 비우기 (업로드된 이미지 우선)
+            const urlInput = document.getElementById('editCoverUrl');
+            if (urlInput) urlInput.value = '';
+            showToast('표지 이미지가 업로드되었습니다.', 'success');
+            console.log('[EditCover] 업로드 완료, imageId:', editBookImageId);
+        } else {
+            throw new Error('이미지 ID를 받지 못했습니다.');
+        }
+    } catch (error) {
+        console.error('표지 이미지 업로드 실패:', error);
+        showToast('이미지 업로드에 실패했습니다.', 'error');
+        removeEditCoverImage();
+    }
+}
+
+/* ========================================
+   수정 모달 표지 이미지 제거
+======================================== */
+function removeEditCoverImage() {
+    const previewContainer = document.getElementById('editCoverPreview');
+    const fileInput = document.getElementById('editCoverInput');
+    const urlInput = document.getElementById('editCoverUrl');
+
+    if (previewContainer) {
+        previewContainer.innerHTML = '<span class="cover-placeholder-text">이미지 없음</span>';
+    }
+    if (fileInput) {
+        fileInput.value = '';
+    }
+    if (urlInput) {
+        urlInput.value = '';
+    }
+
+    editBookImageId = null;
+    editImageRemoved = true; // 명시적으로 이미지 제거됨
+    console.log('[EditCover] 이미지 제거됨, editImageRemoved:', editImageRemoved);
+}
+
+/* ========================================
    직접 입력으로 도서 추가 (API 연동)
 ======================================== */
 async function submitManualBook() {
@@ -915,12 +1377,20 @@ async function submitManualBook() {
         bookData.publisher = publisher;
     }
 
+    // 업로드된 이미지 ID가 있으면 추가
+    if (manualBookImageId) {
+        bookData.imageId = manualBookImageId;
+    }
+
     // bookDetails가 있을 때만 추가
     if (bookDetails && bookDetails.length > 0) {
         bookData.bookDetails = bookDetails;
     }
 
     await saveBookToDB(bookData);
+
+    // 등록 후 이미지 ID 초기화
+    manualBookImageId = null;
 }
 
 /* ========================================

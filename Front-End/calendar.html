@@ -137,14 +137,7 @@
 
                     <!-- 수정 모드 -->
                     <div id="recordEditMode" style="display: none;">
-                        <div class="form-group">
-                            <label>상태</label>
-                            <select id="editRecordStatus" class="form-select">
-                                <option value="to_read">읽을 예정</option>
-                                <option value="reading">읽는 중</option>
-                                <option value="completed">완료</option>
-                            </select>
-                        </div>
+                        <!-- 상태는 날짜 기반으로 백엔드에서 자동 계산됨 -->
                         <div class="form-group">
                             <label>시작일</label>
                             <input type="date" id="editRecordStartDate" class="form-input">

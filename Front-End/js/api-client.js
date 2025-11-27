@@ -579,16 +579,50 @@ class ApiClient {
         });
     }
 
-    /* ========================================
-       독서 일정 API
+    // ==================== Reading Schedule APIs ====================
 
-       독서 일정은 Book API를 통해 저장됩니다.
-       - 저장: PUT /api/books/{bookId} (bookDetailsUpdate 포함)
-       - 조회: GET /api/calendar/{year}/{month}
-       - 조회: GET /api/calendar/date?date={date}
+    /**
+     * 독서 일정 등록
+     * @param {Object} scheduleData - 독서 일정 정보
+     * @param {number} scheduleData.bookId - 도서 ID (필수)
+     * @param {number} scheduleData.childId - 자녀 ID (필수)
+     * @param {string} scheduleData.startDate - 시작일 (YYYY-MM-DD 형식)
+     * @param {string} scheduleData.endDate - 종료일 (YYYY-MM-DD 형식)
+     * @returns {Promise<Object>} 등록된 독서 일정 정보
+     */
+    async createReadingSchedule(scheduleData) {
+        return await this.request('/book-details', {
+            method: 'POST',
+            body: JSON.stringify(scheduleData)
+        });
+    }
 
-       별도의 Calendar POST/PUT/DELETE API는 사용하지 않습니다.
-    ======================================== */
+    /**
+     * 독서 일정 수정
+     * @param {number} detailsId - 독서 상세 ID
+     * @param {Object} scheduleData - 수정할 일정 정보
+     * @param {string} scheduleData.status - 상태 (선택)
+     * @param {string} scheduleData.startDate - 시작일 (선택)
+     * @param {string} scheduleData.endDate - 종료일 (선택)
+     * @returns {Promise<Object>} 수정된 독서 일정 정보
+     */
+    async updateReadingSchedule(detailsId, scheduleData) {
+        return await this.request(`/book-details/${detailsId}`, {
+            method: 'PUT',
+            body: JSON.stringify(scheduleData)
+        });
+    }
+
+    /**
+     * 독서 일정 삭제
+     * @param {number} detailsId - 독서 상세 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteReadingSchedule(detailsId) {
+        return await this.request(`/book-details/${detailsId}`, {
+            method: 'DELETE'
+        });
+    }
 }
 
 // Export singleton instance
