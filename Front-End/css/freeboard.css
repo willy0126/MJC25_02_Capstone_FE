@@ -99,6 +99,8 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    list-style: none;
+    padding: 0;
 }
 
 .freeboard-card {
@@ -192,7 +194,7 @@
     padding: 30px 40px;
     animation: slideUp 0.3s ease;
     box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-    
+
 }
 
 @keyframes slideUp {
@@ -384,4 +386,71 @@
     color: #4b7bec;
     font-weight: bold;
     margin-right: 30px; /* 제목과 간격을 더 벌려줌 */
+}
+
+/* ========================================
+   목록 레이아웃 (HTML에서 이동)
+======================================== */
+.freeboard-wrapper {
+    max-width: 900px;
+    margin: 40px auto 80px;
+    padding: 0 20px;
+}
+
+.freeboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.freeboard-header h2 {
+    font-size: 32px;
+    color: #333;
+}
+
+/* 게시글 리스트 아이템 */
+.freeboard-list li {
+    background: #fff;
+    padding: 18px 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    transition: transform 0.15s;
+}
+
+.freeboard-list li:hover {
+    transform: translateY(-3px);
+}
+
+/* 게시글 제목 링크 */
+.board-title {
+    flex: 1;
+    text-decoration: none;
+    color: #333;
+    margin-right: 15px;
+}
+
+.board-title:hover {
+    text-decoration: underline;
+}
+
+/* 게시글 날짜 */
+.board-date {
+    width: 120px;
+    text-align: right;
+    font-size: 14px;
+    color: #777;
+}
+
+/* 게시글 메타 (작성자 · 날짜) */
+.board-meta {
+    min-width: 180px;
+    text-align: right;
+    font-size: 14px;
+    color: #777;
+    white-space: nowrap;
 }

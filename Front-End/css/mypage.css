@@ -28,46 +28,33 @@
     gap: 40px;
 }
 
-/* ==================== 비밀번호 재확인 모달 ==================== */
+/* ==================== 공통 모달 기본 스타일 ==================== */
 .modal {
-    display: flex;
+    display: none;
     position: fixed;
     z-index: 9999;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
     justify-content: center;
+    align-items: center;
     animation: fadeIn 0.3s ease;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+.modal.show {
+    display: flex;
 }
 
-.modal-content {
-    background-color: white;
-    padding: 40px;
-    border-radius: 16px;
-    max-width: 450px;
-    width: 90%;
-    max-height: 85vh;
-    overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.3s ease;
-    position: relative;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes slideUp {
     from {
-        transform: translateY(30px);
+        transform: translateY(50px);
         opacity: 0;
     }
     to {
@@ -76,10 +63,21 @@
     }
 }
 
+/* ==================== mypage 모달 커스터마이징 ==================== */
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 450px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+}
+
 .modal-content h2 {
     font-size: 1.8rem;
-    font-weight: 700;
-    color: #333;
     margin-bottom: 15px;
     text-align: center;
 }
@@ -122,20 +120,16 @@
     box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
 }
 
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-}
-
 .modal-buttons button {
     flex: 1;
-    padding: 12px;
+    padding: 14px 24px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    font-family: 'Paperlogy', sans-serif;
 }
 
 .btn-cancel {

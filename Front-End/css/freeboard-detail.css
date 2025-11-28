@@ -1,7 +1,7 @@
 /* 게시글 상세 페이지 전체 래퍼 */
 .detail-wrapper {
     max-width: 900px;
-    margin: 100px auto 60px; /* margin-top 추가로 제목이 헤더에 겹치지 않도록 */
+    margin: 140px auto 60px; /* margin-top 추가로 제목이 헤더에 겹치지 않도록 */
     padding: 0 20px 40px;
     min-height: calc(100vh - 200px);
     border-radius: 12px; /* 전체 래퍼에 둥근 모서리 추가 */
@@ -12,6 +12,7 @@
 /* 헤더 */
 .detail-header {
     border-bottom: 2px solid #2c3e50;
+    padding-top: 30px;
     padding-bottom: 20px;
     margin-bottom: 30px;
 }
@@ -483,3 +484,115 @@
 
 /* 모달 버튼 스타일은 기존 .modal-buttons, .btn-cancel, .btn-delete-confirm 클래스를 재사용합니다. */
 /* 이로 인해 게시글 삭제 모달과 댓글 삭제 모달의 버튼 모양이 일관성을 가집니다. */
+
+/* ================================================= */
+/* ⭐️ 댓글 수정 모달 (Reply Edit Modal) ⭐️ */
+/* ================================================= */
+
+#editReplyModal .modal-content {
+    max-width: 550px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+#editReplyModal .reply-modal h2 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin: 0;
+    padding: 20px 30px;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#editReplyModal .reply-modal h2::before {
+    content: "✏️";
+    font-size: 22px;
+}
+
+#editReplyModal .edit-box {
+    padding: 25px 30px;
+    background: #f8f9fa;
+}
+
+#editReplyModal .edit-box textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 16px;
+    border: 2px solid #e1e8ed;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    line-height: 1.6;
+    resize: vertical;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+#editReplyModal .edit-box textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+}
+
+#editReplyModal .edit-box textarea::placeholder {
+    color: #adb5bd;
+}
+
+#editReplyModal .modal-buttons {
+    padding: 20px 30px;
+    background: white;
+    border-top: 1px solid #e9ecef;
+    gap: 12px;
+}
+
+#editReplyModal .btn-cancel {
+    padding: 12px 24px;
+    background: #f1f3f4;
+    color: #5f6368;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#editReplyModal .btn-cancel:hover {
+    background: #e8eaed;
+    border-color: #c6c9cc;
+}
+
+#editReplyModal .btn-primary {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+#editReplyModal .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+#editReplyModal .btn-primary:active {
+    transform: translateY(0);
+}
