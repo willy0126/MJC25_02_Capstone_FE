@@ -48,7 +48,7 @@ function initSlider() {
   autoToggle = document.querySelector(".auto-toggle");
 
   if (!next || !prev || !autoToggle) {
-    console.warn('⚠️ 슬라이더 요소를 찾을 수 없습니다.');
+    logger.warn('⚠️ 슬라이더 요소를 찾을 수 없습니다.');
     return;
   }
 
@@ -105,7 +105,7 @@ function initSlider() {
 
   // 페이지 로드 시 자동 로테이션 시작
   startAutoRotate();
-  console.log('✅ 슬라이더 초기화 완료');
+  logger.log('✅ 슬라이더 초기화 완료');
 }
 
 /* ===================================
@@ -116,7 +116,7 @@ function initSlider() {
 async function loadTrendingBooks() {
   try {
     // 도서관 정보나루 API를 사용하여 데이터 가져오기
-    console.log('도서관 정보나루 API에서 데이터 로딩 중...');
+    logger.log('도서관 정보나루 API에서 데이터 로딩 중...');
 
     // Top 5: 인기 대출 도서 (최근 7일)
     const loanBooksResult = await LibraryAPI.getLoanBooks({
@@ -127,20 +127,20 @@ async function loadTrendingBooks() {
     const hotTrendResult = await LibraryAPI.getHotTrendBooks();
 
     if (loanBooksResult.success) {
-      console.log('인기 대출 도서:', loanBooksResult.books);
+      logger.log('인기 대출 도서:', loanBooksResult.books);
       renderBooks(loanBooksResult.books, 'top5-grid', 'top5');
     } else {
-      console.error('인기 대출 도서 로드 실패:', loanBooksResult.error);
+      logger.error('인기 대출 도서 로드 실패:', loanBooksResult.error);
       // 폴백: 로컬 데이터 사용
       await loadTrendingBooksFromLocal();
       return;
     }
 
     if (hotTrendResult.success) {
-      console.log('급상승 도서:', hotTrendResult.books);
+      logger.log('급상승 도서:', hotTrendResult.books);
       renderBooks(hotTrendResult.books.slice(0, 5), 'community-grid', 'community');
     } else {
-      console.error('급상승 도서 로드 실패:', hotTrendResult.error);
+      logger.error('급상승 도서 로드 실패:', hotTrendResult.error);
       // 폴백: 로컬 데이터 사용
       await loadTrendingBooksFromLocal();
       return;
@@ -149,7 +149,7 @@ async function loadTrendingBooks() {
     // 탭 전환 기능
     initTabSwitching();
   } catch (error) {
-    console.error('인기 도서 데이터 로드 실패:', error);
+    logger.error('인기 도서 데이터 로드 실패:', error);
     // 에러 발생 시 로컬 데이터 사용
     await loadTrendingBooksFromLocal();
   }
@@ -158,7 +158,7 @@ async function loadTrendingBooks() {
 // 로컬 JSON 파일에서 데이터 로드 (폴백용)
 async function loadTrendingBooksFromLocal() {
   try {
-    console.log('로컬 데이터에서 로딩 중...');
+    logger.log('로컬 데이터에서 로딩 중...');
     const response = await fetch('data/trending-books.json');
     const data = await response.json();
 
@@ -172,7 +172,7 @@ async function loadTrendingBooksFromLocal() {
     // 탭 전환 기능
     initTabSwitching();
   } catch (error) {
-    console.error('로컬 데이터 로드 실패:', error);
+    logger.error('로컬 데이터 로드 실패:', error);
   }
 }
 
@@ -181,22 +181,22 @@ function displayMetaInfo(meta) {
   const lastUpdated = new Date(meta.lastUpdated);
   const nextUpdate = new Date(meta.nextUpdate);
 
-  console.log(`데이터 업데이트: ${lastUpdated.toLocaleDateString('ko-KR')}`);
-  console.log(`다음 업데이트: ${nextUpdate.toLocaleDateString('ko-KR')}`);
-  console.log(`데이터 기간: ${meta.dataSourcePeriod.startDate} ~ ${meta.dataSourcePeriod.endDate}`);
+  logger.log(`데이터 업데이트: ${lastUpdated.toLocaleDateString('ko-KR')}`);
+  logger.log(`다음 업데이트: ${nextUpdate.toLocaleDateString('ko-KR')}`);
+  logger.log(`데이터 기간: ${meta.dataSourcePeriod.startDate} ~ ${meta.dataSourcePeriod.endDate}`);
 }
 
 function renderBooks(books, gridId, type) {
   const grid = document.getElementById(gridId);
   if (!grid) {
-    console.error(`❌ 그리드 요소를 찾을 수 없습니다: #${gridId}`);
-    console.log('현재 페이지의 모든 ID:', Array.from(document.querySelectorAll('[id]')).map(el => el.id).join(', '));
+    logger.error(`❌ 그리드 요소를 찾을 수 없습니다: #${gridId}`);
+    logger.log('현재 페이지의 모든 ID:', Array.from(document.querySelectorAll('[id]')).map(el => el.id).join(', '));
     return;
   }
 
   grid.innerHTML = '';
 
-  console.log(`📚 렌더링 시작 - 그리드: ${gridId}, 타입: ${type}, 책 개수: ${books.length}`);
+  logger.log(`📚 렌더링 시작 - 그리드: ${gridId}, 타입: ${type}, 책 개수: ${books.length}`);
 
   books.forEach((book, index) => {
     const card = document.createElement('div');
@@ -222,7 +222,7 @@ function renderBooks(books, gridId, type) {
       coverImage = book.cover;
     }
 
-    console.log(`책 "${book.title}" 이미지 URL:`, coverImage);
+    logger.log(`책 "${book.title}" 이미지 URL:`, coverImage);
 
     card.innerHTML = `
       <img src="${coverImage}" alt="${book.title}" class="book-cover" onerror="this.src='assets/books/default-cover.svg'; console.error('이미지 로드 실패:', '${book.title}');">
@@ -239,7 +239,7 @@ function renderBooks(books, gridId, type) {
     grid.appendChild(card);
   });
 
-  console.log(`${type} 그리드에 ${books.length}권의 책이 렌더링되었습니다.`);
+  logger.log(`${type} 그리드에 ${books.length}권의 책이 렌더링되었습니다.`);
 }
 
 function initTabSwitching() {
@@ -280,7 +280,7 @@ function initTiltedSectionsAnimation() {
   const tiltedSections = document.querySelectorAll('.tilted-section');
 
   if (tiltedSections.length === 0) {
-    console.log('⚠️ Tilted sections를 찾을 수 없습니다.');
+    logger.log('⚠️ Tilted sections를 찾을 수 없습니다.');
     return;
   }
 
@@ -308,7 +308,7 @@ function initTiltedSectionsAnimation() {
     tiltedObserver.observe(section);
   });
 
-  console.log(`✅ Tilted sections 애니메이션 적용: ${tiltedSections.length}개`);
+  logger.log(`✅ Tilted sections 애니메이션 적용: ${tiltedSections.length}개`);
 }
 
 /* ===================================
@@ -317,12 +317,12 @@ function initTiltedSectionsAnimation() {
 async function loadLatestNotices() {
   const grid = document.getElementById('latest-notices-grid');
   if (!grid) {
-    console.error('❌ 공지사항 그리드를 찾을 수 없습니다.');
+    logger.error('❌ 공지사항 그리드를 찾을 수 없습니다.');
     return;
   }
 
   try {
-    console.log('📢 최신 공지사항 로딩 중...');
+    logger.log('📢 최신 공지사항 로딩 중...');
 
     // API에서 공지사항 가져오기
     const response = await apiClient.getNotices(0, 3);
@@ -365,13 +365,13 @@ async function loadLatestNotices() {
     // API 데이터가 없으면 하드코딩 데이터 사용
     if (notices.length === 0) {
       notices = hardcodedNotices;
-      console.log('⚠️ API 데이터 없음 - 하드코딩 데이터 사용');
+      logger.log('⚠️ API 데이터 없음 - 하드코딩 데이터 사용');
     }
 
     renderNotices(notices);
-    console.log(`✅ 최신 공지사항 ${notices.length}개 렌더링 완료`);
+    logger.log(`✅ 최신 공지사항 ${notices.length}개 렌더링 완료`);
   } catch (error) {
-    console.error('❌ 공지사항 로드 실패:', error);
+    logger.error('❌ 공지사항 로드 실패:', error);
 
     // 에러 시 하드코딩 데이터 표시
     const hardcodedNotices = [
@@ -463,7 +463,7 @@ async function loadRecentActivities() {
   const timeline = document.getElementById('activityTimeline');
 
   if (!section || !timeline) {
-    console.log('⚠️ 최근 활동 섹션을 찾을 수 없습니다.');
+    logger.log('⚠️ 최근 활동 섹션을 찾을 수 없습니다.');
     return;
   }
 
@@ -471,12 +471,12 @@ async function loadRecentActivities() {
   const accessToken = localStorage.getItem('accessToken');
   if (!accessToken) {
     section.style.display = 'none';
-    console.log('🔒 로그인하지 않음 - 최근 활동 섹션 숨김');
+    logger.log('🔒 로그인하지 않음 - 최근 활동 섹션 숨김');
     return;
   }
 
   section.style.display = 'block';
-  console.log('📊 최근 활동 로딩 중...');
+  logger.log('📊 최근 활동 로딩 중...');
 
   try {
     // TODO: 백엔드 API가 준비되면 실제 API 호출로 교체
@@ -515,9 +515,9 @@ async function loadRecentActivities() {
     ];
 
     renderActivities(mockActivities);
-    console.log(`✅ 최근 활동 ${mockActivities.length}개 렌더링 완료`);
+    logger.log(`✅ 최근 활동 ${mockActivities.length}개 렌더링 완료`);
   } catch (error) {
-    console.error('❌ 최근 활동 로드 실패:', error);
+    logger.error('❌ 최근 활동 로드 실패:', error);
     showEmptyState();
   }
 }
@@ -566,7 +566,7 @@ function showEmptyState() {
 
 // 페이지 로드 시 모든 초기화 작업 실행
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🎉 DOM 로드 완료 - 초기화 시작');
+  logger.log('🎉 DOM 로드 완료 - 초기화 시작');
 
   // 슬라이더 초기화
   initSlider();
@@ -582,7 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 스크롤 애니메이션 observer 적용
   const revealElements = document.querySelectorAll('.reveal-on-scroll');
-  console.log(`📜 스크롤 애니메이션 적용 대상: ${revealElements.length}개 요소`);
+  logger.log(`📜 스크롤 애니메이션 적용 대상: ${revealElements.length}개 요소`);
   revealElements.forEach(el => {
     scrollObserver.observe(el);
   });
@@ -590,5 +590,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // Tilted sections 애니메이션 초기화
   initTiltedSectionsAnimation();
 
-  console.log('✅ 모든 초기화 작업 완료');
+  logger.log('✅ 모든 초기화 작업 완료');
 });

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자유 게시판 - 책·이음</title>
+    <link rel="icon" type="image/png" href="../assets/logo/tplogo.png">
+
+    <!-- Google Fonts: Paperlogy -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/freeboard.css">
+    <link rel="stylesheet" href="../css/toast.css">
+
+    <style>
+        /* 목록 스타일 */
+        .freeboard-wrapper {
+            max-width: 900px;
+            margin: 40px auto 80px;
+            padding: 0 20px;
+        }
+
+        .freeboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .freeboard-header h2 {
+            font-size: 32px;
+            color: #333;
+        }
+
+        .write-btn {
+            background-color: #4b7bec;
+            color: #fff;
+            border-radius: 8px;
+            padding: 8px 14px;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .write-btn:hover {
+            background-color: #3860d4;
+        }
+
+        .freeboard-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .freeboard-list li {
+            background: #fff;
+            padding: 18px 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            transition: transform 0.15s;
+        }
+
+        .freeboard-list li:hover {
+            transform: translateY(-3px);
+        }
+
+        .board-type {
+            width: 90px;
+            text-align: center;
+            color: #4b7bec;
+            font-weight: bold;
+        }
+
+        .board-title {
+            flex: 1;
+            text-decoration: none;
+            color: #333;
+            margin-right: 15px;
+        }
+
+        .board-title:hover {
+            text-decoration: underline;
+        }
+
+        .board-date {
+            width: 120px;
+            text-align: right;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <main class="freeboard-container">
+
+        <section class="freeboard-hero">
+            <h1>자유게시판</h1>
+            <p>자유롭게 이야기하는 공간</p>
+        </section>
+
+        <!-- Board Section -->
+        <section class="freeboard-board">
+
+            <!-- Controls -->
+            <div class="board-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="제목 또는 내용으로 검색">
+                    <button class="search-btn" id="searchBtn">🔍 검색</button>
+                </div>
+                <button class="write-btn" id="writeBtn">✏️ 글쓰기</button>
+            </div>
+
+            <!-- 게시글 리스트 -->
+            <ul class="freeboard-list" id="freeboardList">
+                <li>
+                    <span class="board-type">잡담</span>
+                    <a class="board-title" href="freeboard-detail.html?id=1">오늘 커피 마셨다 ☕️</a>
+                    <span class="board-date">2025/11/01</span>
+                </li>
+                <li>
+                    <span class="board-type">정보</span>
+                    <a class="board-title" href="freeboard-detail.html?id=2">토익 공부 꿀팁 공유</a>
+                    <span class="board-date">2025/10/29</span>
+                </li>
+                <li>
+                    <span class="board-type">기타</span>
+                    <a class="board-title" href="freeboard-detail.html?id=3">자유롭게 테스트!</a>
+                    <span class="board-date">2025/10/24</span>
+                </li>
+            </ul>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn" id="prevPageBtn">이전</button>
+                <span id="pageInfo"></span>
+                <button class="page-btn" id="nextPageBtn">다음</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 글쓰기/수정 모달 -->
+    <div class="modal" id="writeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">글쓰기</h2>
+                <button class="modal-close" id="writeModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label>
+                    글 제목:
+                    <input type="text" id="postTitleInput" placeholder="제목을 입력하세요">
+                </label>
+                <br><br>
+                <label>
+                    글 내용:
+                    <textarea id="postContentInput" rows="6" placeholder="내용을 입력하세요"></textarea>
+                </label>
+                <br><br>
+                <button id="savePostBtn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- 공용 JS -->
+    <script src="../js/toast.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/constants.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <!-- include.js: Navbar/Footer 동적 로드 -->
+    <script src="../js/include.js" defer></script>
+
+    <!-- 커스텀 커서 & 게시판 JS -->
+    <script src="../js/freeboard.js" defer></script>
+    <script src="../js/cursor.js" defer></script>
+    
+
+</body>
+</html>

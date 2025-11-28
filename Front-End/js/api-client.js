@@ -168,6 +168,41 @@ class ApiClient {
         }
     }
 
+    // ==================== OAuth2 Social Login APIs ====================
+
+    /**
+     * 카카오 OAuth2 로그인 URL 가져오기
+     * @returns {Promise<Object>} { loginUrl: string }
+     */
+    async getKakaoLoginUrl() {
+        return await this.request('/auth/oauth2/kakao', {
+            method: 'GET',
+            skipAuth: true
+        });
+    }
+
+    /**
+     * 네이버 OAuth2 로그인 URL 가져오기
+     * @returns {Promise<Object>} { loginUrl: string }
+     */
+    async getNaverLoginUrl() {
+        return await this.request('/auth/oauth2/naver', {
+            method: 'GET',
+            skipAuth: true
+        });
+    }
+
+    /**
+     * 모든 소셜 로그인 URL 가져오기
+     * @returns {Promise<Object>} { kakao: string, naver: string }
+     */
+    async getSocialLoginUrls() {
+        return await this.request('/auth/oauth2/login-urls', {
+            method: 'GET',
+            skipAuth: true
+        });
+    }
+
     // User APIs
     async signup(userData) {
         return await this.request('/users/signup', {
@@ -620,6 +655,121 @@ class ApiClient {
      */
     async deleteReadingSchedule(detailsId) {
         return await this.request(`/book-details/${detailsId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // ==================== Board (자유게시판) APIs ====================
+
+    /**
+     * 게시글 목록 조회
+     * @returns {Promise<Object>} 게시글 목록
+     */
+    async getBoards() {
+        return await this.request('/boards', {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 게시글 상세 조회
+     * @param {number} boardId - 게시글 ID
+     * @returns {Promise<Object>} 게시글 상세 정보
+     */
+    async getBoard(boardId) {
+        return await this.request(`/boards/${boardId}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 게시글 작성
+     * @param {Object} boardData - 게시글 정보
+     * @param {string} boardData.title - 제목 (필수)
+     * @param {string} boardData.content - 내용 (필수)
+     * @param {number} boardData.boardImage - 이미지 ID (선택)
+     * @returns {Promise<Object>} 작성된 게시글 정보
+     */
+    async createBoard(boardData) {
+        return await this.request('/boards', {
+            method: 'POST',
+            body: JSON.stringify(boardData)
+        });
+    }
+
+    /**
+     * 게시글 수정
+     * @param {number} boardId - 게시글 ID
+     * @param {Object} boardData - 수정할 게시글 정보
+     * @returns {Promise<Object>} 수정된 게시글 정보
+     */
+    async updateBoard(boardId, boardData) {
+        return await this.request(`/boards/${boardId}`, {
+            method: 'PATCH',
+            body: JSON.stringify(boardData)
+        });
+    }
+
+    /**
+     * 게시글 삭제
+     * @param {number} boardId - 게시글 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteBoard(boardId) {
+        return await this.request(`/boards/${boardId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // ==================== Reply (댓글) APIs ====================
+
+    /**
+     * 댓글 목록 조회
+     * @param {number} boardId - 게시글 ID
+     * @returns {Promise<Object>} 댓글 목록
+     */
+    async getReplies(boardId) {
+        return await this.request(`/boards/${boardId}/replies`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 댓글 작성
+     * @param {number} boardId - 게시글 ID
+     * @param {Object} replyData - 댓글 정보
+     * @param {string} replyData.content - 댓글 내용 (필수)
+     * @returns {Promise<Object>} 작성된 댓글 정보
+     */
+    async createReply(boardId, replyData) {
+        return await this.request(`/boards/${boardId}/replies`, {
+            method: 'POST',
+            body: JSON.stringify(replyData)
+        });
+    }
+
+    /**
+     * 댓글 수정
+     * @param {number} boardId - 게시글 ID
+     * @param {number} replyId - 댓글 ID
+     * @param {Object} replyData - 수정할 댓글 정보
+     * @returns {Promise<Object>} 수정된 댓글 정보
+     */
+    async updateReply(boardId, replyId, replyData) {
+        return await this.request(`/boards/${boardId}/replies/${replyId}`, {
+            method: 'PATCH',
+            body: JSON.stringify(replyData)
+        });
+    }
+
+    /**
+     * 댓글 삭제
+     * @param {number} boardId - 게시글 ID
+     * @param {number} replyId - 댓글 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteReply(boardId, replyId) {
+        return await this.request(`/boards/${boardId}/replies/${replyId}`, {
             method: 'DELETE'
         });
     }

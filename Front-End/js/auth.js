@@ -83,8 +83,9 @@ function resetAutoLogoutTimer() {
 
     autoLogoutTimer = setTimeout(() => {
         if (isLoggedIn()) {
-            alert('장시간 활동이 없어 자동 로그아웃됩니다.');
             clearLoginState();
+            // 로그인 페이지로 이동 후 토스트 표시를 위해 sessionStorage 사용
+            sessionStorage.setItem('autoLogoutMessage', '장시간 활동이 없어 자동 로그아웃되었습니다.');
             window.location.href = 'login.html';
         }
     }, INACTIVITY_TIMEOUT);

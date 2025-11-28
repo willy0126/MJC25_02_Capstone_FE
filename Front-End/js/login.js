@@ -2,10 +2,32 @@
    페이지 초기화
 ======================================== */
 document.addEventListener('DOMContentLoaded', function() {
+    // OAuth 콜백 처리 먼저 확인
+    if (handleOAuthCallback()) {
+        return; // OAuth 콜백 처리 중이면 다른 초기화 건너뜀
+    }
+
     checkAlreadyLoggedIn();
     initLoginForm();
     initSocialLogin();
+    checkAutoLogoutMessage();
 });
+
+/* ========================================
+   자동 로그아웃 메시지 확인
+======================================== */
+function checkAutoLogoutMessage() {
+    const message = sessionStorage.getItem('autoLogoutMessage');
+    if (message) {
+        sessionStorage.removeItem('autoLogoutMessage');
+        // 토스트가 로드된 후 표시
+        setTimeout(() => {
+            if (typeof showToast === 'function') {
+                showToast(message, 'warning', 4000);
+            }
+        }, 300);
+    }
+}
 
 /* ========================================
    로그인 상태 확인 및 리다이렉트
@@ -177,6 +199,10 @@ async function performLogin(email, password) {
 /* ========================================
    소셜 로그인 초기화
 ======================================== */
+// 소셜 로그인 팝업 창 참조
+let socialLoginPopup = null;
+let socialLoginCheckInterval = null;
+
 function initSocialLogin() {
     const kakaoButton = document.querySelector('.social-button.kakao');
     const naverButton = document.querySelector('.social-button.naver');
@@ -192,23 +218,254 @@ function initSocialLogin() {
             performSocialLogin('naver');
         });
     }
+
+    // 팝업 창에서 전송하는 OAuth 결과 메시지 수신
+    window.addEventListener('message', handleOAuthMessage);
 }
 
 /* ========================================
-   소셜 로그인 처리
+   OAuth 메시지 수신 처리 (팝업 -> 부모)
 ======================================== */
-function performSocialLogin(provider) {
-    showToast(`${provider} 소셜 로그인 기능은 추후 구현될 예정입니다.`, 'info');
+function handleOAuthMessage(event) {
+    // 동일 출처 확인 (보안)
+    if (event.origin !== window.location.origin) {
+        return;
+    }
 
-    const user = {
-        email: `user@${provider}.com`,
-        name: `${provider} 사용자`,
-        provider: provider,
-        loginTime: new Date().toISOString()
-    };
+    const data = event.data;
+    if (!data || data.type !== 'OAUTH_CALLBACK') {
+        return;
+    }
 
-    setLoginState(user);
+    console.log('[OAuth] 팝업에서 메시지 수신:', data);
 
-    const returnUrl = getReturnUrl() || 'bookcase.html';
-    window.location.href = returnUrl;
+    // 팝업 창 닫기
+    if (socialLoginPopup && !socialLoginPopup.closed) {
+        socialLoginPopup.close();
+    }
+    socialLoginPopup = null;
+
+    // 팝업 체크 인터벌 정리
+    if (socialLoginCheckInterval) {
+        clearInterval(socialLoginCheckInterval);
+        socialLoginCheckInterval = null;
+    }
+
+    if (data.error) {
+        console.error('[OAuth] 로그인 실패:', data.error, data.errorMessage);
+        showToast(data.errorMessage || '소셜 로그인에 실패했습니다.', 'error');
+        return;
+    }
+
+    if (data.accessToken) {
+        console.log('[OAuth] 소셜 로그인 성공, 토큰 수신');
+        handleOAuthSuccess(data.accessToken);
+    }
+}
+
+/* ========================================
+   소셜 로그인 처리 (팝업 방식)
+======================================== */
+async function performSocialLogin(provider) {
+    const providerName = provider === 'kakao' ? '카카오' : '네이버';
+
+    // 이미 팝업이 열려있으면 포커스
+    if (socialLoginPopup && !socialLoginPopup.closed) {
+        socialLoginPopup.focus();
+        return;
+    }
+
+    try {
+        showToast(`${providerName} 로그인 창을 여는 중...`, 'info');
+
+        // 리턴 URL 저장 (소셜 로그인 완료 후 돌아올 페이지)
+        const currentReturnUrl = getReturnUrl() || 'bookcase.html';
+        localStorage.setItem('returnUrl', currentReturnUrl);
+
+        // 백엔드에서 OAuth2 로그인 URL 가져오기
+        let loginUrl;
+        if (provider === 'kakao') {
+            const response = await apiClient.getKakaoLoginUrl();
+            loginUrl = response.loginUrl;
+        } else if (provider === 'naver') {
+            const response = await apiClient.getNaverLoginUrl();
+            loginUrl = response.loginUrl;
+        }
+
+        if (!loginUrl) {
+            throw new Error('로그인 URL을 가져올 수 없습니다.');
+        }
+
+        console.log(`[OAuth] ${provider} 원본 로그인 URL:`, loginUrl);
+
+        // 백엔드가 내부 포트(8082)를 반환하는 경우, 외부 포트(18888)로 변환
+        // TODO: 백엔드에서 올바른 외부 URL을 반환하도록 수정 후 이 코드 제거
+        if (loginUrl.includes('localhost:8082')) {
+            loginUrl = loginUrl.replace('localhost:8082', 'localhost:18888');
+            console.log(`[OAuth] ${provider} 변환된 로그인 URL:`, loginUrl);
+        }
+
+        // 팝업 창 크기 및 위치 계산 (화면 중앙)
+        const popupWidth = 500;
+        const popupHeight = 700;
+        const left = window.screenX + (window.outerWidth - popupWidth) / 2;
+        const top = window.screenY + (window.outerHeight - popupHeight) / 2;
+
+        // 팝업 창 열기
+        socialLoginPopup = window.open(
+            loginUrl,
+            `${provider}Login`,
+            `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes`
+        );
+
+        if (!socialLoginPopup) {
+            throw new Error('팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.');
+        }
+
+        console.log(`[OAuth] ${provider} 로그인 팝업 열림`);
+
+        // 팝업 창 닫힘 감지 (사용자가 수동으로 닫은 경우)
+        socialLoginCheckInterval = setInterval(() => {
+            if (socialLoginPopup && socialLoginPopup.closed) {
+                clearInterval(socialLoginCheckInterval);
+                socialLoginCheckInterval = null;
+                socialLoginPopup = null;
+                console.log('[OAuth] 팝업 창이 닫혔습니다.');
+            }
+        }, 500);
+
+    } catch (error) {
+        console.error(`${provider} 소셜 로그인 실패:`, error);
+        showToast(error.message || `${providerName} 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.`, 'error');
+    }
+}
+
+/* ========================================
+   OAuth 콜백 처리
+   백엔드에서 OAuth 인증 후 리다이렉트될 때 처리
+   - 팝업 창인 경우: 부모 창에 메시지 전송 후 창 닫기
+   - 일반 창인 경우: 직접 로그인 처리 (폴백)
+======================================== */
+function handleOAuthCallback() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // accessToken이 URL 파라미터에 있는지 확인
+    const accessToken = urlParams.get('accessToken') || urlParams.get('token');
+    const error = urlParams.get('error');
+    const errorMessage = urlParams.get('error_message') || urlParams.get('message');
+
+    // OAuth 콜백이 아닌 경우
+    if (!accessToken && !error) {
+        return false;
+    }
+
+    console.log('[OAuth] 콜백 감지 - accessToken:', !!accessToken, 'error:', error);
+
+    // 팝업 창인지 확인 (window.opener가 있고, 같은 출처인 경우)
+    const isPopup = window.opener && !window.opener.closed;
+
+    if (isPopup) {
+        // 팝업 창: 부모 창에 메시지 전송 후 창 닫기
+        console.log('[OAuth] 팝업 창에서 부모 창으로 결과 전송');
+
+        try {
+            const message = {
+                type: 'OAUTH_CALLBACK',
+                accessToken: accessToken || null,
+                error: error || null,
+                errorMessage: errorMessage || null
+            };
+
+            window.opener.postMessage(message, window.location.origin);
+            console.log('[OAuth] 메시지 전송 완료, 팝업 창 닫기');
+
+            // 잠시 후 팝업 창 닫기
+            setTimeout(() => {
+                window.close();
+            }, 100);
+        } catch (e) {
+            console.error('[OAuth] 부모 창 통신 실패:', e);
+            // 통신 실패 시 직접 처리 (폴백)
+            handleOAuthCallbackDirect(accessToken, error, errorMessage);
+        }
+
+        return true;
+    }
+
+    // 일반 창: 직접 로그인 처리 (폴백 - 팝업 차단 등의 경우)
+    console.log('[OAuth] 일반 창에서 직접 처리');
+    handleOAuthCallbackDirect(accessToken, error, errorMessage);
+    return true;
+}
+
+/* ========================================
+   OAuth 콜백 직접 처리 (폴백)
+======================================== */
+function handleOAuthCallbackDirect(accessToken, error, errorMessage) {
+    // URL에서 파라미터 제거 (깔끔한 URL 유지)
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    if (error) {
+        console.error('[OAuth] 로그인 실패:', error, errorMessage);
+        showToast(errorMessage || '소셜 로그인에 실패했습니다.', 'error');
+        return;
+    }
+
+    if (accessToken) {
+        console.log('[OAuth] 소셜 로그인 성공, 토큰 수신');
+        handleOAuthSuccess(accessToken);
+    }
+}
+
+/* ========================================
+   OAuth 로그인 성공 처리
+======================================== */
+async function handleOAuthSuccess(accessToken) {
+    try {
+        // accessToken 저장
+        apiClient.setAccessToken(accessToken);
+        console.log('[OAuth] accessToken 저장 완료');
+
+        // 사용자 정보 가져오기
+        const userInfoResponse = await apiClient.getUserInfo();
+
+        if (!userInfoResponse.success || !userInfoResponse.data) {
+            throw new Error('사용자 정보를 가져올 수 없습니다.');
+        }
+
+        const userInfo = userInfoResponse.data;
+
+        // 로그인 상태 저장
+        const user = {
+            userId: userInfo.userId,
+            email: userInfo.email,
+            username: userInfo.username,
+            nickname: userInfo.nickname,
+            profileImg: userInfo.profileImg,
+            color: userInfo.color,
+            phone: userInfo.phone,
+            address: userInfo.address,
+            birth: userInfo.birth,
+            role: userInfo.role,
+            provider: userInfo.provider || 'SOCIAL',
+            loginTime: new Date().toISOString()
+        };
+
+        setLoginState(user);
+
+        // 환영 메시지
+        const displayName = user.nickname || user.username || '사용자';
+        showToast(`${displayName}님, 환영합니다!`, 'success');
+
+        // 페이지 이동
+        setTimeout(() => {
+            const returnUrl = getReturnUrl() || 'bookcase.html';
+            window.location.href = returnUrl;
+        }, 1000);
+
+    } catch (error) {
+        console.error('[OAuth] 사용자 정보 조회 실패:', error);
+        apiClient.clearTokens();
+        showToast('로그인 처리 중 오류가 발생했습니다.', 'error');
+    }
 }

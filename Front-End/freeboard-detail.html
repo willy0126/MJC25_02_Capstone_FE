@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 상세보기 - 책·이음</title>
+    <link rel="icon" type="image/png" href="../assets/logo/tplogo.png">
+
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/freeboard.css">
+    <link rel="stylesheet" href="../css/toast.css">
+    <link rel="stylesheet" href="../css/freeboard-detail.css">
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <main class="detail-wrapper">
+        <div class="detail-header">
+            <h2 id="postTitle">로딩중…</h2>
+            <div class="detail-info">
+                <span id="postType">게시판</span> · 
+                <span id="postDate">0000-00-00</span>
+            </div>
+        </div>
+
+        <div class="detail-content" id="postContent">
+            불러오는 중입니다...
+        </div>
+
+        <div class="edit-section" style="display: none;">
+            <input type="text" id="editTitle" placeholder="제목을 수정하세요" />
+            <textarea id="editContent" placeholder="내용을 수정하세요"></textarea>
+            <div>
+                <button id="saveBtn">저장</button>
+                <button id="cancelBtn">취소</button>
+            </div>
+        </div>
+
+        <div class="detail-buttons">
+            <button class="back-btn" onclick="history.back()">← 목록으로</button>
+            <button class="edit-btn" id="editBtn">✏️ 수정</button>
+            <button class="delete-btn" id="deleteBtn">🗑 삭제</button>
+        </div>
+
+        <div class="replies-section">
+            <h3>댓글</h3>
+
+            <div class="reply-input">
+                <textarea id="replyContent" placeholder="댓글을 작성하세요..."></textarea>
+                <button id="submitReplyBtn">댓글 작성</button>
+            </div>
+
+            <div id="repliesList" class="replies-list">
+                </div>
+        </div>
+    </main>
+
+    <div id="deletePostModal" class="modal" style="display: none;">
+        <div class="modal-content delete-modal">
+            <h2>게시글 삭제</h2>
+            <div class="warning-box">
+                <p>⚠️ 게시글을 삭제하시겠습니까?</p>
+                <p class="post-title-display" id="deletePostTitle"></p>
+            </div>
+            <p class="confirm-message">이 작업은 되돌릴 수 없습니다.</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" id="cancelDeleteBtn">취소</button>
+                <button type="button" class="btn-delete-confirm" id="confirmDeleteBtn">삭제하기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteReplyModal" class="modal" style="display: none;">
+        <div class="modal-content reply-modal">
+            <h2>댓글 삭제</h2>
+            <div class="warning-box">
+                <p>⚠️ 댓글을 삭제하시겠습니까?</p>
+                <p class="reply-title-display" id="deleteReplyContentDisplay"></p> 
+            </div>
+            <p class="confirm-message">이 작업은 되돌릴 수 없습니다.</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" id="cancelReplyDeleteBtn">취소</button>
+                <button type="button" class="btn-delete-confirm" id="confirmReplyDeleteBtn">삭제하기</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="editReplyModal" class="modal" style="display: none;">
+        <div class="modal-content reply-modal">
+            <h2>댓글 수정</h2>
+            <div class="edit-box">
+                <textarea id="editReplyContent" placeholder="수정할 댓글 내용을 입력하세요."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" id="cancelReplyEditBtn">취소</button>
+                <button type="button" class="btn-primary" id="saveReplyBtn">수정 저장</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../js/toast.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/constants.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/include.js"></script>
+    <script src="../js/freeboard-detail.js"></script>
+    <script src="../js/cursor.js"></script>
+
+</body>
+</html>
