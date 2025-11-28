@@ -1056,6 +1056,117 @@
 
 .manual-book-cover {
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 표지 업로드 컨트롤 */
+.cover-upload-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-upload-cover {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    background: white;
+    border: 2px solid #20B2AA;
+    border-radius: 20px;
+    color: #20B2AA;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-upload-cover:hover {
+    background: #20B2AA;
+    color: white;
+}
+
+.btn-upload-cover .upload-icon {
+    font-size: 14px;
+}
+
+.btn-remove-cover {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e53e3e;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-remove-cover:hover {
+    background: #c53030;
+    transform: scale(1.1);
+}
+
+/* 표지 이미지 미리보기 */
+.cover-image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 수정 모달 표지 업로드 컨트롤 (세로 배치) */
+.cover-upload-controls-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.cover-upload-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-remove-cover-edit {
+    padding: 8px 12px;
+    background: #e53e3e;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-remove-cover-edit:hover {
+    background: #c53030;
+}
+
+.url-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.url-input-row input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.url-input-row input:focus {
+    outline: none;
+    border-color: #20B2AA;
 }
 
 .book-cover-preview {
@@ -1665,6 +1776,105 @@
     font-size: 13px;
     color: #2d3748;
     line-height: 1.5;
+}
+
+/* 다중 일정 등록 스타일 */
+.reading-schedule-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.reading-schedule-section .section-header .section-title {
+    margin-bottom: 0;
+}
+
+.btn-add-schedule {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #20B2AA;
+    border-radius: 50%;
+    background: white;
+    color: #20B2AA;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-add-schedule:hover {
+    background: #20B2AA;
+    color: white;
+}
+
+.schedule-entries-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.schedule-entry {
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fafafa;
+    position: relative;
+}
+
+.schedule-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.schedule-entry-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #20B2AA;
+}
+
+.btn-remove-schedule {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: #e53e3e;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-schedule:hover {
+    background: #c53030;
+}
+
+.schedule-entry .form-group {
+    margin-bottom: 12px;
+}
+
+.schedule-entry .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-entry .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 0;
+}
+
+.schedule-entry .form-row .form-group {
+    margin-bottom: 0;
 }
 
 /* Flatpickr 커스터마이징 */

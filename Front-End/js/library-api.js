@@ -34,7 +34,7 @@ const LibraryAPI = {
     // 에러 체크
     const parserError = xmlDoc.querySelector('parsererror');
     if (parserError) {
-      console.error('XML 파싱 오류:', parserError.textContent);
+      logger.error('XML 파싱 오류:', parserError.textContent);
       return null;
     }
 
@@ -54,7 +54,7 @@ const LibraryAPI = {
     if (isFirst) {
       const allTags = Array.from(docElement.children).map(el => el.tagName);
       if (allTags.length > 0) {
-        console.log('📋 doc 요소의 모든 태그:', allTags.join(', '));
+        logger.log('📋 doc 요소의 모든 태그:', allTags.join(', '));
       }
     }
 
@@ -78,7 +78,7 @@ const LibraryAPI = {
     };
 
     if (isFirst) {
-      console.log('📖 첫 번째 책 정보 샘플:', {
+      logger.log('📖 첫 번째 책 정보 샘플:', {
         title: bookData.title,
         author: bookData.author,
         isbn: bookData.isbn,
@@ -102,7 +102,7 @@ const LibraryAPI = {
   async getLoanBooks(options = {}) {
     // API 사용 불가 시 즉시 실패 반환
     if (!this.useAPI) {
-      console.warn('API 사용 불가 상태 - 로컬 데이터를 사용하세요');
+      logger.warn('API 사용 불가 상태 - 로컬 데이터를 사용하세요');
       return {
         success: false,
         error: 'API 사용 불가 (CORS 또는 이전 오류)',
@@ -126,7 +126,7 @@ const LibraryAPI = {
       });
 
       const url = `${this.baseURL}/loanItemSrch?${params.toString()}`;
-      console.log('📡 인기 대출 도서 API 호출:', url);
+      logger.log('📡 인기 대출 도서 API 호출:', url);
 
       const response = await fetch(url);
 
@@ -135,7 +135,7 @@ const LibraryAPI = {
       }
 
       const xmlText = await response.text();
-      console.log('📄 API 원본 XML 응답 (처음 1000자):', xmlText.substring(0, 1000));
+      logger.log('📄 API 원본 XML 응답 (처음 1000자):', xmlText.substring(0, 1000));
 
       const xmlDoc = this.xmlToJson(xmlText);
 
@@ -152,23 +152,23 @@ const LibraryAPI = {
 
       // 도서 목록 추출
       const docs = xmlDoc.querySelectorAll('doc');
-      console.log('📚 XML에서 찾은 doc 요소 개수:', docs.length);
+      logger.log('📚 XML에서 찾은 doc 요소 개수:', docs.length);
 
       if (docs.length === 0) {
-        console.warn('⚠️ doc 요소를 찾지 못했습니다. XML 구조 확인:');
-        console.log('루트 요소:', xmlDoc.documentElement?.tagName);
+        logger.warn('⚠️ doc 요소를 찾지 못했습니다. XML 구조 확인:');
+        logger.log('루트 요소:', xmlDoc.documentElement?.tagName);
         const children = Array.from(xmlDoc.documentElement?.children || []);
-        console.log('자식 요소들:', children.map(el => el.tagName).join(', '));
+        logger.log('자식 요소들:', children.map(el => el.tagName).join(', '));
 
         // response 태그 확인
         const response = xmlDoc.querySelector('response');
         if (response) {
-          console.log('response 요소의 자식:', Array.from(response.children).map(el => el.tagName).join(', '));
+          logger.log('response 요소의 자식:', Array.from(response.children).map(el => el.tagName).join(', '));
         }
       }
 
       const books = Array.from(docs).map((doc, index) => this.extractBookInfo(doc, index === 0));
-      console.log('✅ 추출된 책 데이터 개수:', books.length);
+      logger.log('✅ 추출된 책 데이터 개수:', books.length);
 
       // 메타 정보 추출
       const resultNum = xmlDoc.querySelector('resultNum');
@@ -186,11 +186,11 @@ const LibraryAPI = {
       };
 
     } catch (error) {
-      console.error('인기 대출 도서 조회 실패:', error);
+      logger.error('인기 대출 도서 조회 실패:', error);
 
       // CORS 오류인 경우 API 사용 중지
       if (error.message.includes('CORS') || error.message.includes('fetch')) {
-        console.warn('CORS 오류 감지 - API 사용을 중지하고 로컬 데이터를 사용합니다');
+        logger.warn('CORS 오류 감지 - API 사용을 중지하고 로컬 데이터를 사용합니다');
         this.useAPI = false;
       }
 
@@ -209,7 +209,7 @@ const LibraryAPI = {
   async getHotTrendBooks(searchDt) {
     // API 사용 불가 시 즉시 실패 반환
     if (!this.useAPI) {
-      console.warn('API 사용 불가 상태 - 로컬 데이터를 사용하세요');
+      logger.warn('API 사용 불가 상태 - 로컬 데이터를 사용하세요');
       return {
         success: false,
         error: 'API 사용 불가 (CORS 또는 이전 오류)',
@@ -228,7 +228,7 @@ const LibraryAPI = {
       });
 
       const url = `${this.baseURL}/hotTrend?${params.toString()}`;
-      console.log('📈 급상승 도서 API 호출:', url);
+      logger.log('📈 급상승 도서 API 호출:', url);
 
       const response = await fetch(url);
 
@@ -237,7 +237,7 @@ const LibraryAPI = {
       }
 
       const xmlText = await response.text();
-      console.log('📄 급상승 API 원본 XML 응답 (처음 1000자):', xmlText.substring(0, 1000));
+      logger.log('📄 급상승 API 원본 XML 응답 (처음 1000자):', xmlText.substring(0, 1000));
 
       const xmlDoc = this.xmlToJson(xmlText);
 
@@ -254,12 +254,12 @@ const LibraryAPI = {
 
       // 도서 목록 추출
       const results = xmlDoc.querySelectorAll('result');
-      console.log('🚀 XML에서 찾은 result 요소 개수:', results.length);
+      logger.log('🚀 XML에서 찾은 result 요소 개수:', results.length);
 
       if (results.length === 0) {
-        console.warn('⚠️ result 요소를 찾지 못했습니다. XML 구조 확인:');
-        console.log('루트 요소:', xmlDoc.documentElement?.tagName);
-        console.log('자식 요소들:', Array.from(xmlDoc.documentElement?.children || []).map(el => el.tagName).join(', '));
+        logger.warn('⚠️ result 요소를 찾지 못했습니다. XML 구조 확인:');
+        logger.log('루트 요소:', xmlDoc.documentElement?.tagName);
+        logger.log('자식 요소들:', Array.from(xmlDoc.documentElement?.children || []).map(el => el.tagName).join(', '));
       }
 
       const books = Array.from(results).map((result, index) => {
@@ -287,7 +287,7 @@ const LibraryAPI = {
         };
 
         if (index === 0) {
-          console.log('🚀 첫 번째 급상승 책 샘플:', {
+          logger.log('🚀 첫 번째 급상승 책 샘플:', {
             title: bookData.title,
             author: bookData.author,
             loanCount: bookData.loanCount,
@@ -298,7 +298,7 @@ const LibraryAPI = {
         return bookData;
       });
 
-      console.log('✅ 급상승 도서 추출 완료. 책 개수:', books.length);
+      logger.log('✅ 급상승 도서 추출 완료. 책 개수:', books.length);
 
       return {
         success: true,
@@ -306,11 +306,11 @@ const LibraryAPI = {
       };
 
     } catch (error) {
-      console.error('급상승 도서 조회 실패:', error);
+      logger.error('급상승 도서 조회 실패:', error);
 
       // CORS 오류인 경우 API 사용 중지
       if (error.message.includes('CORS') || error.message.includes('fetch')) {
-        console.warn('CORS 오류 감지 - API 사용을 중지하고 로컬 데이터를 사용합니다');
+        logger.warn('CORS 오류 감지 - API 사용을 중지하고 로컬 데이터를 사용합니다');
         this.useAPI = false;
       }
 
@@ -337,7 +337,7 @@ const LibraryAPI = {
       });
 
       const url = `${this.baseURL}/extends/loanItemSrchByLib?${params.toString()}`;
-      console.log('도서관별 인기 도서 API 호출:', url);
+      logger.log('도서관별 인기 도서 API 호출:', url);
 
       const response = await fetch(url);
 
@@ -369,7 +369,7 @@ const LibraryAPI = {
       };
 
     } catch (error) {
-      console.error('도서관별 인기 도서 조회 실패:', error);
+      logger.error('도서관별 인기 도서 조회 실패:', error);
       return {
         success: false,
         error: error.message,

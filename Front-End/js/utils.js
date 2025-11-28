@@ -4,6 +4,37 @@
  */
 
 /* ========================================
+   디버그 모드 설정
+======================================== */
+/**
+ * 디버그 모드 플래그
+ * true: 콘솔 로그 출력 (개발 환경)
+ * false: 콘솔 로그 비활성화 (프로덕션 환경)
+ */
+const DEBUG_MODE = true;
+
+/**
+ * 디버그 로깅 유틸리티
+ * DEBUG_MODE가 true일 때만 콘솔에 출력
+ */
+const logger = {
+    log: (...args) => DEBUG_MODE && console.log(...args),
+    info: (...args) => DEBUG_MODE && console.info(...args),
+    warn: (...args) => DEBUG_MODE && console.warn(...args),
+    error: (...args) => console.error(...args), // 에러는 항상 출력
+    debug: (...args) => DEBUG_MODE && console.debug(...args),
+    table: (...args) => DEBUG_MODE && console.table(...args),
+    group: (label) => DEBUG_MODE && console.group(label),
+    groupEnd: () => DEBUG_MODE && console.groupEnd(),
+    time: (label) => DEBUG_MODE && console.time(label),
+    timeEnd: (label) => DEBUG_MODE && console.timeEnd(label)
+};
+
+// 전역으로 사용할 수 있도록 window 객체에 할당
+window.DEBUG_MODE = DEBUG_MODE;
+window.logger = logger;
+
+/* ========================================
    네비게이션바 스크롤 효과
 ======================================== */
 /**
@@ -209,6 +240,21 @@ function isElementVisible(element) {
         rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
         rect.right <= (window.innerWidth || document.documentElement.clientWidth)
     );
+}
+
+/* ========================================
+   보안 유틸리티
+======================================== */
+/**
+ * HTML 특수문자 이스케이프 (XSS 방지)
+ * @param {string} text - 이스케이프할 텍스트
+ * @returns {string} 이스케이프된 텍스트
+ */
+function escapeHtml(text) {
+    if (text == null) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 /* ========================================

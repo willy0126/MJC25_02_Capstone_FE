@@ -114,44 +114,41 @@
                     <h2 id="recordTitle">책 제목</h2>
                     <p class="record-author" id="recordAuthor">저자</p>
 
-                    <!-- 보기 모드 -->
+                    <!-- 보기 모드: 다중 독자 일정 표시 -->
                     <div id="recordViewMode">
-                        <div class="record-status">
-                            <span class="status-badge" id="recordStatus">읽는 중</span>
-                        </div>
-                        <div class="record-dates">
-                            <div class="date-item">
-                                <span class="date-label">시작일</span>
-                                <span class="date-value" id="recordStartDate">-</span>
+                        <div class="modal-readers-section">
+                            <h4 class="modal-readers-title">독자별 일정</h4>
+                            <div class="modal-readers-list" id="modalReadersList">
+                                <!-- 동적으로 생성됨 -->
                             </div>
-                            <div class="date-item">
-                                <span class="date-label">완료일</span>
-                                <span class="date-value" id="recordEndDate">-</span>
-                            </div>
-                        </div>
-                        <div class="record-actions">
-                            <button type="button" class="btn-edit" id="recordEditBtn">수정</button>
-                            <button type="button" class="btn-delete" id="recordDeleteBtn">삭제</button>
                         </div>
                     </div>
 
                     <!-- 수정 모드 -->
                     <div id="recordEditMode" style="display: none;">
-                        <div class="form-group">
-                            <label>상태</label>
-                            <select id="editRecordStatus" class="form-select">
-                                <option value="to_read">읽을 예정</option>
-                                <option value="reading">읽는 중</option>
-                                <option value="completed">완료</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>시작일</label>
-                            <input type="date" id="editRecordStartDate" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label>완료일</label>
-                            <input type="date" id="editRecordEndDate" class="form-input">
+                        <!-- 독서 일정 설정 섹션 (bookcase 스타일) -->
+                        <div class="reading-schedule-section-edit">
+                            <div class="schedule-entry-edit">
+                                <div class="form-group">
+                                    <label>독자 선택</label>
+                                    <div class="reader-select-wrapper">
+                                        <select id="editReader" name="editReader" class="form-select schedule-reader-select">
+                                            <option value="">선택 안 함</option>
+                                        </select>
+                                        <div class="reader-color-indicator schedule-color-indicator" id="editReaderColorIndicator"></div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>시작일</label>
+                                        <input type="text" id="editRecordStartDate" class="form-input flatpickr-input schedule-start-date" placeholder="시작일 선택" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>완료일</label>
+                                        <input type="text" id="editRecordEndDate" class="form-input flatpickr-input schedule-end-date" placeholder="완료일 선택" readonly>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="record-actions">
                             <button type="button" class="btn-cancel" id="editCancelBtn">취소</button>
@@ -179,30 +176,16 @@
                     </div>
                 </div>
                 <div class="schedule-form-info">
-                    <!-- 독자 선택 -->
-                    <div class="form-group">
-                        <label>독자 선택</label>
-                        <div class="custom-select" id="scheduleReaderSelect" data-name="reader">
-                            <input type="hidden" id="scheduleReader" name="reader" value="">
-                            <div class="custom-select-trigger">
-                                <span class="custom-select-value">독자 선택</span>
-                                <span class="custom-select-arrow">▼</span>
-                            </div>
-                            <div class="custom-select-options" id="scheduleReaderOptions">
-                                <!-- 동적으로 생성됨 -->
-                            </div>
-                        </div>
+                    <!-- 독자별 일정 (다중 선택) -->
+                    <div class="reader-details-header">
+                        <label>독자별 일정</label>
                     </div>
-                    <!-- 시작일 -->
-                    <div class="form-group">
-                        <label>시작일</label>
-                        <input type="text" id="scheduleStartDate" class="form-input flatpickr-input" placeholder="시작일 선택" readonly>
+                    <div class="reader-details-container" id="readerDetailsContainer">
+                        <!-- 동적으로 생성됨 -->
                     </div>
-                    <!-- 종료일 -->
-                    <div class="form-group">
-                        <label>종료일</label>
-                        <input type="text" id="scheduleEndDate" class="form-input flatpickr-input" placeholder="종료일 선택" readonly>
-                    </div>
+                    <button type="button" class="btn-add-reader" id="addReaderBtn">
+                        <span>+</span> 독자 추가
+                    </button>
                 </div>
             </div>
             <div class="modal-footer">

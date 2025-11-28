@@ -122,14 +122,23 @@
                         <input type="text" id="editIsbn" name="isbn" placeholder="10자리 또는 13자리 숫자" maxlength="13" pattern="\d*" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <div class="form-group">
-                        <label for="editCoverUrl">책 표지 이미지 URL</label>
+                        <label for="editCoverUrl">책 표지 이미지</label>
                         <div class="cover-upload-section">
                             <div class="cover-preview" id="editCoverPreview">
                                 <span class="cover-placeholder-text">이미지 없음</span>
                             </div>
-                            <div class="cover-upload-controls">
-                                <input type="text" id="editCoverUrl" name="coverUrl" placeholder="이미지 URL 입력" onblur="previewEditCoverFromUrl(this.value)">
-                                <button type="button" class="btn-remove-cover" onclick="removeEditCover()">제거</button>
+                            <div class="cover-upload-controls-vertical">
+                                <div class="cover-upload-buttons">
+                                    <input type="file" id="editCoverInput" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn-upload-cover" id="btnEditUploadCover">
+                                        <span class="upload-icon">📷</span>
+                                        <span>이미지 업로드</span>
+                                    </button>
+                                    <button type="button" class="btn-remove-cover-edit" id="btnEditRemoveCover">제거</button>
+                                </div>
+                                <div class="url-input-row">
+                                    <input type="text" id="editCoverUrl" name="coverUrl" placeholder="또는 이미지 URL 입력" onblur="previewEditCoverFromUrl(this.value)">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -140,31 +149,41 @@
 
                     <!-- 독서 일정 설정 섹션 -->
                     <div class="reading-schedule-section">
-                        <h3 class="section-title">📅 독서 일정 설정</h3>
+                        <div class="section-header">
+                            <h3 class="section-title">📅 독서 일정 설정</h3>
+                            <button type="button" class="btn-add-schedule" id="btnAddSchedule" title="독자 추가">
+                                <span>+</span>
+                            </button>
+                        </div>
                         <p class="section-description">독서 일정을 설정하면 캘린더에서 확인할 수 있습니다.</p>
 
-                        <div class="form-group">
-                            <label for="editReader">독자 선택</label>
-                            <div class="reader-select-wrapper">
-                                <select id="editReader" name="reader" class="form-select">
-                                    <option value="">선택 안 함</option>
-                                    <!-- 본인과 자녀 목록이 동적으로 추가됩니다 -->
-                                </select>
-                                <div class="reader-color-indicator" id="editReaderColorIndicator">
-                                    <!-- 선택된 독자의 색상 표시 -->
+                        <!-- 일정 목록 컨테이너 -->
+                        <div class="schedule-entries-container" id="scheduleEntriesContainer">
+                            <!-- 첫 번째 일정 항목 -->
+                            <div class="schedule-entry" data-index="0">
+                                <div class="schedule-entry-header">
+                                    <span class="schedule-entry-label">독자 1</span>
+                                    <button type="button" class="btn-remove-schedule" title="삭제" style="display: none;">×</button>
                                 </div>
-                            </div>
-                        </div>
-
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="editStartDate">시작일</label>
-                                <input type="text" id="editStartDate" name="startDate" class="form-input flatpickr-input" placeholder="시작일 선택" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="editEndDate">완료일</label>
-                                <input type="text" id="editEndDate" name="endDate" class="form-input flatpickr-input" placeholder="완료일 선택" readonly>
+                                <div class="form-group">
+                                    <label>독자 선택</label>
+                                    <div class="reader-select-wrapper">
+                                        <select name="reader" class="form-select schedule-reader-select">
+                                            <option value="">선택 안 함</option>
+                                        </select>
+                                        <div class="reader-color-indicator schedule-color-indicator"></div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>시작일</label>
+                                        <input type="text" name="startDate" class="form-input flatpickr-input schedule-start-date" placeholder="시작일 선택" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>완료일</label>
+                                        <input type="text" name="endDate" class="form-input flatpickr-input schedule-end-date" placeholder="완료일 선택" readonly>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -233,9 +252,20 @@
                         <div class="manual-book-layout">
                             <div class="manual-book-cover">
                                 <div class="book-cover-preview" id="manualCoverPreview">
-                                    <div class="book-cover-placeholder blue">
+                                    <div class="book-cover-placeholder blue" id="manualCoverPlaceholder">
                                         <h3 id="manualCoverTitle">책 제목</h3>
                                     </div>
+                                    <img id="manualCoverImage" class="cover-image-preview" style="display: none;" alt="책 표지">
+                                </div>
+                                <div class="cover-upload-controls">
+                                    <input type="file" id="manualCoverInput" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn-upload-cover" id="btnUploadCover">
+                                        <span class="upload-icon">📷</span>
+                                        <span>표지 업로드</span>
+                                    </button>
+                                    <button type="button" class="btn-remove-cover" id="btnRemoveCover" style="display: none;">
+                                        <span>×</span>
+                                    </button>
                                 </div>
                             </div>
                             <div class="manual-book-fields">

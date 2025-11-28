@@ -1,9 +1,9 @@
 /* ========================================
-   독서 일정 관리 기능 (bookcase 수정 모달용)
+   독서 일정 관리 기능 (bookcase 수정 모달용) - 다중 독자 지원
 ======================================== */
 
-let editStartPicker = null;
-let editEndPicker = null;
+let scheduleEntryIndex = 0;
+let flatpickrInstances = []; // Flatpickr 인스턴스 관리
 
 /* ========================================
    독자 목록 로드 (수정 모달용)
@@ -27,8 +27,8 @@ async function loadReadersForEdit() {
             }
         }
 
-        // 독자 선택 드롭다운 채우기
-        populateEditReaderSelect();
+        // 일정 초기화
+        initScheduleEntries();
 
     } catch (error) {
         console.error('독자 데이터 로드 실패:', error);
@@ -47,15 +47,169 @@ function getKoreanOrdinal(num) {
 }
 
 /* ========================================
+   일정 항목 초기화
+======================================== */
+function initScheduleEntries() {
+    const container = document.getElementById('scheduleEntriesContainer');
+    if (!container) return;
+
+    // 기존 Flatpickr 인스턴스 정리
+    flatpickrInstances.forEach(fp => {
+        if (fp && fp.destroy) fp.destroy();
+    });
+    flatpickrInstances = [];
+
+    // 컨테이너 초기화
+    container.innerHTML = '';
+    scheduleEntryIndex = 0;
+
+    // 첫 번째 일정 항목 추가
+    addScheduleEntry();
+
+    // + 버튼 이벤트 설정
+    const addBtn = document.getElementById('btnAddSchedule');
+    if (addBtn) {
+        // 기존 이벤트 제거 후 새로 추가
+        const newAddBtn = addBtn.cloneNode(true);
+        addBtn.parentNode.replaceChild(newAddBtn, addBtn);
+        newAddBtn.addEventListener('click', addScheduleEntry);
+    }
+}
+
+/* ========================================
+   새 일정 항목 추가
+======================================== */
+function addScheduleEntry() {
+    const container = document.getElementById('scheduleEntriesContainer');
+    if (!container) return;
+
+    scheduleEntryIndex++;
+    const entryDiv = document.createElement('div');
+    entryDiv.className = 'schedule-entry';
+    entryDiv.dataset.index = scheduleEntryIndex;
+
+    const showRemoveBtn = container.children.length > 0;
+
+    entryDiv.innerHTML = `
+        <div class="schedule-entry-header">
+            <span class="schedule-entry-label">독자 ${container.children.length + 1}</span>
+            <button type="button" class="btn-remove-schedule" title="삭제" style="display: ${showRemoveBtn ? 'flex' : 'none'};">×</button>
+        </div>
+        <div class="form-group">
+            <label>독자 선택</label>
+            <div class="reader-select-wrapper">
+                <select name="reader" class="form-select schedule-reader-select">
+                    <option value="">선택 안 함</option>
+                </select>
+                <div class="reader-color-indicator schedule-color-indicator"></div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>시작일</label>
+                <input type="text" name="startDate" class="form-input flatpickr-input schedule-start-date" placeholder="시작일 선택" readonly>
+            </div>
+            <div class="form-group">
+                <label>완료일</label>
+                <input type="text" name="endDate" class="form-input flatpickr-input schedule-end-date" placeholder="완료일 선택" readonly>
+            </div>
+        </div>
+    `;
+
+    container.appendChild(entryDiv);
+
+    // 독자 선택 드롭다운 채우기
+    const readerSelect = entryDiv.querySelector('.schedule-reader-select');
+    populateReaderSelect(readerSelect);
+
+    // 독자 선택 변경 이벤트
+    readerSelect.addEventListener('change', function() {
+        updateColorIndicator(this);
+    });
+
+    // 삭제 버튼 이벤트
+    const removeBtn = entryDiv.querySelector('.btn-remove-schedule');
+    if (removeBtn) {
+        removeBtn.addEventListener('click', function() {
+            removeScheduleEntry(entryDiv);
+        });
+    }
+
+    // Flatpickr 초기화
+    initEntryDatePickers(entryDiv);
+
+    // 첫 번째 항목의 삭제 버튼 표시 업데이트
+    updateRemoveButtonVisibility();
+}
+
+/* ========================================
+   일정 항목 삭제
+======================================== */
+function removeScheduleEntry(entryDiv) {
+    const container = document.getElementById('scheduleEntriesContainer');
+    if (!container || container.children.length <= 1) return;
+
+    // Flatpickr 인스턴스 제거
+    const startInput = entryDiv.querySelector('.schedule-start-date');
+    const endInput = entryDiv.querySelector('.schedule-end-date');
+
+    if (startInput && startInput._flatpickr) {
+        startInput._flatpickr.destroy();
+    }
+    if (endInput && endInput._flatpickr) {
+        endInput._flatpickr.destroy();
+    }
+
+    entryDiv.remove();
+
+    // 라벨 번호 업데이트
+    updateEntryLabels();
+
+    // 삭제 버튼 표시 업데이트
+    updateRemoveButtonVisibility();
+}
+
+/* ========================================
+   라벨 번호 업데이트
+======================================== */
+function updateEntryLabels() {
+    const container = document.getElementById('scheduleEntriesContainer');
+    if (!container) return;
+
+    const entries = container.querySelectorAll('.schedule-entry');
+    entries.forEach((entry, index) => {
+        const label = entry.querySelector('.schedule-entry-label');
+        if (label) {
+            label.textContent = `독자 ${index + 1}`;
+        }
+    });
+}
+
+/* ========================================
+   삭제 버튼 표시 업데이트
+======================================== */
+function updateRemoveButtonVisibility() {
+    const container = document.getElementById('scheduleEntriesContainer');
+    if (!container) return;
+
+    const entries = container.querySelectorAll('.schedule-entry');
+    entries.forEach((entry, index) => {
+        const removeBtn = entry.querySelector('.btn-remove-schedule');
+        if (removeBtn) {
+            removeBtn.style.display = entries.length > 1 ? 'flex' : 'none';
+        }
+    });
+}
+
+/* ========================================
    독자 선택 드롭다운 채우기
 ======================================== */
-function populateEditReaderSelect() {
-    const readerSelect = document.getElementById('editReader');
-    if (!readerSelect) return;
+function populateReaderSelect(selectElement) {
+    if (!selectElement) return;
 
     // 기존 옵션 초기화 (첫 번째 "선택 안 함" 제외)
-    while (readerSelect.options.length > 1) {
-        readerSelect.remove(1);
+    while (selectElement.options.length > 1) {
+        selectElement.remove(1);
     }
 
     // 본인 추가
@@ -66,7 +220,7 @@ function populateEditReaderSelect() {
         option.dataset.type = 'user';
         option.dataset.userId = currentUserInfo.userId;
         option.dataset.color = currentUserInfo.color || '#20B2AA';
-        readerSelect.appendChild(option);
+        selectElement.appendChild(option);
     }
 
     // 자녀 추가
@@ -76,25 +230,11 @@ function populateEditReaderSelect() {
             const childName = child.childName || child.name || '자녀';
             const birthOrder = child.birthOrder;
 
-            // 나이 계산 (childBirth가 있는 경우)
-            let age = null;
-            if (child.childBirth) {
-                const birthDate = new Date(child.childBirth);
-                const today = new Date();
-                age = today.getFullYear() - birthDate.getFullYear();
-                const monthDiff = today.getMonth() - birthDate.getMonth();
-                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-            }
-
             // 표시 텍스트 생성
             let displayText = childName;
             if (birthOrder) {
                 const orderText = getKoreanOrdinal(birthOrder);
                 displayText = `${childName} (자녀, ${orderText})`;
-            } else if (age !== null) {
-                displayText = `${childName} (자녀, ${age}세)`;
             } else {
                 displayText = `${childName} (자녀)`;
             }
@@ -105,26 +245,23 @@ function populateEditReaderSelect() {
             option.dataset.type = 'child';
             option.dataset.userId = childId;
             option.dataset.color = child.color || '#FF6B6B';
-            readerSelect.appendChild(option);
+            selectElement.appendChild(option);
         });
     }
-
-    // 독자 선택 변경 이벤트
-    readerSelect.addEventListener('change', updateReaderColorIndicator);
 }
 
 /* ========================================
    독자 색상 아이콘 업데이트
 ======================================== */
-function updateReaderColorIndicator() {
-    const readerSelect = document.getElementById('editReader');
-    const colorIndicator = document.getElementById('editReaderColorIndicator');
+function updateColorIndicator(selectElement) {
+    const wrapper = selectElement.closest('.reader-select-wrapper');
+    const colorIndicator = wrapper?.querySelector('.schedule-color-indicator');
 
-    if (!readerSelect || !colorIndicator) return;
+    if (!colorIndicator) return;
 
-    const selectedOption = readerSelect.options[readerSelect.selectedIndex];
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
 
-    if (selectedOption && selectedOption.dataset.color) {
+    if (selectedOption && selectedOption.dataset.color && selectedOption.value) {
         const color = selectedOption.dataset.color;
         const readerName = selectedOption.textContent.split('(')[0].trim();
 
@@ -144,41 +281,31 @@ function updateReaderColorIndicator() {
 /* ========================================
    날짜 선택기 초기화 (Flatpickr)
 ======================================== */
-function initEditDatePickers() {
-    // 기존 인스턴스 제거
-    if (editStartPicker) {
-        editStartPicker.destroy();
-        editStartPicker = null;
-    }
-    if (editEndPicker) {
-        editEndPicker.destroy();
-        editEndPicker = null;
-    }
+function initEntryDatePickers(entryDiv) {
+    const startDateInput = entryDiv.querySelector('.schedule-start-date');
+    const endDateInput = entryDiv.querySelector('.schedule-end-date');
 
-    // 시작일 선택기
-    const startDateInput = document.getElementById('editStartDate');
     if (startDateInput) {
-        editStartPicker = flatpickr(startDateInput, {
+        const startPicker = flatpickr(startDateInput, {
             locale: 'ko',
             dateFormat: 'Y-m-d',
             allowInput: false,
-            onChange: function(selectedDates, dateStr, instance) {
-                // 시작일이 선택되면 종료일의 minDate 설정
-                if (editEndPicker && dateStr) {
-                    editEndPicker.set('minDate', dateStr);
+            onChange: function(selectedDates, dateStr) {
+                if (endDateInput && endDateInput._flatpickr && dateStr) {
+                    endDateInput._flatpickr.set('minDate', dateStr);
                 }
             }
         });
+        flatpickrInstances.push(startPicker);
     }
 
-    // 종료일 선택기
-    const endDateInput = document.getElementById('editEndDate');
     if (endDateInput) {
-        editEndPicker = flatpickr(endDateInput, {
+        const endPicker = flatpickr(endDateInput, {
             locale: 'ko',
             dateFormat: 'Y-m-d',
             allowInput: false
         });
+        flatpickrInstances.push(endPicker);
     }
 }
 
@@ -186,71 +313,75 @@ function initEditDatePickers() {
    기존 독서 일정 불러오기
 ======================================== */
 async function loadExistingSchedule(bookId) {
-    // 일정 초기화
-    const readerSelect = document.getElementById('editReader');
-    const colorIndicator = document.getElementById('editReaderColorIndicator');
-
-    if (readerSelect) readerSelect.value = '';
-    if (editStartPicker) editStartPicker.clear();
-    if (editEndPicker) editEndPicker.clear();
-    if (colorIndicator) {
-        colorIndicator.innerHTML = '';
-        colorIndicator.style.display = 'none';
-    }
-
-    // 기존 독서 일정 API가 없으므로 초기화만 수행
-    // 새로운 일정은 도서 수정 시 함께 저장됨
+    // 일정 초기화는 initScheduleEntries에서 처리됨
 }
 
 /* ========================================
-   독서 일정 데이터 수집 (Book API 형식)
+   모든 일정 데이터 수집 (Book API 형식)
 ======================================== */
-function collectScheduleData() {
-    const readerSelect = document.getElementById('editReader');
-    const startDateInput = document.getElementById('editStartDate');
-    const endDateInput = document.getElementById('editEndDate');
+function collectAllScheduleData() {
+    const container = document.getElementById('scheduleEntriesContainer');
+    if (!container) return [];
 
-    // 독자나 시작일이 선택되지 않으면 null 반환
-    if (!readerSelect.value || !startDateInput.value) {
-        return null;
-    }
+    const schedules = [];
+    const entries = container.querySelectorAll('.schedule-entry');
 
-    // 독자 ID 추출 (childId)
-    let childId = null;
-    const selectedOption = readerSelect.options[readerSelect.selectedIndex];
-    const readerType = selectedOption.dataset.type;
+    entries.forEach(entry => {
+        const readerSelect = entry.querySelector('.schedule-reader-select');
+        const startDateInput = entry.querySelector('.schedule-start-date');
+        const endDateInput = entry.querySelector('.schedule-end-date');
 
-    if (readerType === 'user') {
-        // 본인인 경우 childId를 null로 설정 (백엔드에서 ADULT 타입으로 처리)
-        childId = null;
-    } else if (readerType === 'child') {
-        // 자녀인 경우 childId 사용 (dataset.userId에 childId가 저장됨)
-        childId = parseInt(selectedOption.dataset.userId);
-    }
+        // 독자와 시작일이 모두 선택되어야 유효
+        if (!readerSelect?.value || !startDateInput?.value) {
+            return;
+        }
 
-    // Book API의 bookDetailsUpdate 형식으로 반환
-    const scheduleData = {
-        childId: childId,
-        startDate: startDateInput.value
-    };
+        const selectedOption = readerSelect.options[readerSelect.selectedIndex];
+        const readerType = selectedOption.dataset.type;
 
-    // 종료일 추가 (있을 경우)
-    if (endDateInput.value) {
-        scheduleData.endDate = endDateInput.value;
-    }
+        let childId = null;
+        if (readerType === 'child') {
+            childId = parseInt(selectedOption.dataset.userId);
+        }
 
-    return scheduleData;
+        const scheduleData = {
+            childId: childId,
+            startDate: startDateInput.value
+        };
+
+        if (endDateInput?.value) {
+            scheduleData.endDate = endDateInput.value;
+        }
+
+        schedules.push(scheduleData);
+    });
+
+    return schedules;
 }
 
 /* ========================================
    독서 일정을 Book API의 bookDetailsUpdate 배열로 반환
 ======================================== */
 function getBookDetailsUpdate() {
-    const scheduleData = collectScheduleData();
+    return collectAllScheduleData();
+}
 
-    if (!scheduleData) {
-        return [];
-    }
+/* ========================================
+   하위 호환성을 위한 기존 함수들
+======================================== */
+function collectScheduleData() {
+    const schedules = collectAllScheduleData();
+    return schedules.length > 0 ? schedules[0] : null;
+}
 
-    return [scheduleData];
+function populateEditReaderSelect() {
+    initScheduleEntries();
+}
+
+function initEditDatePickers() {
+    // 새 구조에서는 각 entry별로 initEntryDatePickers에서 처리
+}
+
+function updateReaderColorIndicator() {
+    // 새 구조에서는 updateColorIndicator에서 처리
 }

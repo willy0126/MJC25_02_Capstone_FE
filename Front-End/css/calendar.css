@@ -759,19 +759,89 @@
     margin-bottom: 4px;
 }
 
-.record-item-reader {
+/* 독자 목록 컨테이너 (각 독자별 일정 표시) */
+.record-item-readers {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+/* 독자별 일정 아이템 */
+.reader-schedule-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: var(--reader-bg-color, rgba(0, 0, 0, 0.05));
+    border: 1px solid var(--reader-border-color, rgba(0, 0, 0, 0.08));
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.reader-schedule-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.reader-info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reader-info-row .reader-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #333;
+}
+
+.reader-schedule-date {
+    font-size: 0.75rem;
+    color: #666;
+    padding-left: 20px;
+}
+
+.record-item-reader {
+    display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 0.75rem;
+    padding: 4px 10px 4px 6px;
+    border-radius: 20px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.record-item-reader:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* 독자가 하나일 때 (readers 컨테이너 없이 직접 사용) */
+.record-item-info > .record-item-reader {
     margin-bottom: 8px;
 }
 
+.record-item-reader.has-color {
+    background-color: var(--reader-bg-color, rgba(0, 0, 0, 0.05));
+    border-color: var(--reader-border-color, rgba(0, 0, 0, 0.08));
+}
+
 .reader-dot {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.record-item-reader .reader-name {
+    font-weight: 500;
+    color: #333;
 }
 
 .record-item-status {
@@ -848,49 +918,70 @@
     color: #666;
 }
 
-/* ==================== Modal Styles ==================== */
-
+/* ==================== 공통 모달 기본 스타일 ==================== */
 .modal {
+    display: none;
     position: fixed;
-    top: 0;
+    z-index: 1000;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
     justify-content: center;
-    z-index: 1000;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
 }
 
+.modal.show {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ==================== calendar 모달 커스터마이징 ==================== */
 .modal-content {
     background: white;
     border-radius: 20px;
     padding: 30px;
-    max-width: 500px;
+    max-width: 650px;
     width: 90%;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
-    position: relative;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
 }
 
 .modal-close {
     position: absolute;
     top: 15px;
     right: 20px;
-    background: none;
-    border: none;
-    font-size: 1.8rem;
-    cursor: pointer;
-    color: #999;
-    transition: color 0.2s ease;
 }
 
 .modal-close:hover {
     color: #333;
+    transform: none;
 }
 
 /* Record Detail Modal */
+.record-detail-modal {
+    max-width: 550px;
+}
+
 .record-detail-content {
     display: flex;
     gap: 24px;
@@ -898,7 +989,7 @@
 }
 
 .record-book-cover {
-    width: 140px;
+    width: 110px;
     flex-shrink: 0;
 }
 
@@ -910,7 +1001,7 @@
 
 .book-cover-placeholder {
     width: 100%;
-    height: 200px;
+    height: 160px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 8px;
     display: flex;
@@ -918,17 +1009,21 @@
     justify-content: center;
     color: white;
     text-align: center;
-    padding: 15px;
+    padding: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .book-cover-placeholder h3 {
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 600;
+    line-height: 1.3;
+    word-break: keep-all;
 }
 
 .record-book-info {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .record-book-info h2 {
@@ -936,12 +1031,17 @@
     font-weight: 700;
     color: #333;
     margin-bottom: 8px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.4;
 }
 
 .record-author {
     font-size: 1rem;
     color: #666;
     margin-bottom: 16px;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .record-status {
@@ -987,6 +1087,8 @@
 .date-label {
     color: #666;
     font-size: 0.9rem;
+    flex-shrink: 0;
+    min-width: 50px;
 }
 
 .date-value {
@@ -1047,6 +1149,140 @@
 .btn-delete:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+/* Modal Readers Section (다중 독자 일정 표시) */
+.modal-readers-section {
+    margin-top: 8px;
+}
+
+.modal-readers-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-readers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* 모달 내 독자 일정 아이템 */
+.modal-reader-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: var(--reader-bg-color, #f8f9fa);
+    border: 1px solid var(--reader-border-color, #e0e0e0);
+    transition: box-shadow 0.2s ease;
+}
+
+.modal-reader-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.modal-reader-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-reader-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.modal-reader-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-reader-status {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+.modal-reader-status.reading {
+    background: #fef3cd;
+    color: #856404;
+}
+
+.modal-reader-status.completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.modal-reader-status.to_read {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.modal-reader-dates {
+    display: flex;
+    gap: 16px;
+    padding-left: 22px;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.modal-reader-dates span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.modal-reader-dates .date-label {
+    color: #888;
+    font-size: 0.8rem;
+}
+
+.modal-reader-actions {
+    display: flex;
+    gap: 8px;
+    padding-left: 22px;
+    margin-top: 4px;
+}
+
+.modal-reader-actions .btn-sm {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Paperlogy', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.modal-reader-actions .btn-edit-sm {
+    background: #00b493;
+    color: white;
+}
+
+.modal-reader-actions .btn-edit-sm:hover {
+    background: #00957a;
+}
+
+.modal-reader-actions .btn-delete-sm {
+    background: #e63946;
+    color: white;
+}
+
+.modal-reader-actions .btn-delete-sm:hover {
+    background: #d62828;
 }
 
 /* Edit Mode Form */
@@ -1391,4 +1627,294 @@
 
 .flatpickr-input::placeholder {
     color: #999;
+}
+
+/* ==================== 독자 다중 선택 (독서 일정 등록 모달) ==================== */
+.reader-details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.reader-detail-row {
+    display: grid;
+    grid-template-columns: 1fr 130px 20px 130px 40px;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.reader-detail-row .custom-select {
+    min-width: 0;
+}
+
+.reader-detail-row .custom-select-trigger {
+    padding: 10px 12px;
+    font-size: 13px;
+}
+
+.reader-detail-row .date-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Paperlogy', sans-serif;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.reader-detail-row .date-input:hover,
+.reader-detail-row .date-input:focus {
+    border-color: #00b493;
+    outline: none;
+}
+
+.reader-detail-row .date-separator {
+    text-align: center;
+    color: #666;
+    font-weight: 500;
+}
+
+.btn-remove-reader {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: #ff6b6b;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove-reader:hover {
+    background: #ee5253;
+    transform: scale(1.1);
+}
+
+.btn-add-reader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 2px dashed #00b493;
+    border-radius: 10px;
+    background: transparent;
+    color: #00b493;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.btn-add-reader:hover {
+    background: #e6f7f4;
+    border-style: solid;
+}
+
+.reader-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.reader-details-header label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
+}
+
+/* 반응형 - 좁은 화면 */
+@media (max-width: 600px) {
+    .reader-detail-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .reader-detail-row .date-separator {
+        display: none;
+    }
+
+    .btn-remove-reader {
+        justify-self: end;
+    }
+}
+
+/* ==================== 수정 모달 - 독서 일정 스타일 (bookcase 동일) ==================== */
+
+.reading-schedule-section-edit {
+    margin-top: 10px;
+}
+
+.schedule-entry-edit {
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fafafa;
+}
+
+.schedule-entry-edit .form-group {
+    margin-bottom: 15px;
+}
+
+.schedule-entry-edit .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-entry-edit .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.schedule-entry-edit .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.schedule-entry-edit .form-row .form-group {
+    margin-bottom: 0;
+}
+
+/* 독자 선택 드롭다운 (bookcase 스타일) */
+.schedule-entry-edit .reader-select-wrapper {
+    position: relative;
+}
+
+.schedule-entry-edit .form-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2d3748;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Paperlogy', sans-serif;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 35px;
+}
+
+.schedule-entry-edit .form-select:focus {
+    outline: none;
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
+}
+
+.schedule-entry-edit .form-select:hover {
+    border-color: #cbd5e0;
+    background-color: #f8f9fa;
+}
+
+/* 독자 색상 인디케이터 */
+.schedule-entry-edit .reader-color-indicator {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background-color: #f7fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.schedule-entry-edit .reader-color-indicator.show {
+    display: flex;
+}
+
+.schedule-entry-edit .color-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.schedule-entry-edit .color-badge-text {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.schedule-entry-edit .color-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
+}
+
+/* 날짜 입력 스타일 */
+.schedule-entry-edit .form-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2d3748;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Paperlogy', sans-serif;
+    box-sizing: border-box;
+}
+
+.schedule-entry-edit .form-input:focus {
+    outline: none;
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
+}
+
+/* 안내 박스 */
+.reading-schedule-section-edit .schedule-info-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 15px;
+    background-color: #e6f7f7;
+    border-left: 4px solid #20B2AA;
+    border-radius: 6px;
+    margin-top: 15px;
+}
+
+.reading-schedule-section-edit .schedule-info-box .info-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.reading-schedule-section-edit .schedule-info-box span:last-child {
+    font-size: 13px;
+    color: #2d3748;
+    line-height: 1.5;
+}
+
+/* 반응형 - 수정 모달 */
+@media (max-width: 480px) {
+    .schedule-entry-edit .form-row {
+        grid-template-columns: 1fr;
+    }
 }

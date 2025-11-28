@@ -42,38 +42,41 @@ DROP TABLE IF EXISTS `email_verify`;
 -- Table: email_verify
 CREATE TABLE `email_verify` (
     `verify_id` BIGINT NOT NULL AUTO_INCREMENT,
-    `email` varchar(255) NOT NULL,
-    `code` varchar(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `code` VARCHAR(255) NOT NULL,
     `expired_at` DATETIME,
     PRIMARY KEY (`verify_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: user
 CREATE TABLE `user` (
-    `user_id` bigint NOT NULL AUTO_INCREMENT,
-    `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `username` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `birth` date DEFAULT NULL,
-    `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `nickname` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `color` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `profile_img` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `role` enum('ADMIN','USER') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USER',
-    `reset_token` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `reset_token_expiry` datetime DEFAULT NULL,
+    `user_id` BIGINT NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `username` VARCHAR(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `password` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `birth` DATE DEFAULT NULL,
+    `phone` VARCHAR(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `nickname` VARCHAR(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `color` VARCHAR(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `address` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `profile_img` TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `role` ENUM('ADMIN', 'USER') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USER',
+    `provider` VARCHAR(20) COLLATE utf8mb4_unicode_ci DEFAULT 'LOCAL',
+    `provider_id` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `reset_token` VARCHAR(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `reset_token_expiry` DATETIME DEFAULT NULL,
     PRIMARY KEY (`user_id`),
     UNIQUE KEY `email` (`email`),
-    UNIQUE KEY `nickname` (`nickname`)
+    UNIQUE KEY `nickname` (`nickname`),
+    UNIQUE KEY `uk_provider_provider_id` (`provider`, `provider_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: refresh_token
 CREATE TABLE `refresh_token` (
-    `id` bigint NOT NULL AUTO_INCREMENT,
-    `user_id` bigint NOT NULL,
-    `token` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `expiry_date` datetime(6) NOT NULL,
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `user_id` BIGINT NOT NULL,
+    `token` VARCHAR(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `expiry_date` DATETIME(6) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_user_id` (`user_id`),
     CONSTRAINT `fk_refresh_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
@@ -118,6 +121,8 @@ CREATE TABLE `children` (
     `birth_order` INT NULL COMMENT 'Child order number',
     `profile_img` VARCHAR(255) NULL,
     `color` VARCHAR(10) NULL,
+    `provider` VARCHAR(20) NULL,
+    `provider_id` VARCHAR(255) NULL,
     PRIMARY KEY (`child_id`),
     KEY `idx_user_id` (`user_id`),
     CONSTRAINT `fk_children_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
@@ -204,19 +209,20 @@ CREATE TABLE `board` (
 
 -- Table: notice
 CREATE TABLE `notice` (
-    `notice_id` bigint NOT NULL AUTO_INCREMENT,
-    `user_id` bigint DEFAULT NULL,
-    `image_id` bigint DEFAULT NULL,
-    `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `content` varchar(2000) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
-    `update_at` datetime DEFAULT CURRENT_TIMESTAMP,
+    `notice_id` BIGINT NOT NULL AUTO_INCREMENT,
+    `user_id` BIGINT DEFAULT NULL,
+    `image_id` BIGINT DEFAULT NULL,
+    `title` VARCHAR(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `content` VARCHAR(2000) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `create_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `update_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`notice_id`),
     KEY `fk_notice_user` (`user_id`),
     KEY `fk_notice_image` (`image_id`),
     CONSTRAINT `fk_notice_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
     CONSTRAINT `fk_notice_image` FOREIGN KEY (`image_id`) REFERENCES `image` (`image_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- ========================================
 -- SECOND LEVEL DEPENDENCIES
@@ -274,7 +280,7 @@ CREATE TABLE `subscription` (
     `status` ENUM('ACTIVE', 'EXPIRED', 'CANCELLED') NOT NULL DEFAULT 'ACTIVE',
     `payment_method` VARCHAR(50) NULL,
     `payment_status` ENUM('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED') NOT NULL DEFAULT 'PENDING',
-    `amount` DECIMAL(10,2) NOT NULL,
+    `amount` DECIMAL(10, 2) NOT NULL,
     PRIMARY KEY (`subscription_id`),
     KEY `idx_user_id` (`user_id`),
     KEY `idx_package_id` (`package_id`),
@@ -339,7 +345,6 @@ CREATE TABLE `share_board` (
     CONSTRAINT `fk_share_board_image` FOREIGN KEY (`image_id`) REFERENCES `image` (`image_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 -- Table: reply
 CREATE TABLE `reply` (
     `reply_id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -355,7 +360,6 @@ CREATE TABLE `reply` (
     CONSTRAINT `fk_reply_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 -- Table: contest_result
 CREATE TABLE `contest_result` (
     `result_id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -368,6 +372,7 @@ CREATE TABLE `contest_result` (
     KEY `idx_contest_id` (`contest_id`),
     CONSTRAINT `fk_contest_result_contest` FOREIGN KEY (`contest_id`) REFERENCES `contest` (`contest_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- ========================================
 -- THIRD LEVEL DEPENDENCIES
@@ -442,9 +447,9 @@ CREATE TABLE `vote` (
     PRIMARY KEY (`vote_id`),
     KEY `idx_story_id` (`story_id`),
     KEY `idx_user_id` (`user_id`),
+    UNIQUE KEY `uk_story_user` (`story_id`, `user_id`),
     CONSTRAINT `fk_vote_story` FOREIGN KEY (`story_id`) REFERENCES `story` (`story_id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_vote_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-    UNIQUE KEY `uk_story_user` (`story_id`, `user_id`)
+    CONSTRAINT `fk_vote_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: result_images
@@ -458,28 +463,30 @@ CREATE TABLE `result_images` (
     CONSTRAINT `fk_result_images_contest_result` FOREIGN KEY (`result_id`) REFERENCES `contest_result` (`result_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 -- ========================================
 -- DATA DUMP
 -- ========================================
+
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` (`user_id`, `email`, `username`, `password`, `birth`, `phone`, `nickname`, `color`, `address`, `profile_img`, `role`, `reset_token`, `reset_token_expiry`)
-VALUES (1,'admin1@admin.com','admin1','$2a$10$UX7LPes/mDVlBOlpoZRl/u/6wRLongxZVEBrJN4a6XGdBXxjqL5Km','2000-01-01','010-1111-1111','admin1','#FFFFFF','admin',NULL,'ADMIN',NULL,NULL),
-       (2,'admin2@admin.com','admin2','$2a$10$rP.0wpQ5KDjGhqvAceh5YO.poPHgikyHNlmMaLMJ.2rtZ9LX.2XG.','2000-01-01','010-1111-1111','admin2','#FFFFFF','admin',NULL,'ADMIN',NULL,NULL),
-       (3,'admin3@admin.com','admin3','$2a$10$tDI0SWtroMdOpduPIQd2zOKVnvCDzx1qK7KSo.ZzrsF6s4IQE5W66','2000-01-01','010-1111-1111','admin3','#FFFFFF','admin',NULL,'ADMIN',NULL,NULL);
+INSERT INTO `user` (`user_id`, `email`, `username`, `password`, `birth`, `phone`, `nickname`, `color`, `address`, `profile_img`, `role`, `provider`, `provider_id`, `reset_token`, `reset_token_expiry`)
+VALUES
+    (1, 'admin1@admin.com', 'admin1', '$2a$10$UX7LPes/mDVlBOlpoZRl/u/6wRLongxZVEBrJN4a6XGdBXxjqL5Km', '2000-01-01', '010-1111-1111', 'admin1', '#FFFFFF', 'admin', NULL, 'ADMIN', 'LOCAL', NULL, NULL, NULL),
+    (2, 'admin2@admin.com', 'admin2', '$2a$10$rP.0wpQ5KDjGhqvAceh5YO.poPHgikyHNlmMaLMJ.2rtZ9LX.2XG.', '2000-01-01', '010-1111-1111', 'admin2', '#FFFFFF', 'admin', NULL, 'ADMIN', 'LOCAL', NULL, NULL, NULL),
+    (3, 'admin3@admin.com', 'admin3', '$2a$10$tDI0SWtroMdOpduPIQd2zOKVnvCDzx1qK7KSo.ZzrsF6s4IQE5W66', '2000-01-01', '010-1111-1111', 'admin3', '#FFFFFF', 'admin', NULL, 'ADMIN', 'LOCAL', NULL, NULL, NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
-
 
 LOCK TABLES `children` WRITE;
 /*!40000 ALTER TABLE `children` DISABLE KEYS */;
 INSERT INTO `children` (`child_id`, `user_id`, `child_name`, `child_birth`, `gender`, `birth_order`, `profile_img`, `color`)
-VALUES (1, 2,'child1', '2018-05-15', 'M', 1, 'http://example.com/profiles/example.jpg', '#FF5733'),
-       (2, 2,'child2', '2019-05-15', 'F', 2, 'http://example.com/profiles/example.jpg', '#FF5733'),
-       (3, 3,'child3', '2017-05-15', 'M', 1, 'http://example.com/profiles/example.jpg', '#FF5733');
+VALUES
+    (1, 2, 'child1', '2018-05-15', 'M', 1, 'http://example.com/profiles/example.jpg', '#FF5733'),
+    (2, 2, 'child2', '2019-05-15', 'F', 2, 'http://example.com/profiles/example.jpg', '#FF5733'),
+    (3, 3, 'child3', '2017-05-15', 'M', 1, 'http://example.com/profiles/example.jpg', '#FF5733');
 /*!40000 ALTER TABLE `children` ENABLE KEYS */;
 UNLOCK TABLES;
-
 
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
