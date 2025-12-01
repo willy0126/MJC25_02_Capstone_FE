@@ -62,7 +62,7 @@ html * {
     padding: 50px 240px;
     min-height: 500px;
     background: #FBF5FD;
-    background: linear-gradient(180deg,rgba(251, 245, 253, 1) 0%, rgba(252, 221, 255, 1) 100%);
+    background: linear-gradient(180deg,rgba(251, 245, 253, 1) 0%, rgb(255, 248, 255) 100%);
 }
 
 .main-feature h1 {
@@ -749,8 +749,7 @@ html * {
 /* --- 인기 도서 섹션 --- */
 .trending-books-section {
     padding: 100px 240px;
-    background: #FCDDFF;
-    background: linear-gradient(180deg,rgba(252, 221, 255, 1) 0%, rgba(252, 248, 242, 1) 100%);
+    background: linear-gradient(180deg,rgb(254, 248, 255) 0%, rgb(255, 255, 255) 100%);
 }
 
 .trending-books-section h2 {

@@ -42,6 +42,7 @@ function updateNavbarLoginState() {
     const loginBtn = document.getElementById('login-btn');
     const userMenu = document.getElementById('user-menu');
     const userName = document.getElementById('user-name');
+    const userIcon = document.querySelector('.user-icon');
 
     if (!loginBtn || !userMenu) return;
 
@@ -51,10 +52,30 @@ function updateNavbarLoginState() {
 
         if (typeof getCurrentUser === 'function') {
             const user = getCurrentUser();
-            if (user && userName) {
+            if (user) {
                 // nickname이 있으면 nickname, 없으면 username 표시
-                const displayName = user.nickname || user.username || '사용자';
-                userName.textContent = displayName;
+                if (userName) {
+                    const displayName = user.nickname || user.username || '사용자';
+                    userName.textContent = displayName;
+                }
+
+                // 사용자 아바타 표시
+                if (userIcon && user.profileImg) {
+                    // SVG 코드인 경우
+                    if (user.profileImg.includes('<svg')) {
+                        userIcon.innerHTML = user.profileImg;
+                        // SVG 크기 조정
+                        const svgElement = userIcon.querySelector('svg');
+                        if (svgElement) {
+                            svgElement.style.width = '24px';
+                            svgElement.style.height = '24px';
+                            svgElement.style.display = 'block';
+                        }
+                    } else {
+                        // 이모지인 경우
+                        userIcon.textContent = user.profileImg;
+                    }
+                }
             }
         }
     } else {

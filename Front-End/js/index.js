@@ -510,7 +510,6 @@ async function loadRecentActivities() {
         title: '겨울 독서 챌린지',
         description: '챌린지에 참여했어요',
         time: '3일 전',
-        link: 'program.html'
       }
     ];
 
