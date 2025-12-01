@@ -32,20 +32,26 @@ function isTokenExpired(token) {
    로그인 상태 확인 (토큰 만료 체크 포함)
 ======================================== */
 function isLoggedIn() {
-    const accessToken = localStorage.getItem('accessToken');
-    const userInfo = localStorage.getItem('userInfo');
+    try {
+        const accessToken = localStorage.getItem('accessToken');
+        const userInfo = localStorage.getItem('userInfo');
 
-    if (!accessToken || !userInfo) {
+        if (!accessToken || !userInfo) {
+            return false;
+        }
+
+        // 토큰 만료 체크
+        if (isTokenExpired(accessToken)) {
+            clearLoginState();
+            return false;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('localStorage 접근 에러:', error);
+        console.warn('브라우저 설정에서 쿠키/저장소가 차단되었거나 시크릿 모드입니다.');
         return false;
     }
-
-    // 토큰 만료 체크
-    if (isTokenExpired(accessToken)) {
-        clearLoginState();
-        return false;
-    }
-
-    return true;
 }
 
 /* ========================================

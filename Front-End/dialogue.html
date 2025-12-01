@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!-- HEAD: 메타데이터 및 스타일시트 -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독후 활동 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/dialogue.css">
+    <link rel="stylesheet" href="css/toast.css">
+</head>
+
+<!-- BODY: 독후 활동 메인 -->
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <!-- 독후 활동 메인 컨테이너 -->
+    <main class="dialogue-container">
+        <div class="dialogue-wrapper">
+            <!-- 왼쪽 사이드바: 대화 기록 목록 -->
+            <aside class="dialogue-sidebar">
+                <!-- 검색창 -->
+                <div class="search-box">
+                    <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="6" stroke="#938a80" stroke-width="2"/>
+                        <path d="M17 17L21 21" stroke="#938a80" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <input type="text" placeholder="대화 기록 검색" id="searchInput">
+                </div>
+
+                <!-- 대화 기록 리스트 -->
+                <div class="conversation-list" id="conversationList">
+                    <!-- 대화 카드 1 -->
+                    <div class="conversation-card active">
+                        <div class="conversation-info">
+                            <span class="conversation-date">2025.11.30</span>
+                            <h3 class="conversation-title">어린 왕자를 읽고</h3>
+                            <div class="emotion-tags">
+                                <span class="emotion-tag">🙂즐거움</span>
+                            </div>
+                        </div>
+                        <button class="btn-edit-conversation" title="수정">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="btn-delete-conversation" title="삭제">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 6L6 18M6 6l12 12" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- 대화 카드 2 -->
+                    <div class="conversation-card">
+                        <div class="conversation-info">
+                            <span class="conversation-date">2025.11.30</span>
+                            <h3 class="conversation-title">&lt;대화 내용 요약&gt;</h3>
+                            <div class="emotion-tags">
+                                <span class="emotion-tag">🙂즐거움</span>
+                                <span class="emotion-tag">🥹감동</span>
+                            </div>
+                        </div>
+                        <button class="btn-edit-conversation" title="수정">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="btn-delete-conversation" title="삭제">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 6L6 18M6 6l12 12" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- 대화 카드 3 -->
+                    <div class="conversation-card">
+                        <div class="conversation-info">
+                            <span class="conversation-date">2025.11.30</span>
+                            <h3 class="conversation-title">&lt;대화 내용 요약&gt;</h3>
+                            <div class="emotion-tags">
+                                <span class="emotion-tag">😐보통</span>
+                                <span class="emotion-tag">🥹감동</span>
+                            </div>
+                        </div>
+                        <button class="btn-edit-conversation" title="수정">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="btn-delete-conversation" title="삭제">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 6L6 18M6 6l12 12" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- 대화 카드 4 -->
+                    <div class="conversation-card">
+                        <div class="conversation-info">
+                            <span class="conversation-date">2025.11.30</span>
+                            <h3 class="conversation-title">&lt;대화 내용 요약&gt;</h3>
+                            <div class="emotion-tags">
+                                <span class="emotion-tag">🙂즐거움</span>
+                                <span class="emotion-tag">🥹감동</span>
+                            </div>
+                        </div>
+                        <button class="btn-edit-conversation" title="수정">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="btn-delete-conversation" title="삭제">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 6L6 18M6 6l12 12" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- 대화 카드 5 -->
+                    <div class="conversation-card">
+                        <div class="conversation-info">
+                            <span class="conversation-date">2025.11.30</span>
+                            <h3 class="conversation-title">&lt;대화 내용 요약&gt;</h3>
+                            <div class="emotion-tags">
+                                <span class="emotion-tag">🙂즐거움</span>
+                            </div>
+                        </div>
+                        <button class="btn-edit-conversation" title="수정">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="btn-delete-conversation" title="삭제">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 6L6 18M6 6l12 12" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 메인 콘텐츠 영역 -->
+            <div class="dialogue-main">
+                <!-- 활동 기록창 -->
+                <section class="activity-section">
+                    <!-- 헤더 -->
+                    <div class="activity-header">
+                        <h1 class="activity-title">오늘의 독서 대화</h1>
+                        <p class="activity-subtitle">아이와 나눈 이야기를 따뜻하게 담아보세요.</p>
+                    </div>
+
+                    <!-- 오늘의 감정 선택 -->
+                    <div class="emotion-selector">
+                        <h2 class="emotion-label">오늘의 감정</h2>
+                        <div class="emotion-buttons">
+                            <button class="emotion-btn active" data-emotion="happy">
+                                <span>🙂즐거움</span>
+                            </button>
+                            <button class="emotion-btn" data-emotion="normal">
+                                <span>😐보통</span>
+                            </button>
+                            <button class="emotion-btn active" data-emotion="touched">
+                                <span>🥹감동</span>
+                            </button>
+                            <button class="emotion-btn" data-emotion="difficult">
+                                <span>😵어려움</span>
+                            </button>
+                            <button class="emotion-btn" data-emotion="curious">
+                                <span>🤔궁금함</span>
+                            </button>
+                            <button class="emotion-btn" data-emotion="growth">
+                                <span>🌱성장</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 대화 기록 입력 -->
+                    <div class="conversation-input-wrapper">
+                        <textarea class="conversation-textarea" id="conversationInput" placeholder="아이와 책에 대해 나눈 대화, 반응, 감정, 질문 등을 자유롭게 적어주세요"></textarea>
+                        <button class="btn-register">등록</button>
+                    </div>
+
+                    <!-- AI 질문 제안 -->
+                    <div class="ai-suggestion-box">
+                        <div class="ai-avatar">
+                            <span class="brain-emoji">🧠</span>
+                        </div>
+                        <div class="ai-suggestion-content">
+                            <p><span class="suggestion-label">추천 질문 제안:</span> <span class="suggestion-text">"앨리스가 토끼를 따라간 이유에 대해 아이는 어떻게 생각했나요?"</span></p>
+                        </div>
+                        <button class="btn-refresh-suggestion" title="다른 질문 보기">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 4v4h-4" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- 독후 활동 가이드 -->
+                    <div class="guide-box">
+                        <div class="guide-header">
+                            <span class="guide-icon">💡</span>
+                            <h3 class="guide-title">이렇게 대화해보세요</h3>
+                        </div>
+                        <ul class="guide-list">
+                            <li>아이의 대답을 경청하고 공감하기</li>
+                            <li>"왜?"라는 질문으로 생각 확장하기</li>
+                            <li>정답을 강요하지 않고 존중하기</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 확인 모달 -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">확인</h3>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message" id="modalMessage">작업을 진행하시겠습니까?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" id="modalCancelBtn">취소</button>
+                <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- 애플리케이션 스크립트 -->
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/dialogue.js"></script>
+</body>
+</html>

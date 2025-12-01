@@ -118,7 +118,6 @@ async function performLogin(email, password) {
 
         // accessToken은 apiClient.login()에서 localStorage에 저장됨
         // refreshToken은 브라우저가 쿠키로 자동 관리
-        console.log('로그인 성공: accessToken 저장됨');
 
         // 사용자 정보 가져오기
         const userInfoResponse = await apiClient.getUserInfo();
@@ -237,8 +236,6 @@ function handleOAuthMessage(event) {
         return;
     }
 
-    console.log('[OAuth] 팝업에서 메시지 수신:', data);
-
     // 팝업 창 닫기
     if (socialLoginPopup && !socialLoginPopup.closed) {
         socialLoginPopup.close();
@@ -258,7 +255,6 @@ function handleOAuthMessage(event) {
     }
 
     if (data.accessToken) {
-        console.log('[OAuth] 소셜 로그인 성공, 토큰 수신');
         handleOAuthSuccess(data.accessToken);
     }
 }
@@ -296,13 +292,10 @@ async function performSocialLogin(provider) {
             throw new Error('로그인 URL을 가져올 수 없습니다.');
         }
 
-        console.log(`[OAuth] ${provider} 원본 로그인 URL:`, loginUrl);
-
         // 백엔드가 내부 포트(8082)를 반환하는 경우, 외부 포트(18888)로 변환
         // TODO: 백엔드에서 올바른 외부 URL을 반환하도록 수정 후 이 코드 제거
         if (loginUrl.includes('localhost:8082')) {
             loginUrl = loginUrl.replace('localhost:8082', 'localhost:18888');
-            console.log(`[OAuth] ${provider} 변환된 로그인 URL:`, loginUrl);
         }
 
         // 팝업 창 크기 및 위치 계산 (화면 중앙)
@@ -322,15 +315,12 @@ async function performSocialLogin(provider) {
             throw new Error('팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.');
         }
 
-        console.log(`[OAuth] ${provider} 로그인 팝업 열림`);
-
         // 팝업 창 닫힘 감지 (사용자가 수동으로 닫은 경우)
         socialLoginCheckInterval = setInterval(() => {
             if (socialLoginPopup && socialLoginPopup.closed) {
                 clearInterval(socialLoginCheckInterval);
                 socialLoginCheckInterval = null;
                 socialLoginPopup = null;
-                console.log('[OAuth] 팝업 창이 닫혔습니다.');
             }
         }, 500);
 
@@ -359,15 +349,11 @@ function handleOAuthCallback() {
         return false;
     }
 
-    console.log('[OAuth] 콜백 감지 - accessToken:', !!accessToken, 'error:', error);
-
     // 팝업 창인지 확인 (window.opener가 있고, 같은 출처인 경우)
     const isPopup = window.opener && !window.opener.closed;
 
     if (isPopup) {
         // 팝업 창: 부모 창에 메시지 전송 후 창 닫기
-        console.log('[OAuth] 팝업 창에서 부모 창으로 결과 전송');
-
         try {
             const message = {
                 type: 'OAUTH_CALLBACK',
@@ -377,7 +363,6 @@ function handleOAuthCallback() {
             };
 
             window.opener.postMessage(message, window.location.origin);
-            console.log('[OAuth] 메시지 전송 완료, 팝업 창 닫기');
 
             // 잠시 후 팝업 창 닫기
             setTimeout(() => {
@@ -393,7 +378,6 @@ function handleOAuthCallback() {
     }
 
     // 일반 창: 직접 로그인 처리 (폴백 - 팝업 차단 등의 경우)
-    console.log('[OAuth] 일반 창에서 직접 처리');
     handleOAuthCallbackDirect(accessToken, error, errorMessage);
     return true;
 }
@@ -412,7 +396,6 @@ function handleOAuthCallbackDirect(accessToken, error, errorMessage) {
     }
 
     if (accessToken) {
-        console.log('[OAuth] 소셜 로그인 성공, 토큰 수신');
         handleOAuthSuccess(accessToken);
     }
 }
@@ -424,7 +407,6 @@ async function handleOAuthSuccess(accessToken) {
     try {
         // accessToken 저장
         apiClient.setAccessToken(accessToken);
-        console.log('[OAuth] accessToken 저장 완료');
 
         // 사용자 정보 가져오기
         const userInfoResponse = await apiClient.getUserInfo();

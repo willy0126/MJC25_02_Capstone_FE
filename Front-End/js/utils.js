@@ -11,7 +11,7 @@
  * true: 콘솔 로그 출력 (개발 환경)
  * false: 콘솔 로그 비활성화 (프로덕션 환경)
  */
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
 
 /**
  * 디버그 로깅 유틸리티

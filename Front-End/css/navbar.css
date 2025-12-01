@@ -48,6 +48,7 @@
     font-size: 17px;
     font-weight: 500;
     color: #333;
+    text-decoration: none;
     transition: color 0.3s ease;
 }
 
@@ -144,6 +145,11 @@
     font-size: 20px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+    border-radius: 50%;
 }
 
 .user-name {
