@@ -1044,7 +1044,7 @@ function displaySearchResults(data) {
                     <div class="search-result-meta">${author}</div>
                     <div class="search-result-meta">${publisher}${year ? ' | ' + year : ''}</div>
                 </div>
-                <button class="search-result-add" onclick="addBookFromSearch('${escapeHtml(title)}', '${escapeHtml(author)}', '${escapeHtml(publisher)}', '${year}', '${isbn}', '${escapeHtml(coverUrl)}', '${escapeHtml(description)}')" title="도서 추가">
+                <button class="search-result-add" onclick="addBookFromSearch('${escapeHtmlForAttr(title)}', '${escapeHtmlForAttr(author)}', '${escapeHtmlForAttr(publisher)}', '${year}', '${isbn}', '${escapeHtmlForAttr(coverUrl)}', '${escapeHtmlForAttr(description)}')" title="도서 추가">
                     +
                 </button>
             </div>
@@ -1055,9 +1055,9 @@ function displaySearchResults(data) {
 }
 
 /* ========================================
-   HTML 이스케이프 함수
+   HTML 속성용 이스케이프 함수 (따옴표 포함)
 ======================================== */
-function escapeHtml(text) {
+function escapeHtmlForAttr(text) {
     if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;

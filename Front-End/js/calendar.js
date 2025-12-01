@@ -386,14 +386,6 @@ function renderWishlistBooks() {
     initializeDraggable();
 }
 
-// HTML 이스케이프 함수
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
 // ==================== 데이터 로드 ====================
 
 // FullCalendar 이벤트 소스 함수

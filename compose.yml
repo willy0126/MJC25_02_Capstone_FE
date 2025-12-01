@@ -5,7 +5,7 @@ services:
   # 1. 프론트엔드 (FE) - 핫 리로딩 적용
   # ==================================
   frontend:
-    # image: willy0126/capstone-fe:v1.0 (개발 시에는 주석 처리)
+    # image: willy0126/capstone-fe:v1.0.1 (개발 시에는 주석 처리)
     build:
       context: .
     
@@ -46,7 +46,7 @@ services:
       - capstone
 
   backend:
-    image: jhh0101/capstone:v1.0.22
+    image: jhh0101/capstone:v1.0.24
     container_name: backend_container
     env_file:
       - .env

@@ -193,6 +193,19 @@ class ApiClient {
     }
 
     /**
+     * OAuth2 일회용 코드를 AccessToken으로 교환
+     * @param {string} code - 일회용 인증 코드
+     * @returns {Promise<Object>} { accessToken: string }
+     */
+    async exchangeOAuthCode(code) {
+        return await this.request('/auth/oauth2/token', {
+            method: 'POST',
+            body: JSON.stringify({ code }),
+            skipAuth: true
+        });
+    }
+
+    /**
      * 모든 소셜 로그인 URL 가져오기
      * @returns {Promise<Object>} { kakao: string, naver: string }
      */
