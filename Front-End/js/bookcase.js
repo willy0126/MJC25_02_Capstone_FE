@@ -854,6 +854,30 @@ async function submitEditBook() {
         const response = await apiClient.updateBook(currentBookId, updateData);
         console.log('✅ Book API 응답:', response);
 
+        // 캘린더 연동: 새 Calendar Schedule API로도 일정 등록
+        // (calendar_schedule 테이블에 저장하여 캘린더에서 조회 가능하게 함)
+        if (bookDetailsUpdate.length > 0) {
+            try {
+                // 새 Calendar Schedule API 형식으로 변환
+                const calendarSchedules = bookDetailsUpdate.map(schedule => ({
+                    childId: schedule.childId || null,  // null이면 본인
+                    startDate: schedule.startDate,
+                    endDate: schedule.endDate
+                }));
+
+                console.log('📅 Calendar Schedule API 호출:', {
+                    bookId: currentBookId,
+                    schedules: calendarSchedules
+                });
+
+                await apiClient.createCalendarSchedule(currentBookId, calendarSchedules);
+                console.log('✅ Calendar Schedule 등록 성공');
+            } catch (calendarError) {
+                // Calendar API 실패해도 도서 수정은 성공으로 처리
+                console.warn('⚠️ Calendar Schedule 등록 실패 (무시):', calendarError.message);
+            }
+        }
+
         // 로컬 데이터 업데이트 (서버 응답 데이터 사용)
         const bookIndex = booksData.findIndex(b => (b.bookId || b.id) == currentBookId);
         if (bookIndex !== -1) {

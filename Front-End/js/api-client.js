@@ -616,7 +616,7 @@ class ApiClient {
     }
 
     /**
-     * 일간 독서 기록 조회
+     * 일간 독서 기록 조회 (기존 book_details 기반)
      * @param {string} date - 날짜 (YYYY-MM-DD 형식)
      * @returns {Promise<Object>} 일간 독서 기록
      */
@@ -627,7 +627,91 @@ class ApiClient {
         });
     }
 
-    // ==================== Reading Schedule APIs ====================
+    // ==================== Calendar Schedule APIs (NEW - calendar_schedule 테이블 기반) ====================
+
+    /**
+     * 일정 등록 (새 Calendar API)
+     * @param {number} bookId - 도서 ID
+     * @param {Array} schedules - 일정 목록 [{ childId, startDate, endDate }]
+     * @returns {Promise<Object>} 등록된 일정 정보
+     */
+    async createCalendarSchedule(bookId, schedules) {
+        return await this.request('/calendar/schedule', {
+            method: 'POST',
+            body: JSON.stringify({ bookId, schedules })
+        });
+    }
+
+    /**
+     * 월별 스케줄 조회 (새 Calendar API)
+     * @param {number} year - 연도
+     * @param {number} month - 월 (1-12)
+     * @returns {Promise<Array>} 월별 스케줄 목록
+     */
+    async getMonthlySchedules(year, month) {
+        return await this.request(`/calendar/schedule/${year}/${month}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 일별 스케줄 조회 (새 Calendar API)
+     * @param {string} date - 날짜 (YYYY-MM-DD 형식)
+     * @returns {Promise<Object>} 일별 스케줄 목록
+     */
+    async getDailySchedules(date) {
+        return await this.request(`/calendar/schedule/date?date=${date}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 개별 일정 수정 (새 Calendar API) - scheduleId 기반
+     * @param {number} scheduleId - 스케줄 ID
+     * @param {Object} data - 수정할 정보 { childId, startDate, endDate }
+     * @returns {Promise<Object>} 수정된 일정 정보
+     */
+    async updateCalendarSchedule(scheduleId, data) {
+        return await this.request(`/calendar/schedule/${scheduleId}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    /**
+     * 개별 일정 삭제 (새 Calendar API) - scheduleId 기반
+     * @param {number} scheduleId - 스케줄 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteCalendarSchedule(scheduleId) {
+        return await this.request(`/calendar/schedule/${scheduleId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    /**
+     * 도서별 일정 조회 (새 Calendar API)
+     * @param {number} bookId - 도서 ID
+     * @returns {Promise<Object>} 도서의 모든 일정
+     */
+    async getBookSchedules(bookId) {
+        return await this.request(`/calendar/book/${bookId}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 도서별 일정 전체 삭제 (새 Calendar API)
+     * @param {number} bookId - 도서 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteBookSchedules(bookId) {
+        return await this.request(`/calendar/book/${bookId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // ==================== Reading Schedule APIs (기존 book_details 기반) ====================
 
     /**
      * 독서 일정 등록

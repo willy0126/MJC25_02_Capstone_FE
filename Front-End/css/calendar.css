@@ -867,55 +867,253 @@
     color: #383d41;
 }
 
-/* ==================== Reading Summary Section ==================== */
+/* ==================== Reading Summary Section (ApexCharts) ==================== */
 
-.reading-summary {
+.reading-summary-charts {
     background: white;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    padding: 30px;
+    padding: 24px 30px;
 }
 
-.reading-summary h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.summary-cards {
+.summary-charts-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: 280px 1fr 300px;
+    gap: 24px;
+    align-items: stretch;
 }
 
-.summary-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+.summary-chart-block {
+    background: linear-gradient(135deg, #f8fafa 0%, #f0f4f4 100%);
+    border-radius: 16px;
     padding: 20px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 12px;
-}
-
-.summary-icon {
-    font-size: 2.5rem;
-}
-
-.summary-info {
     display: flex;
     flex-direction: column;
 }
 
-.summary-value {
-    font-size: 2rem;
-    font-weight: 700;
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.chart-header h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.today-date {
+    font-size: 0.85rem;
+    color: #20B2AA;
+    font-weight: 500;
+}
+
+.radial-chart {
+    flex: 1;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bar-chart {
+    flex: 1;
+    min-height: 180px;
+}
+
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-label {
+    color: #666;
+}
+
+.legend-value {
+    font-weight: 600;
+    color: #333;
+}
+
+/* 오늘의 독서 리스트 */
+.today-block {
+    min-height: 220px;
+}
+
+.today-reading-list {
+    flex: 1;
+    overflow: hidden;
+    max-height: 160px;
+}
+
+.today-book-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.today-book-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.today-book-item:last-child {
+    margin-bottom: 0;
+}
+
+.today-book-color {
+    width: 4px;
+    height: 40px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.today-book-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.today-book-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.today-book-reader {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.today-book-status {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.today-book-status.reading {
+    background: rgba(32, 178, 170, 0.15);
     color: #20B2AA;
 }
 
-.summary-label {
+.today-book-status.to_read {
+    background: rgba(255, 193, 7, 0.15);
+    color: #FFA000;
+}
+
+.today-book-status.completed {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+}
+
+.summary-empty {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    padding: 40px 20px;
     font-size: 0.9rem;
+}
+
+/* 범례 스타일 */
+.chart-legend {
+    padding: 10px 15px;
+}
+
+.legend-items {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-label {
+    font-size: 0.85rem;
     color: #666;
+}
+
+/* 오늘의 독서 독자 색상 점 */
+.reader-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.today-more {
+    color: #888;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 8px;
+    padding: 0;
+}
+
+/* 반응형 */
+@media (max-width: 1200px) {
+    .summary-charts-container {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .summary-chart-block:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-charts-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 레거시 호환 (숨김 처리) */
+.reading-summary {
+    display: none;
+}
+
+.reading-summary-text {
+    display: none;
 }
 
 /* ==================== 공통 모달 기본 스타일 ==================== */
