@@ -3,9 +3,24 @@
  * dialogue.js
  */
 
-// 이전에 표시된 질문을 저장 (중복 방지용)
+// ==================== 상태 관리 ====================
 let previousQuestion = null;
+let conversationsList = [];        // 전체 대화 기록 목록
+let currentConversation = null;    // 현재 선택된 대화
+let isEditMode = false;            // 수정 모드 여부
+let editingConversationId = null;  // 수정 중인 대화 ID
 
+// 감정 매핑
+const EMOTION_MAP = {
+    'happy': { label: '즐거움', emoji: '🙂' },
+    'normal': { label: '보통', emoji: '😐' },
+    'touched': { label: '감동', emoji: '🥹' },
+    'difficult': { label: '어려움', emoji: '😵' },
+    'curious': { label: '궁금함', emoji: '🤔' },
+    'growth': { label: '성장', emoji: '🌱' }
+};
+
+// ==================== 초기화 ====================
 document.addEventListener('DOMContentLoaded', function() {
     initDialogue();
     initModal();
@@ -14,360 +29,111 @@ document.addEventListener('DOMContentLoaded', function() {
 /**
  * 독후 활동 페이지 초기화
  */
-function initDialogue() {
+async function initDialogue() {
+    // 로그인 체크
+    if (!isLoggedIn()) {
+        showToast('로그인이 필요합니다.', 'warning');
+        setTimeout(() => {
+            window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+        }, 1500);
+        return;
+    }
+
     initEmotionButtons();
     initSearchFunction();
     initConversationCards();
     initRefreshSuggestion();
     initRegisterButton();
 
+    // 서버에서 대화 기록 목록 불러오기
+    await loadConversations();
+
     // 페이지 로드 시 초기 질문 랜덤 설정
     requestNewQuestion();
 }
 
 /**
- * 감정 버튼 초기화
+ * 대화 기록 목록 불러오기
  */
-function initEmotionButtons() {
-    const emotionButtons = document.querySelectorAll('.emotion-btn');
-    
-    emotionButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // 토글 방식으로 활성화/비활성화
-            this.classList.toggle('active');
-            
-            // 선택된 감정들 수집
-            const selectedEmotions = getSelectedEmotions();
-            console.log('선택된 감정:', selectedEmotions);
-        });
-    });
-}
+async function loadConversations() {
+    try {
+        const response = await apiClient.getDialogueConversations({ page: 1, size: 50 });
 
-/**
- * 선택된 감정 목록 가져오기
- */
-function getSelectedEmotions() {
-    const activeButtons = document.querySelectorAll('.emotion-btn.active');
-    return Array.from(activeButtons).map(btn => btn.dataset.emotion);
-}
-
-/**
- * 검색 기능 초기화
- */
-function initSearchFunction() {
-    const searchInput = document.getElementById('searchInput');
-    
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase().trim();
-            filterConversations(searchTerm);
-        });
+        if (response.success && response.data) {
+            conversationsList = response.data.conversations || response.data.content || [];
+            renderConversationList(conversationsList);
+        }
+    } catch (error) {
+        console.error('대화 기록 로드 실패:', error);
+        // 에러 시 빈 목록 표시
+        renderConversationList([]);
     }
 }
 
 /**
- * 대화 기록 필터링
+ * 대화 기록 목록 렌더링
  */
-function filterConversations(searchTerm) {
-    const conversationCards = document.querySelectorAll('.conversation-card');
-    
-    conversationCards.forEach(card => {
-        const title = card.querySelector('.conversation-title')?.textContent.toLowerCase() || '';
-        const date = card.querySelector('.conversation-date')?.textContent.toLowerCase() || '';
-        const emotions = card.querySelector('.emotion-tags')?.textContent.toLowerCase() || '';
-        
-        const matchesSearch = title.includes(searchTerm) || 
-                             date.includes(searchTerm) || 
-                             emotions.includes(searchTerm);
-        
-        if (searchTerm === '' || matchesSearch) {
-            card.style.display = 'flex';
-            card.style.animation = 'fadeInUp 0.4s ease forwards';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
-
-/**
- * 대화 카드 초기화 (이벤트 위임 패턴)
- * 부모 요소에 한 번만 이벤트 리스너를 등록하여 중복 방지
- */
-function initConversationCards() {
+function renderConversationList(conversations) {
     const conversationList = document.getElementById('conversationList');
-
-    if (!conversationList) {
-        return;
-    }
-
-    // 이미 이벤트 리스너가 등록되어 있으면 중복 등록 방지
-    if (conversationList.dataset.initialized === 'true') {
-        return;
-    }
-
-    // 이벤트 위임: 부모 요소에 한 번만 등록
-    conversationList.addEventListener('click', function(e) {
-        const card = e.target.closest('.conversation-card');
-
-        if (!card) {
-            return;
-        }
-
-        // 수정 버튼 클릭
-        if (e.target.closest('.btn-edit-conversation')) {
-            e.stopPropagation();
-            const title = card.querySelector('.conversation-title')?.textContent;
-            editConversation(card, title);
-            return;
-        }
-
-        // 삭제 버튼 클릭
-        if (e.target.closest('.btn-delete-conversation')) {
-            e.stopPropagation();
-            const title = card.querySelector('.conversation-title')?.textContent;
-            deleteConversation(card, title);
-            return;
-        }
-
-        // 카드 자체 클릭 (선택)
-        // 모든 카드에서 active 클래스 제거
-        const allCards = conversationList.querySelectorAll('.conversation-card');
-        allCards.forEach(c => c.classList.remove('active'));
-
-        // 클릭한 카드에 active 클래스 추가
-        card.classList.add('active');
-
-        // 선택한 대화 불러오기
-        loadConversation(card);
-    });
-
-    // 초기화 완료 표시
-    conversationList.dataset.initialized = 'true';
-}
-
-/**
- * 대화 불러오기
- */
-function loadConversation(card) {
-    const title = card.querySelector('.conversation-title')?.textContent || '';
-    const date = card.querySelector('.conversation-date')?.textContent || '';
-    const emotions = card.querySelectorAll('.emotion-tag');
-    
-    console.log('대화 불러오기:', { title, date });
-    
-    // 감정 버튼 초기화 및 선택
-    const emotionButtons = document.querySelectorAll('.emotion-btn');
-    emotionButtons.forEach(btn => btn.classList.remove('active'));
-    
-    // 카드의 감정 태그와 매칭되는 버튼 활성화
-    emotions.forEach(tag => {
-        const emotionText = tag.textContent;
-        emotionButtons.forEach(btn => {
-            if (btn.textContent.includes(emotionText.substring(2))) {
-                btn.classList.add('active');
-            }
-        });
-    });
-    
-    // TODO: API 호출하여 실제 대화 내용 불러오기
-}
-
-/**
- * 대화 수정
- */
-function editConversation(card, title) {
-    console.log('대화 수정:', title);
-    // TODO: 수정 모달 열기 또는 수정 모드 활성화
-    if (typeof showToast === 'function') {
-        showToast('수정 기능은 준비 중입니다.', 'info');
-    }
-}
-
-/**
- * 대화 삭제
- */
-async function deleteConversation(card, title) {
-    console.log('대화 삭제:', title);
-
-    const confirmDelete = await showConfirmModal(
-        `"${title}" 대화 기록을 삭제하시겠습니까?`,
-        '대화 기록 삭제'
-    );
-
-    if (confirmDelete) {
-        // 카드 삭제 애니메이션
-        card.style.animation = 'fadeOutDown 0.3s ease forwards';
-
-        setTimeout(() => {
-            card.remove();
-
-            if (typeof showToast === 'function') {
-                showToast('대화 기록이 삭제되었습니다.', 'success');
-            }
-
-            // TODO: API 호출하여 실제 삭제 처리
-        }, 300);
-    }
-}
-
-/**
- * AI 질문 제안 업데이트
- */
-function updateAISuggestion(suggestion) {
-    const suggestionText = document.querySelector('.suggestion-text');
-
-    if (suggestionText) {
-        // 스켈레톤 로딩 표시
-        suggestionText.classList.add('skeleton');
-        suggestionText.textContent = '질문을 불러오는 중입니다...';
-
-        // 800ms 후 실제 질문으로 교체 (shimmer 애니메이션을 충분히 볼 수 있도록)
-        setTimeout(() => {
-            suggestionText.classList.remove('skeleton');
-            suggestionText.textContent = `"${suggestion}"`;
-        }, 800);
-    }
-}
-
-/**
- * 질문 새로고침 버튼 초기화
- */
-function initRefreshSuggestion() {
-    const refreshBtn = document.querySelector('.btn-refresh-suggestion');
-    
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', function() {
-            // 버튼 회전 애니메이션
-            this.style.transform = 'rotate(360deg)';
-            
-            setTimeout(() => {
-                this.style.transform = 'rotate(0deg)';
-            }, 300);
-            
-            // 새 질문 요청
-            requestNewQuestion();
-        });
-    }
-}
-
-/**
- * 새 질문 요청
- * constants.js의 ALL_AI_QUESTIONS 배열에서 랜덤하게 선택
- * 이전 질문과 중복되지 않도록 처리
- */
-function requestNewQuestion() {
-    // ALL_AI_QUESTIONS는 constants.js에서 정의된 30개의 질문 배열
-    // 6가지 카테고리(EMOTION, STORY, CHARACTER, IMAGINATION, VALUE, CREATIVE)의 질문 포함
-
-    // 질문이 1개만 있는 경우 무한 루프 방지
-    if (ALL_AI_QUESTIONS.length <= 1) {
-        const randomSuggestion = ALL_AI_QUESTIONS[0];
-        updateAISuggestion(randomSuggestion);
-        previousQuestion = randomSuggestion;
-        return;
-    }
-
-    let randomSuggestion;
-    let attempts = 0;
-    const maxAttempts = 10; // 무한 루프 방지
-
-    // 이전 질문과 다른 질문이 나올 때까지 반복
-    do {
-        randomSuggestion = ALL_AI_QUESTIONS[Math.floor(Math.random() * ALL_AI_QUESTIONS.length)];
-        attempts++;
-    } while (randomSuggestion === previousQuestion && attempts < maxAttempts);
-
-    updateAISuggestion(randomSuggestion);
-    previousQuestion = randomSuggestion;
-}
-
-/**
- * 등록 버튼 초기화
- */
-function initRegisterButton() {
-    const registerBtn = document.querySelector('.btn-register');
-    const conversationInput = document.getElementById('conversationInput');
-    
-    if (registerBtn && conversationInput) {
-        registerBtn.addEventListener('click', function() {
-            const content = conversationInput.value.trim();
-            
-            if (!content) {
-                if (typeof showToast === 'function') {
-                    showToast('대화 내용을 입력해주세요.', 'warning');
-                }
-                conversationInput.focus();
-                return;
-            }
-            
-            const selectedEmotions = getSelectedEmotions();
-            
-            if (selectedEmotions.length === 0) {
-                if (typeof showToast === 'function') {
-                    showToast('오늘의 감정을 선택해주세요.', 'warning');
-                }
-                return;
-            }
-            
-            // 대화 기록 저장
-            saveConversation(content, selectedEmotions);
-        });
-    }
-}
-
-/**
- * 대화 기록 저장
- */
-function saveConversation(content, emotions) {
-    console.log('대화 저장:', { content, emotions });
-    
-    // TODO: API 호출하여 실제 저장 처리
-    
-    // 성공 시뮬레이션
-    if (typeof showToast === 'function') {
-        showToast('대화 기록이 저장되었습니다.', 'success');
-    }
-    
-    // 입력 필드 초기화
-    document.getElementById('conversationInput').value = '';
-    
-    // 새 대화 카드 추가 (시뮬레이션)
-    addNewConversationCard(content, emotions);
-}
-
-/**
- * 새 대화 카드 추가
- */
-function addNewConversationCard(content, emotions) {
-    const conversationList = document.getElementById('conversationList');
-    
     if (!conversationList) return;
-    
-    const emotionMap = {
-        'happy': '🙂즐거움',
-        'normal': '😐보통',
-        'touched': '🥹감동',
-        'difficult': '😵어려움',
-        'curious': '🤔궁금함',
-        'growth': '🌱성장'
-    };
-    
-    const today = new Date();
-    const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
-    
-    const emotionTagsHTML = emotions.map(e => 
-        `<span class="emotion-tag">${emotionMap[e] || e}</span>`
-    ).join('');
-    
-    const summaryContent = content.length > 20 ? content.substring(0, 20) + '...' : content;
-    
-    const newCard = document.createElement('div');
-    newCard.className = 'conversation-card';
-    newCard.style.animation = 'fadeInUp 0.4s ease forwards';
-    newCard.innerHTML = `
+
+    // 기존 내용 초기화
+    conversationList.innerHTML = '';
+
+    if (conversations.length === 0) {
+        conversationList.innerHTML = `
+            <div class="empty-state">
+                <p>아직 기록된 대화가 없습니다.</p>
+                <p>아이와 나눈 독서 대화를 기록해보세요!</p>
+            </div>
+        `;
+        return;
+    }
+
+    conversations.forEach((conv, index) => {
+        const card = createConversationCard(conv, index === 0);
+        conversationList.appendChild(card);
+    });
+
+    // 첫 번째 대화 자동 선택
+    if (conversations.length > 0) {
+        const firstCard = conversationList.querySelector('.conversation-card');
+        if (firstCard) {
+            firstCard.classList.add('active');
+            loadConversationDetail(conversations[0].conversationId);
+        }
+    }
+}
+
+/**
+ * 대화 카드 HTML 생성
+ */
+function createConversationCard(conversation, isActive = false) {
+    const card = document.createElement('div');
+    card.className = `conversation-card${isActive ? ' active' : ''}`;
+    card.dataset.conversationId = conversation.conversationId;
+
+    // 날짜 포맷팅
+    const dateStr = formatDateString(conversation.createdAt);
+
+    // 제목 (없으면 내용 앞부분 사용)
+    const title = conversation.title ||
+                  (conversation.content ? conversation.content.substring(0, 20) + '...' : '제목 없음');
+
+    // 감정 태그 HTML (API는 type 필드 사용)
+    const emotionTagsHTML = (conversation.emotions || []).map(e => {
+        const emotionKey = typeof e === 'string' ? e : (e.type || e.emotionType);
+        const emotion = EMOTION_MAP[emotionKey];
+        if (emotion) {
+            return `<span class="emotion-tag">${emotion.emoji}${emotion.label}</span>`;
+        }
+        return '';
+    }).join('');
+
+    card.innerHTML = `
         <div class="conversation-info">
             <span class="conversation-date">${dateStr}</span>
-            <h3 class="conversation-title">${summaryContent}</h3>
+            <h3 class="conversation-title">${escapeHtml(title)}</h3>
             <div class="emotion-tags">
                 ${emotionTagsHTML}
             </div>
@@ -385,10 +151,542 @@ function addNewConversationCard(content, emotions) {
         </button>
     `;
 
-    // 맨 앞에 추가
-    conversationList.insertBefore(newCard, conversationList.firstChild);
+    return card;
+}
 
-    // 이벤트 위임 패턴을 사용하므로 별도의 이벤트 바인딩 불필요
+/**
+ * 날짜 문자열 포맷팅
+ */
+function formatDateString(dateString) {
+    if (!dateString) return '-';
+
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}.${month}.${day}`;
+}
+
+/**
+ * HTML 이스케이프
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * 감정 버튼 초기화
+ */
+function initEmotionButtons() {
+    const emotionButtons = document.querySelectorAll('.emotion-btn');
+
+    emotionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            this.classList.toggle('active');
+
+            const selectedEmotions = getSelectedEmotions();
+            console.log('선택된 감정:', selectedEmotions);
+        });
+    });
+}
+
+/**
+ * 선택된 감정 목록 가져오기
+ */
+function getSelectedEmotions() {
+    const activeButtons = document.querySelectorAll('.emotion-btn.active');
+    return Array.from(activeButtons).map(btn => btn.dataset.emotion);
+}
+
+/**
+ * 감정 버튼 상태 설정
+ */
+function setEmotionButtons(emotions) {
+    const emotionButtons = document.querySelectorAll('.emotion-btn');
+    emotionButtons.forEach(btn => btn.classList.remove('active'));
+
+    emotions.forEach(emotion => {
+        const emotionKey = typeof emotion === 'string' ? emotion : emotion.emotionType;
+        const btn = document.querySelector(`.emotion-btn[data-emotion="${emotionKey}"]`);
+        if (btn) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+/**
+ * 검색 기능 초기화
+ */
+function initSearchFunction() {
+    const searchInput = document.getElementById('searchInput');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            filterConversations(searchTerm);
+        });
+    }
+}
+
+/**
+ * 대화 기록 필터링
+ */
+function filterConversations(searchTerm) {
+    const conversationCards = document.querySelectorAll('.conversation-card');
+
+    conversationCards.forEach(card => {
+        const title = card.querySelector('.conversation-title')?.textContent.toLowerCase() || '';
+        const date = card.querySelector('.conversation-date')?.textContent.toLowerCase() || '';
+        const emotions = card.querySelector('.emotion-tags')?.textContent.toLowerCase() || '';
+
+        const matchesSearch = title.includes(searchTerm) ||
+                             date.includes(searchTerm) ||
+                             emotions.includes(searchTerm);
+
+        if (searchTerm === '' || matchesSearch) {
+            card.style.display = 'flex';
+            card.style.animation = 'fadeInUp 0.4s ease forwards';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+/**
+ * 대화 카드 초기화 (이벤트 위임 패턴)
+ */
+function initConversationCards() {
+    const conversationList = document.getElementById('conversationList');
+
+    if (!conversationList) return;
+
+    if (conversationList.dataset.initialized === 'true') return;
+
+    conversationList.addEventListener('click', function(e) {
+        const card = e.target.closest('.conversation-card');
+
+        if (!card) return;
+
+        const conversationId = parseInt(card.dataset.conversationId);
+
+        // 수정 버튼 클릭
+        if (e.target.closest('.btn-edit-conversation')) {
+            e.stopPropagation();
+            startEditMode(conversationId);
+            return;
+        }
+
+        // 삭제 버튼 클릭
+        if (e.target.closest('.btn-delete-conversation')) {
+            e.stopPropagation();
+            deleteConversation(conversationId);
+            return;
+        }
+
+        // 카드 자체 클릭 (선택)
+        const allCards = conversationList.querySelectorAll('.conversation-card');
+        allCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+
+        // 선택한 대화 상세 불러오기
+        loadConversationDetail(conversationId);
+    });
+
+    conversationList.dataset.initialized = 'true';
+}
+
+/**
+ * 대화 상세 불러오기
+ */
+async function loadConversationDetail(conversationId) {
+    try {
+        const response = await apiClient.getDialogueConversation(conversationId);
+
+        if (response.success && response.data) {
+            currentConversation = response.data;
+            displayConversationDetail(response.data);
+        }
+    } catch (error) {
+        console.error('대화 상세 조회 실패:', error);
+        showToast('대화 기록을 불러오는데 실패했습니다.', 'error');
+    }
+}
+
+/**
+ * 대화 상세 표시
+ */
+function displayConversationDetail(conversation) {
+    // 감정 버튼 설정
+    setEmotionButtons(conversation.emotions || []);
+
+    // 내용 표시
+    const conversationInput = document.getElementById('conversationInput');
+    if (conversationInput) {
+        conversationInput.value = conversation.content || '';
+    }
+
+    // AI 질문 표시
+    if (conversation.aiQuestion) {
+        const suggestionText = document.querySelector('.suggestion-text');
+        if (suggestionText) {
+            suggestionText.textContent = `"${conversation.aiQuestion}"`;
+        }
+    }
+
+    // 수정 모드 해제
+    exitEditMode();
+}
+
+/**
+ * 수정 모드 시작
+ */
+function startEditMode(conversationId) {
+    isEditMode = true;
+    editingConversationId = conversationId;
+
+    // 해당 대화 상세 불러오기
+    loadConversationDetail(conversationId);
+
+    // UI 변경
+    const registerBtn = document.querySelector('.btn-register');
+    if (registerBtn) {
+        registerBtn.textContent = '수정';
+        registerBtn.classList.add('edit-mode');
+    }
+
+    // 타이틀 변경
+    const activityTitle = document.querySelector('.activity-title');
+    if (activityTitle) {
+        activityTitle.textContent = '대화 기록 수정';
+    }
+
+    showToast('수정 모드입니다. 내용을 변경 후 수정 버튼을 클릭하세요.', 'info');
+}
+
+/**
+ * 수정 모드 해제
+ */
+function exitEditMode() {
+    isEditMode = false;
+    editingConversationId = null;
+
+    const registerBtn = document.querySelector('.btn-register');
+    if (registerBtn) {
+        registerBtn.textContent = '등록';
+        registerBtn.classList.remove('edit-mode');
+    }
+
+    const activityTitle = document.querySelector('.activity-title');
+    if (activityTitle) {
+        activityTitle.textContent = '오늘의 독서 대화';
+    }
+}
+
+/**
+ * 대화 삭제
+ */
+async function deleteConversation(conversationId) {
+    // 대화 정보 찾기
+    const conversation = conversationsList.find(c => c.conversationId === conversationId);
+    const title = conversation?.title || '이 대화 기록';
+
+    const confirmDelete = await showConfirmModal(
+        `"${title}"을(를) 삭제하시겠습니까?`,
+        '대화 기록 삭제'
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+        const response = await apiClient.deleteDialogueConversation(conversationId);
+
+        if (response.success) {
+            showToast('대화 기록이 삭제되었습니다.', 'success');
+
+            // 카드 삭제 애니메이션
+            const card = document.querySelector(`.conversation-card[data-conversation-id="${conversationId}"]`);
+            if (card) {
+                card.style.animation = 'fadeOutDown 0.3s ease forwards';
+                setTimeout(() => {
+                    card.remove();
+
+                    // 목록에서도 제거
+                    conversationsList = conversationsList.filter(c => c.conversationId !== conversationId);
+
+                    // 현재 선택된 대화였다면 초기화
+                    if (currentConversation?.conversationId === conversationId) {
+                        currentConversation = null;
+                        clearInputForm();
+                    }
+
+                    // 첫 번째 카드 자동 선택
+                    const firstCard = document.querySelector('.conversation-card');
+                    if (firstCard) {
+                        firstCard.click();
+                    }
+                }, 300);
+            }
+        } else {
+            throw new Error(response.message || '삭제에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('대화 삭제 실패:', error);
+        showToast(error.message || '삭제 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+/**
+ * 입력 폼 초기화
+ */
+function clearInputForm() {
+    const conversationInput = document.getElementById('conversationInput');
+    if (conversationInput) {
+        conversationInput.value = '';
+    }
+
+    const emotionButtons = document.querySelectorAll('.emotion-btn');
+    emotionButtons.forEach(btn => btn.classList.remove('active'));
+
+    exitEditMode();
+}
+
+/**
+ * AI 질문 제안 업데이트
+ */
+function updateAISuggestion(suggestion) {
+    const suggestionText = document.querySelector('.suggestion-text');
+
+    if (suggestionText) {
+        suggestionText.classList.add('skeleton');
+        suggestionText.textContent = '질문을 불러오는 중입니다...';
+
+        setTimeout(() => {
+            suggestionText.classList.remove('skeleton');
+            suggestionText.textContent = `"${suggestion}"`;
+        }, 800);
+    }
+}
+
+/**
+ * 질문 새로고침 버튼 초기화
+ */
+function initRefreshSuggestion() {
+    const refreshBtn = document.querySelector('.btn-refresh-suggestion');
+
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            this.style.transform = 'rotate(360deg)';
+
+            setTimeout(() => {
+                this.style.transform = 'rotate(0deg)';
+            }, 300);
+
+            requestNewQuestion();
+        });
+    }
+}
+
+/**
+ * 새 질문 요청
+ */
+function requestNewQuestion() {
+    if (typeof ALL_AI_QUESTIONS === 'undefined' || ALL_AI_QUESTIONS.length === 0) {
+        updateAISuggestion('아이에게 책에서 가장 기억에 남는 장면이 무엇인지 물어보세요.');
+        return;
+    }
+
+    if (ALL_AI_QUESTIONS.length <= 1) {
+        const randomSuggestion = ALL_AI_QUESTIONS[0];
+        updateAISuggestion(randomSuggestion);
+        previousQuestion = randomSuggestion;
+        return;
+    }
+
+    let randomSuggestion;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    do {
+        randomSuggestion = ALL_AI_QUESTIONS[Math.floor(Math.random() * ALL_AI_QUESTIONS.length)];
+        attempts++;
+    } while (randomSuggestion === previousQuestion && attempts < maxAttempts);
+
+    updateAISuggestion(randomSuggestion);
+    previousQuestion = randomSuggestion;
+}
+
+/**
+ * 등록 버튼 초기화
+ */
+function initRegisterButton() {
+    const registerBtn = document.querySelector('.btn-register');
+    const conversationInput = document.getElementById('conversationInput');
+
+    if (registerBtn && conversationInput) {
+        registerBtn.addEventListener('click', function() {
+            const content = conversationInput.value.trim();
+
+            if (!content) {
+                showToast('대화 내용을 입력해주세요.', 'warning');
+                conversationInput.focus();
+                return;
+            }
+
+            const selectedEmotions = getSelectedEmotions();
+
+            if (selectedEmotions.length === 0) {
+                showToast('오늘의 감정을 선택해주세요.', 'warning');
+                return;
+            }
+
+            if (isEditMode && editingConversationId) {
+                // 수정 모드
+                updateConversation(editingConversationId, content, selectedEmotions);
+            } else {
+                // 등록 모드
+                saveConversation(content, selectedEmotions);
+            }
+        });
+    }
+}
+
+/**
+ * 대화 기록 저장
+ */
+async function saveConversation(content, emotions) {
+    // 제목 자동 생성 (내용의 첫 20자)
+    const title = content.length > 20 ? content.substring(0, 20) + '...' : content;
+
+    // AI 질문 가져오기
+    const suggestionText = document.querySelector('.suggestion-text');
+    const aiQuestion = suggestionText?.textContent?.replace(/^"|"$/g, '') || '';
+
+    const conversationData = {
+        title: title,
+        content: content,
+        emotions: emotions,
+        aiQuestion: aiQuestion
+    };
+
+    try {
+        showToast('저장 중...', 'info');
+
+        const response = await apiClient.createDialogueConversation(conversationData);
+
+        if (response.success && response.data) {
+            showToast('대화 기록이 저장되었습니다.', 'success');
+
+            // API 응답에 emotions가 없거나 빈 배열일 경우 로컬 데이터 사용
+            const responseEmotions = response.data.emotions;
+            const hasEmotions = responseEmotions && Array.isArray(responseEmotions) && responseEmotions.length > 0;
+
+            const newConversation = {
+                ...response.data,
+                emotions: hasEmotions ? responseEmotions : emotions,
+                title: response.data.title || title,
+                createdAt: response.data.createdAt || new Date().toISOString()
+            };
+
+            console.log('저장된 대화:', newConversation);
+
+            // 목록에 추가
+            conversationsList.unshift(newConversation);
+
+            // 새 카드 추가
+            const conversationList = document.getElementById('conversationList');
+            const newCard = createConversationCard(newConversation, true);
+            newCard.style.animation = 'fadeInUp 0.4s ease forwards';
+
+            // 기존 active 제거
+            const allCards = conversationList.querySelectorAll('.conversation-card');
+            allCards.forEach(c => c.classList.remove('active'));
+
+            // 맨 앞에 추가
+            if (conversationList.firstChild) {
+                conversationList.insertBefore(newCard, conversationList.firstChild);
+            } else {
+                conversationList.appendChild(newCard);
+            }
+
+            // 빈 상태 메시지 제거
+            const emptyState = conversationList.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            // 입력 폼 초기화
+            clearInputForm();
+
+            // 새 질문 요청
+            requestNewQuestion();
+
+        } else {
+            throw new Error(response.message || '저장에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('대화 저장 실패:', error);
+        showToast(error.message || '저장 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+/**
+ * 대화 기록 수정
+ */
+async function updateConversation(conversationId, content, emotions) {
+    const title = content.length > 20 ? content.substring(0, 20) + '...' : content;
+
+    const conversationData = {
+        title: title,
+        content: content,
+        emotions: emotions
+    };
+
+    try {
+        showToast('수정 중...', 'info');
+
+        const response = await apiClient.updateDialogueConversation(conversationId, conversationData);
+
+        if (response.success && response.data) {
+            showToast('대화 기록이 수정되었습니다.', 'success');
+
+            // API 응답에 emotions가 없거나 빈 배열일 경우 로컬 데이터 사용
+            const responseEmotions = response.data.emotions;
+            const hasEmotions = responseEmotions && Array.isArray(responseEmotions) && responseEmotions.length > 0;
+
+            const updatedConversation = {
+                ...response.data,
+                emotions: hasEmotions ? responseEmotions : emotions,
+                title: response.data.title || title
+            };
+
+            console.log('수정된 대화:', updatedConversation);
+
+            // 목록에서 업데이트
+            const index = conversationsList.findIndex(c => c.conversationId === conversationId);
+            if (index !== -1) {
+                conversationsList[index] = updatedConversation;
+            }
+
+            // 카드 업데이트
+            const card = document.querySelector(`.conversation-card[data-conversation-id="${conversationId}"]`);
+            if (card) {
+                const newCard = createConversationCard(updatedConversation, true);
+                card.replaceWith(newCard);
+            }
+
+            // 수정 모드 해제
+            exitEditMode();
+
+        } else {
+            throw new Error(response.message || '수정에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('대화 수정 실패:', error);
+        showToast(error.message || '수정 중 오류가 발생했습니다.', 'error');
+    }
 }
 
 /**
@@ -405,6 +703,36 @@ style.textContent = `
             opacity: 0;
             transform: translateY(20px);
         }
+    }
+
+    .btn-register.edit-mode {
+        background: #ff9800 !important;
+    }
+
+    .btn-register.edit-mode:hover {
+        background: #f57c00 !important;
+    }
+
+    .empty-state,
+    .loading-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+    }
+
+    .empty-state p,
+    .loading-state p {
+        margin: 5px 0;
+        font-size: 0.9rem;
+    }
+
+    .loading-state {
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
     }
 `;
 document.head.appendChild(style);
@@ -423,28 +751,22 @@ function initModal() {
     const cancelBtn = document.getElementById('modalCancelBtn');
     const confirmBtn = document.getElementById('modalConfirmBtn');
 
-    if (!modal || !cancelBtn || !confirmBtn) {
-        return;
-    }
+    if (!modal || !cancelBtn || !confirmBtn) return;
 
-    // 취소 버튼 클릭
     cancelBtn.addEventListener('click', function() {
         closeModal(false);
     });
 
-    // 확인 버튼 클릭
     confirmBtn.addEventListener('click', function() {
         closeModal(true);
     });
 
-    // 오버레이 클릭 시 닫기
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             closeModal(false);
         }
     });
 
-    // ESC 키로 닫기
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && modal.classList.contains('active')) {
             closeModal(false);
@@ -454,9 +776,6 @@ function initModal() {
 
 /**
  * 확인 모달 표시 (Promise 기반)
- * @param {string} message - 모달에 표시할 메시지
- * @param {string} title - 모달 제목 (선택사항, 기본값: "확인")
- * @returns {Promise<boolean>} - 확인: true, 취소: false
  */
 function showConfirmModal(message, title = '확인') {
     return new Promise((resolve) => {
@@ -470,32 +789,23 @@ function showConfirmModal(message, title = '확인') {
             return;
         }
 
-        // 모달 내용 설정
         modalTitle.textContent = title;
         modalMessage.textContent = message;
-
-        // 모달 표시
         modal.classList.add('active');
-
-        // resolve 콜백 저장
         modalResolveCallback = resolve;
     });
 }
 
 /**
  * 모달 닫기
- * @param {boolean} result - 확인: true, 취소: false
  */
 function closeModal(result) {
     const modal = document.getElementById('confirmModal');
 
-    if (!modal) {
-        return;
-    }
+    if (!modal) return;
 
     modal.classList.remove('active');
 
-    // Promise resolve 호출
     if (modalResolveCallback) {
         modalResolveCallback(result);
         modalResolveCallback = null;

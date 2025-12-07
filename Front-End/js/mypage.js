@@ -1,6 +1,19 @@
 // ==================== 전역 변수 ====================
 let isPasswordVerified = false;
 let userInfo = null;
+let currentSubscriptions = []; // 여러 구독 지원
+
+// ==================== 구독 플랜 상수 ====================
+const SUBSCRIPTION_PLANS = {
+    // 숫자 키 (planId)
+    1: { id: 'preschool', planId: 1, name: '영·유아 패키지', price: 19900, targetAge: '0-7세' },
+    2: { id: 'students', planId: 2, name: '초등·청소년 패키지', price: 24900, targetAge: '8-13세' },
+    3: { id: 'parents', planId: 3, name: '부모 패키지', price: 22900, targetAge: '부모' },
+    // 문자열 키 (호환성)
+    preschool: { id: 'preschool', planId: 1, name: '영·유아 패키지', price: 19900, targetAge: '0-7세' },
+    students: { id: 'students', planId: 2, name: '초등·청소년 패키지', price: 24900, targetAge: '8-13세' },
+    parents: { id: 'parents', planId: 3, name: '부모 패키지', price: 22900, targetAge: '부모' }
+};
 
 // ==================== 페이지 로드 시 초기화 ====================
 document.addEventListener('DOMContentLoaded', async function() {
@@ -19,6 +32,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // 사용자 정보 로드
     await loadUserInfo();
+
+    // 구독 정보 로드
+    await loadSubscriptionInfo();
 
     // 자녀 관리 초기화
     initChildrenManagement();
@@ -56,8 +72,11 @@ function displayUserInfo(user) {
     const userInitial = document.getElementById('userInitial');
 
     if (user.profileImg && user.profileImg.trim()) {
-        // SVG 아바타가 있는 경우 - SVG 문자열을 직접 삽입
-        avatarCircle.innerHTML = user.profileImg;
+        // SVG 아바타가 있는 경우 - sanitize 후 삽입 (XSS 방지)
+        const safeSVG = sanitizeSVG(user.profileImg);
+        if (safeSVG) {
+            avatarCircle.innerHTML = safeSVG;
+        }
 
         // SVG 스타일 조정 (아바타 영역에 맞게)
         const svgElement = avatarCircle.querySelector('svg');
@@ -90,31 +109,128 @@ function displayUserInfo(user) {
         document.getElementById('avgRating').textContent = (user.stats.avgRating || 0).toFixed(1);
         document.getElementById('programsJoined').textContent = user.stats.programsJoined || 0;
     }
+}
 
-    // 구독 정보 표시 (백엔드에서 제공하는 경우)
-    if (user.subscription) {
-        displaySubscriptionInfo(user.subscription);
+// ==================== 구독 정보 로드 ====================
+async function loadSubscriptionInfo() {
+    try {
+        // 모든 구독 정보 로드 (여러 플랜 구독 지원)
+        const response = await apiClient.getSubscriptions();
+        console.log('전체 구독 API 응답:', response);
+
+        if (response.success && response.data && response.data.length > 0) {
+            // ACTIVE 상태인 구독만 필터링
+            const activeSubscriptions = response.data.filter(sub => sub.status === 'ACTIVE');
+            console.log('활성 구독 목록:', activeSubscriptions);
+
+            currentSubscriptions = activeSubscriptions;
+            displaySubscriptionInfo(activeSubscriptions);
+        } else {
+            // 활성 구독 없음
+            currentSubscriptions = [];
+            displaySubscriptionInfo([]);
+        }
+    } catch (error) {
+        console.log('구독 정보 로드 실패:', error);
+        currentSubscriptions = [];
+        displaySubscriptionInfo([]);
     }
 }
 
-function displaySubscriptionInfo(subscription) {
+function displaySubscriptionInfo(subscriptions) {
     const statusBadge = document.getElementById('subscriptionStatus');
     const details = document.getElementById('subscriptionDetails');
+    const subscribeBtn = document.querySelector('.subscription-section .btn-subscribe');
 
-    if (subscription.isActive) {
-        statusBadge.textContent = '구독 중';
+    // 배열이 아닌 경우 배열로 변환 (하위 호환성)
+    const subArray = Array.isArray(subscriptions) ? subscriptions : (subscriptions ? [subscriptions] : []);
+
+    if (subArray.length > 0) {
+        // 구독 중인 플랜 개수에 따라 상태 표시
+        statusBadge.textContent = subArray.length > 1 ? `${subArray.length}개 구독 중` : '구독 중';
         statusBadge.classList.add('active');
 
-        details.innerHTML = `
-            <p><strong>플랜:</strong> ${subscription.planName}</p>
-            <p><strong>시작일:</strong> ${subscription.startDate}</p>
-            <p><strong>종료일:</strong> ${subscription.endDate}</p>
-        `;
+        // 각 구독 정보를 HTML로 생성
+        let detailsHtml = '';
+
+        subArray.forEach((subscription, index) => {
+            // 플랜 정보 가져오기 (planId 또는 planType으로 조회)
+            const plan = SUBSCRIPTION_PLANS[subscription.planId] || SUBSCRIPTION_PLANS[subscription.planType] || {};
+            const planName = plan.name || subscription.planName || '구독 플랜';
+
+            // 날짜 포맷
+            const startDate = formatSubscriptionDate(subscription.startDate);
+            const endDate = formatSubscriptionDate(subscription.endDate);
+
+            // 자동 갱신 상태에 따른 텍스트 및 버튼
+            const autoRenew = subscription.autoRenew;
+            let autoRenewText = autoRenew ? '자동 갱신' : '갱신 안함 (취소 예정)';
+            let cancelButtonHtml = '';
+
+            if (autoRenew) {
+                // 자동 갱신 중 -> 취소 신청 버튼 표시
+                cancelButtonHtml = `
+                    <button class="btn-cancel-subscription" onclick="openCancelSubscriptionModal(${subscription.subscriptionId}, '${planName.replace(/'/g, "\\'")}')">
+                        취소 신청
+                    </button>
+                `;
+            } else {
+                // 취소 예정 -> 취소 철회 버튼 표시
+                autoRenewText = `<span class="cancel-scheduled">갱신 안함 (취소 예정)</span>`;
+                cancelButtonHtml = `
+                    <button class="btn-withdraw-cancel" onclick="withdrawCancellationRequest(${subscription.subscriptionId}, '${planName.replace(/'/g, "\\'")}')">
+                        취소 철회
+                    </button>
+                `;
+            }
+
+            // 여러 구독 시 구분선 추가
+            if (index > 0) {
+                detailsHtml += '<hr class="subscription-divider">';
+            }
+
+            detailsHtml += `
+                <div class="subscription-item" data-subscription-id="${subscription.subscriptionId}">
+                    <div class="subscription-info-content">
+                        <p><strong>플랜:</strong> ${planName}</p>
+                        <p><strong>구독 기간:</strong> ${startDate} ~ ${endDate}</p>
+                        <p><strong>갱신 설정:</strong> ${autoRenewText}</p>
+                        <p><strong>월 구독료:</strong> ${(plan.price || 0).toLocaleString()}원</p>
+                    </div>
+                    <div class="subscription-actions">
+                        ${cancelButtonHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        details.innerHTML = detailsHtml;
+
+        // 버튼 텍스트 변경
+        if (subscribeBtn) {
+            subscribeBtn.textContent = '플랜 추가';
+        }
     } else {
         statusBadge.textContent = '미구독';
         statusBadge.classList.remove('active');
         details.innerHTML = '<p>현재 구독 중인 플랜이 없습니다.</p>';
+
+        if (subscribeBtn) {
+            subscribeBtn.textContent = '구독 플랜 보기';
+        }
     }
+}
+
+// ==================== 구독 날짜 포맷 ====================
+function formatSubscriptionDate(dateString) {
+    if (!dateString) return '-';
+
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}.${month}.${day}`;
 }
 
 // ==================== 현재 사용자 이메일 가져오기 ====================
@@ -509,100 +625,42 @@ function resetPassword() {
         }
     });
 
-    // 이벤트 리스너 등록
-    const newPassword = document.getElementById('newPassword');
-    const confirmNewPassword = document.getElementById('confirmNewPassword');
-
-    newPassword.removeEventListener('input', validateNewPassword);
-    confirmNewPassword.removeEventListener('input', checkNewPasswordMatch);
-
-    newPassword.addEventListener('input', validateNewPassword);
-    confirmNewPassword.addEventListener('input', checkNewPasswordMatch);
-
-    // 폼 제출 이벤트
-    const form = document.getElementById('resetPasswordForm');
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-
-    newForm.addEventListener('submit', handlePasswordReset);
+    // 계속 버튼 이벤트 리스너
+    const confirmBtn = document.getElementById('confirmResetPasswordBtn');
+    confirmBtn.onclick = handleResetPasswordRedirect;
 }
 
 // 비밀번호 재설정 모달 닫기
 function closeResetPasswordModal() {
     const modal = document.getElementById('resetPasswordModal');
     modal.style.display = 'none';
-
-    // 폼 초기화
-    document.getElementById('resetPasswordForm').reset();
-    document.getElementById('newPassword').classList.remove('valid', 'invalid');
-    document.getElementById('confirmNewPassword').classList.remove('valid', 'invalid');
-    document.getElementById('newPasswordError').style.display = 'none';
 }
 
-// 비밀번호 재설정 처리
-async function handlePasswordReset(e) {
-    e.preventDefault();
-
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-
-    // 비밀번호 유효성 검사
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-
-    if (!regex.test(newPassword)) {
-        showToast('비밀번호는 영어, 숫자, 특수문자(@$!%*#?&)를 포함한 8자리 이상이어야 합니다.', 'warning');
-        return;
-    }
-
-    if (newPassword !== confirmNewPassword) {
-        showToast('비밀번호가 일치하지 않습니다.', 'warning');
-        return;
-    }
-
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
+// 비밀번호 재설정 페이지로 이동 (로그아웃 후)
+async function handleResetPasswordRedirect() {
+    const confirmBtn = document.getElementById('confirmResetPasswordBtn');
 
     try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = '재설정 중...';
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = '처리 중...';
 
-        // 비밀번호 재설정 API 호출
-        const response = await apiClient.resetPassword({
-            email: userInfo.email,
-            username: userInfo.username,
-            newPassword: newPassword
-        });
+        // 로그아웃 처리
+        await apiClient.logout();
 
-        if (response.success) {
-            showToast('비밀번호가 성공적으로 재설정되었습니다.', 'success');
-            closeResetPasswordModal();
-        } else {
-            throw new Error(response.message || '비밀번호 재설정에 실패했습니다.');
-        }
+        // 비밀번호 재설정 페이지로 이동
+        window.location.href = '/resetpw.html';
 
     } catch (error) {
-        console.error('비밀번호 재설정 실패:', error);
-
-        let errorMessage = '비밀번호 재설정에 실패했습니다. 다시 시도해주세요.';
-
-        if (error.data && error.data.message) {
-            errorMessage = error.data.message;
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-
-        showToast(errorMessage, 'error');
-
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
+        console.error('로그아웃 실패:', error);
+        // 에러가 발생해도 토큰 정리 후 이동
+        apiClient.clearTokens();
+        window.location.href = '/resetpw.html';
     }
 }
 
 // ==================== 구독 플랜 보기 ====================
 function goToSubscription() {
-    // TODO: 구독 페이지로 이동
-    showToast('구독 플랜 페이지는 추후 구현 예정입니다.', 'info');
+    window.location.href = '/subscription.html';
 }
 
 // ==================== 로그아웃 ====================
@@ -1320,4 +1378,115 @@ function initChildrenManagement() {
 
     // 자녀 목록 로드
     loadChildren();
+}
+
+// ==================== 구독 취소 관리 ====================
+
+let cancelTargetSubscription = null;
+
+// 구독 취소 모달 열기
+function openCancelSubscriptionModal(subscriptionId, planName) {
+    cancelTargetSubscription = { subscriptionId, planName };
+
+    const modal = document.getElementById('cancelSubscriptionModal');
+    const planNameDisplay = document.getElementById('cancelPlanName');
+
+    planNameDisplay.textContent = planName;
+    modal.style.display = 'flex';
+
+    // 모달 외부 클릭 시 닫기
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            closeCancelSubscriptionModal();
+        }
+    };
+}
+
+// 구독 취소 모달 닫기
+function closeCancelSubscriptionModal() {
+    const modal = document.getElementById('cancelSubscriptionModal');
+    modal.style.display = 'none';
+    cancelTargetSubscription = null;
+}
+
+// 기간 종료 후 취소 (자동 갱신 해제)
+async function requestCancelSubscription() {
+    if (!cancelTargetSubscription) return;
+
+    const { subscriptionId, planName } = cancelTargetSubscription;
+
+    try {
+        showToast('취소 신청 처리 중...', 'info');
+
+        const response = await apiClient.updateAutoRenew(subscriptionId, false);
+
+        if (response.success) {
+            showToast(`${planName} 취소가 신청되었습니다. 구독 기간 종료 후 자동 해지됩니다.`, 'success');
+            closeCancelSubscriptionModal();
+            await loadSubscriptionInfo(); // 구독 정보 새로고침
+        } else {
+            throw new Error(response.message || '취소 신청에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('취소 신청 실패:', error);
+        showToast(error.message || '취소 신청 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// ==================== 취소 철회 모달 관리 ====================
+
+let withdrawTargetSubscription = null;
+
+// 취소 철회 모달 열기
+function openWithdrawCancelModal(subscriptionId, planName) {
+    withdrawTargetSubscription = { subscriptionId, planName };
+
+    const modal = document.getElementById('withdrawCancelModal');
+    const planNameDisplay = document.getElementById('withdrawPlanName');
+
+    planNameDisplay.textContent = planName;
+    modal.style.display = 'flex';
+
+    // 모달 외부 클릭 시 닫기
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            closeWithdrawCancelModal();
+        }
+    };
+}
+
+// 취소 철회 모달 닫기
+function closeWithdrawCancelModal() {
+    const modal = document.getElementById('withdrawCancelModal');
+    modal.style.display = 'none';
+    withdrawTargetSubscription = null;
+}
+
+// 취소 신청 철회 확인 (자동 갱신 다시 활성화)
+async function confirmWithdrawCancellation() {
+    if (!withdrawTargetSubscription) return;
+
+    const { subscriptionId, planName } = withdrawTargetSubscription;
+
+    try {
+        showToast('취소 철회 처리 중...', 'info');
+
+        const response = await apiClient.updateAutoRenew(subscriptionId, true);
+
+        if (response.success) {
+            showToast(`${planName} 취소 신청이 철회되었습니다. 자동 갱신이 다시 활성화됩니다.`, 'success');
+            closeWithdrawCancelModal();
+            await loadSubscriptionInfo(); // 구독 정보 새로고침
+        } else {
+            throw new Error(response.message || '취소 철회에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('취소 철회 실패:', error);
+        showToast(error.message || '취소 철회 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// 하위 호환성: 기존 함수명 유지
+function withdrawCancellationRequest(subscriptionId, planName) {
+    openWithdrawCancelModal(subscriptionId, planName);
 }

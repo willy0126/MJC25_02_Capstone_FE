@@ -60,6 +60,18 @@ function updateReaderCacheFromRecords(records) {
     });
 }
 
+// 새 스케줄 데이터에서 readerId 캐시 업데이트
+function updateReaderCacheFromSchedules(schedules) {
+    if (!schedules || !Array.isArray(schedules)) return;
+
+    schedules.forEach(schedule => {
+        const reader = schedule.reader || {};
+        if (reader.readerName && reader.readerId) {
+            saveReaderIdToCache(reader.readerName, reader.readerId);
+        }
+    });
+}
+
 // ==================== 초기화 ====================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -184,7 +196,7 @@ function initializeDraggable() {
     if (!containerEl) return;
 
     // FullCalendar의 Draggable 클래스 사용
-    draggableInstance = new FullCalendar.Draggable(containerEl, {
+    draggableInstance =new FullCalendar.Draggable(containerEl, {
         itemSelector: '.draggable-book',
         eventData: function(eventEl) {
             // 드래그된 요소의 데이터 추출
@@ -288,13 +300,13 @@ async function loadWishlistBooks() {
         // 응답 형식에 따라 처리
         if (Array.isArray(response)) {
             // 배열로 직접 반환되는 경우
-            wishlistBooks = response;
+            wishlistBooks =response;
         } else if (response.success && response.data) {
             // { success: true, data: [...] } 형식
-            wishlistBooks = response.data;
+            wishlistBooks =response.data;
         } else if (response.data) {
             // { data: [...] } 형식
-            wishlistBooks = response.data;
+            wishlistBooks =response.data;
         } else {
             throw new Error('책 목록 응답 형식 오류');
         }
@@ -386,17 +398,9 @@ function renderWishlistBooks() {
     initializeDraggable();
 }
 
-// HTML 이스케이프 함수
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
 // ==================== 데이터 로드 ====================
 
-// FullCalendar 이벤트 소스 함수
+// FullCalendar 이벤트 소스 함수 (새 Calendar Schedule API 사용)
 async function fetchEvents(info, successCallback, failureCallback) {
     // 현재 보이는 달의 중간 날짜로 정확한 월 계산
     const viewStart = info.start;
@@ -406,39 +410,459 @@ async function fetchEvents(info, successCallback, failureCallback) {
     const month = midDate.getMonth() + 1;
 
     // 현재 연/월 저장
-    currentCalendarYear = year;
-    currentCalendarMonth = month;
+    currentCalendarYear =year;
+    currentCalendarMonth =month;
 
     try {
-        const response = await apiClient.getMonthlyCalendar(year, month);
+        // 새 Calendar Schedule API 사용
+        const response = await apiClient.getMonthlySchedules(year, month);
 
         // 응답 형식에 따라 처리
-        // 백엔드 응답: [{ day: number, readers: [{ readerId, color, readerName }] }]
-        let calendarData = [];
+        // 새 API 응답: { success: true, data: [{ scheduleId, book, reader, startDate, endDate, status }] }
+        let schedules = [];
         if (Array.isArray(response)) {
-            calendarData = response;
+            schedules = response;
         } else if (response.success && response.data) {
-            calendarData = response.data;
+            schedules = response.data;
         } else if (response.data) {
-            calendarData = response.data;
+            schedules = response.data;
         }
 
-        processCalendarData(calendarData, year, month);
+        processScheduleData(schedules, year, month);
         successCallback(allEvents);
-        updateMonthlySummary(calendarData);
+        updateMonthlySummaryFromSchedules(schedules);
     } catch (error) {
         console.error('월간 캘린더 데이터 로드 실패:', error);
         // 실패 시 빈 데이터로 처리
-        processCalendarData([], year, month);
+        processScheduleData([], year, month);
         successCallback([]);
-        updateMonthlySummary([]);
+        updateMonthlySummaryFromSchedules([]);
     }
 }
 
-// 캘린더 데이터 처리 (백엔드 응답 형식에 맞춤)
+// 새 Calendar Schedule API 데이터 처리
+// 응답 형식: [{ scheduleId, book, reader, startDate, endDate, status }]
+function processScheduleData(schedules, year, month) {
+    monthlyRecords ={};
+    const events = [];
+
+    // 날짜 범위 내의 일정만 필터링 및 각 날짜별로 이벤트 생성
+    schedules.forEach((schedule, index) => {
+        const reader = schedule.reader || {};
+        const book = schedule.book || {};
+        const startDate = schedule.startDate;
+        const endDate = schedule.endDate || startDate;
+
+        // 해당 월의 각 날짜에 대해 이벤트 생성 (일정 기간 내)
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const monthStart = new Date(year, month - 1, 1);
+        const monthEnd = new Date(year, month, 0);
+
+        // 일정 기간 내의 각 날짜에 이벤트 추가
+        for (let d = new Date(Math.max(start, monthStart)); d <= Math.min(end, monthEnd); d.setDate(d.getDate() + 1)) {
+            const dateStr = formatDateToString(d);
+
+            if (!monthlyRecords[dateStr]) {
+                monthlyRecords[dateStr] = [];
+            }
+
+            const eventData = {
+                date: dateStr,
+                scheduleId: schedule.scheduleId,
+                readerId: reader.readerId || reader.childId,
+                readerName: reader.readerName || '본인',
+                color: reader.color || '#20B2AA',
+                book: book,
+                startDate: startDate,
+                endDate: endDate,
+                status: schedule.status
+            };
+
+            monthlyRecords[dateStr].push(eventData);
+            events.push(convertScheduleToEvent(eventData, index));
+
+            // readerId 캐시 업데이트
+            if (reader.readerName && reader.readerId) {
+                saveReaderIdToCache(reader.readerName, reader.readerId);
+            }
+        }
+    });
+
+    allEvents =events;
+}
+
+// 스케줄을 FullCalendar 이벤트로 변환
+function convertScheduleToEvent(record, index = 0) {
+    return {
+        id: `schedule-${record.scheduleId}-${record.date}`,
+        title: record.readerName || '독서 중',
+        start: record.date,
+        backgroundColor: record.color || '#20B2AA',
+        borderColor: record.color || '#20B2AA',
+        textColor: '#ffffff',
+        display: 'block',
+        extendedProps: {
+            scheduleId: record.scheduleId,
+            readerId: record.readerId,
+            readerName: record.readerName,
+            color: record.color,
+            book: record.book,
+            startDate: record.startDate,
+            endDate: record.endDate,
+            status: record.status
+        }
+    };
+}
+
+// 새 스케줄 데이터 기반 월간 요약 업데이트
+function updateMonthlySummaryFromSchedules(schedules) {
+    const totalBooksEl = document.getElementById('totalBooks');
+    const readingBooksEl = document.getElementById('readingBooks');
+    const readingDaysEl = document.getElementById('readingDays');
+
+    if (!schedules || schedules.length === 0) {
+        if (totalBooksEl) totalBooksEl.textContent = '0';
+        if (readingBooksEl) readingBooksEl.textContent = '0';
+        if (readingDaysEl) readingDaysEl.textContent = '0';
+        updateTextSummary([], 0, 0);
+        return;
+    }
+
+    // 고유한 독자 ID와 책 ID 수집
+    const uniqueReaders = new Set();
+    const uniqueBooks = new Set();
+    const datesWithSchedules = new Set();
+
+    schedules.forEach(schedule => {
+        const reader = schedule.reader || {};
+        const book = schedule.book || {};
+
+        if (reader.readerId || reader.childId) {
+            uniqueReaders.add(reader.readerId || reader.childId);
+        }
+        if (book.bookId) {
+            uniqueBooks.add(book.bookId);
+        }
+
+        // 일정 기간 내의 날짜들 수집
+        const start = new Date(schedule.startDate);
+        const end = new Date(schedule.endDate || schedule.startDate);
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            datesWithSchedules.add(formatDateToString(d));
+        }
+    });
+
+    if (totalBooksEl) totalBooksEl.textContent = uniqueBooks.size;
+    if (readingBooksEl) readingBooksEl.textContent = schedules.length;
+    if (readingDaysEl) readingDaysEl.textContent = datesWithSchedules.size;
+
+    // 텍스트 기반 요약 업데이트
+    updateTextSummary(schedules, uniqueBooks.size, datesWithSchedules.size);
+}
+
+// ApexCharts 인스턴스 저장
+let monthProgressChartInstance = null;
+let weekBarChartInstance = null;
+
+// ApexCharts 기반 요약 업데이트
+function updateTextSummary(schedules, bookCount, dayCount) {
+    const today = formatDateToString(new Date());
+    const todayDate = new Date();
+
+    // 오늘 날짜 라벨 업데이트
+    const todayDateLabel = document.getElementById('todayDateLabel');
+    if (todayDateLabel) {
+        const monthDay = `${todayDate.getMonth() + 1}월 ${todayDate.getDate()}일`;
+        const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+        todayDateLabel.textContent = `${monthDay} (${dayNames[todayDate.getDay()]})`;
+    }
+
+    // 1. 이번 달 진행률 (Radial Bar)
+    updateMonthProgressChart(schedules, bookCount, dayCount);
+
+    // 2. 오늘의 독서 리스트
+    updateTodayReadingList(schedules, today);
+
+    // 3. 이번 주 일정 (Bar Chart)
+    updateWeekBarChart(schedules, todayDate, today);
+}
+
+// 이번 달 진행률 차트 (Radial Bar)
+function updateMonthProgressChart(schedules, bookCount, dayCount) {
+    const chartEl = document.getElementById('monthProgressChart');
+    const legendEl = document.getElementById('monthProgressLegend');
+    if (!chartEl) return;
+
+    // 이번 달 총 일수
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const progressPercent = daysInMonth > 0 ? Math.round((dayCount / daysInMonth) * 100) : 0;
+
+    // 기존 차트 제거
+    if (monthProgressChartInstance) {
+        monthProgressChartInstance.destroy();
+    }
+
+    const options = {
+        series: [progressPercent],
+        chart: {
+            height: 200,
+            type: 'radialBar',
+            sparkline: { enabled: true }
+        },
+        plotOptions: {
+            radialBar: {
+                startAngle: -135,
+                endAngle: 135,
+                hollow: {
+                    margin: 0,
+                    size: '70%',
+                    background: 'transparent'
+                },
+                track: {
+                    background: '#e7e7e7',
+                    strokeWidth: '100%',
+                    margin: 5,
+                    dropShadow: {
+                        enabled: true,
+                        top: 2,
+                        left: 0,
+                        blur: 4,
+                        opacity: 0.1
+                    }
+                },
+                dataLabels: {
+                    name: {
+                        show: true,
+                        fontSize: '14px',
+                        fontFamily: 'Paperlogy, sans-serif',
+                        color: '#888',
+                        offsetY: -10
+                    },
+                    value: {
+                        show: true,
+                        fontSize: '32px',
+                        fontFamily: 'Paperlogy, sans-serif',
+                        fontWeight: 700,
+                        color: '#20B2AA',
+                        offsetY: 5,
+                        formatter: function(val) {
+                            return val + '%';
+                        }
+                    }
+                }
+            }
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shade: 'dark',
+                type: 'horizontal',
+                shadeIntensity: 0.5,
+                gradientToColors: ['#87CEEB'],
+                inverseColors: true,
+                opacityFrom: 1,
+                opacityTo: 1,
+                stops: [0, 100]
+            }
+        },
+        stroke: {
+            lineCap: 'round'
+        },
+        labels: ['독서일']
+    };
+
+    monthProgressChartInstance = new ApexCharts(chartEl, options);
+    monthProgressChartInstance.render();
+
+    // 범례 업데이트
+    if (legendEl) {
+        legendEl.innerHTML = `
+            <div class="legend-items">
+                <div class="legend-item">
+                    <span class="legend-dot" style="background: #20B2AA;"></span>
+                    <span class="legend-label">총 ${bookCount}권</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot" style="background: #87CEEB;"></span>
+                    <span class="legend-label">${dayCount}일 / ${daysInMonth}일</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot" style="background: #FFB6C1;"></span>
+                    <span class="legend-label">${schedules.length}건 일정</span>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// 오늘의 독서 리스트
+function updateTodayReadingList(schedules, today) {
+    const listEl = document.getElementById('todayReadingList');
+    if (!listEl) return;
+
+    const todaySchedules = schedules.filter(s => {
+        const start = s.startDate;
+        const end = s.endDate || s.startDate;
+        return start <= today && today <= end;
+    });
+
+    if (todaySchedules.length === 0) {
+        listEl.innerHTML = '<p class="summary-empty">오늘 읽을 책이 없습니다.</p>';
+        return;
+    }
+
+    const items = todaySchedules.slice(0, 4).map(s => {
+        const book = s.book || {};
+        const reader = s.reader || {};
+        const coverUrl = book.coverUrl || book.imageUrl || '';
+        const coverStyle = coverUrl ? `background-image: url('${coverUrl}');` : '';
+
+        return `
+            <div class="today-book-item">
+                <div class="today-book-cover" style="${coverStyle}">
+                    ${!coverUrl ? `<span class="cover-placeholder">${escapeHtml((book.title || '책')[0])}</span>` : ''}
+                </div>
+                <div class="today-book-info">
+                    <span class="today-book-title">${escapeHtml(book.title || '제목 없음')}</span>
+                    <span class="today-book-reader">
+                        <span class="reader-dot" style="background: ${reader.color || '#20B2AA'};"></span>
+                        ${escapeHtml(reader.readerName || '본인')}
+                    </span>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const moreText = todaySchedules.length > 4
+        ? `<p class="today-more">외 ${todaySchedules.length - 4}건</p>`
+        : '';
+    listEl.innerHTML = items + moreText;
+}
+
+// 이번 주 일정 (Bar Chart)
+function updateWeekBarChart(schedules, todayDate, today) {
+    const chartEl = document.getElementById('weekBarChart');
+    if (!chartEl) return;
+
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+    const weekStart = new Date(todayDate);
+    weekStart.setDate(todayDate.getDate() - todayDate.getDay()); // 이번 주 일요일
+
+    const categories = [];
+    const data = [];
+    const colors = [];
+
+    for (let i = 0; i < 7; i++) {
+        const checkDate = new Date(weekStart);
+        checkDate.setDate(weekStart.getDate() + i);
+        const checkDateStr = formatDateToString(checkDate);
+        const isToday = checkDateStr === today;
+
+        const daySchedules = schedules.filter(s => {
+            const start = s.startDate;
+            const end = s.endDate || s.startDate;
+            return start <= checkDateStr && checkDateStr <= end;
+        });
+
+        categories.push(isToday ? `${dayNames[i]}*` : dayNames[i]);
+        data.push(daySchedules.length);
+        colors.push(isToday ? '#20B2AA' : '#87CEEB');
+    }
+
+    // 기존 차트 제거
+    if (weekBarChartInstance) {
+        weekBarChartInstance.destroy();
+    }
+
+    const options = {
+        series: [{
+            name: '독서 일정',
+            data: data
+        }],
+        chart: {
+            type: 'bar',
+            height: 180,
+            toolbar: { show: false },
+            sparkline: { enabled: false }
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 6,
+                columnWidth: '50%',
+                distributed: true,
+                dataLabels: {
+                    position: 'top'
+                }
+            }
+        },
+        colors: colors,
+        dataLabels: {
+            enabled: true,
+            formatter: function(val) {
+                return val > 0 ? val : '';
+            },
+            offsetY: -20,
+            style: {
+                fontSize: '12px',
+                fontFamily: 'Paperlogy, sans-serif',
+                colors: ['#304758']
+            }
+        },
+        legend: { show: false },
+        xaxis: {
+            categories: categories,
+            labels: {
+                style: {
+                    fontSize: '12px',
+                    fontFamily: 'Paperlogy, sans-serif',
+                    colors: categories.map((_, i) => {
+                        const checkDate = new Date(weekStart);
+                        checkDate.setDate(weekStart.getDate() + i);
+                        return formatDateToString(checkDate) === today ? '#20B2AA' : '#666';
+                    }),
+                    fontWeight: categories.map((_, i) => {
+                        const checkDate = new Date(weekStart);
+                        checkDate.setDate(weekStart.getDate() + i);
+                        return formatDateToString(checkDate) === today ? 700 : 400;
+                    })
+                }
+            },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        yaxis: {
+            show: false,
+            max: Math.max(...data, 3) + 1
+        },
+        grid: {
+            show: false,
+            padding: {
+                top: 0,
+                right: 10,
+                bottom: 0,
+                left: 10
+            }
+        },
+        tooltip: {
+            enabled: true,
+            y: {
+                formatter: function(val) {
+                    return val + '건';
+                }
+            }
+        }
+    };
+
+    weekBarChartInstance = new ApexCharts(chartEl, options);
+    weekBarChartInstance.render();
+}
+
+// 기존 캘린더 데이터 처리 (레거시 - book_details 기반)
 // 백엔드 응답: [{ day: number, readers: [{ readerId, color, readerName }] }]
 function processCalendarData(dayDataList, year, month) {
-    monthlyRecords = {};
+    monthlyRecords ={};
     const events = [];
 
     dayDataList.forEach(dayData => {
@@ -469,7 +893,7 @@ function processCalendarData(dayDataList, year, month) {
         }
     });
 
-    allEvents = events;
+    allEvents =events;
 }
 
 // 레코드를 FullCalendar 이벤트로 변환 (독자 색상 기반)
@@ -494,7 +918,7 @@ function convertToEvent(record, index = 0) {
 
 // 날짜 선택
 function selectDate(dateStr) {
-    selectedDate = dateStr;
+    selectedDate =dateStr;
     loadDailyRecords(dateStr);
 }
 
@@ -512,7 +936,7 @@ function highlightSelectedDate(dateStr) {
     }
 }
 
-// 일간 독서 기록 로드
+// 일간 독서 기록 로드 (새 Calendar Schedule API 사용)
 async function loadDailyRecords(dateStr) {
     const selectedDateEl = document.getElementById('selectedDate');
     const recordsContent = document.getElementById('recordsContent');
@@ -526,32 +950,33 @@ async function loadDailyRecords(dateStr) {
     recordsContent.innerHTML = '<div class="loading-spinner"></div>';
 
     try {
-        const response = await apiClient.getDailyRecords(dateStr);
+        // 새 Calendar Schedule API 사용
+        const response = await apiClient.getDailySchedules(dateStr);
 
-        // 백엔드 응답 형식: { date: LocalDate, records: [{ detailsId, reader, book, startDate, endDate }] }
-        let records = [];
+        // 새 API 응답 형식: { success: true, data: [{ scheduleId, book, reader, startDate, endDate, status }] }
+        let schedules = [];
         if (response.records) {
-            records = response.records;
+            schedules = response.records;
         } else if (response.success && response.data) {
-            records = response.data.records || response.data || [];
+            schedules = response.data.records || response.data || [];
         } else if (response.data) {
-            records = response.data.records || response.data || [];
+            schedules = response.data.records || response.data || [];
         } else if (Array.isArray(response)) {
-            records = response;
+            schedules = response;
         }
 
-        // 캐시에 저장
-        dailyRecordsCache[dateStr] = records;
+        // 캐시에 저장 (scheduleId 기반)
+        dailyRecordsCache[dateStr] = schedules;
 
         // readerId 캐시 업데이트
-        updateReaderCacheFromRecords(records);
+        updateReaderCacheFromSchedules(schedules);
 
-        renderDailyRecords(records, dateStr);
+        renderDailySchedules(schedules, dateStr);
     } catch (error) {
         console.error('일간 기록 로드 실패:', error);
         // 캐시된 데이터 사용 (폴백)
         const cachedRecords = dailyRecordsCache[dateStr] || [];
-        renderDailyRecords(cachedRecords, dateStr);
+        renderDailySchedules(cachedRecords, dateStr);
     }
 }
 
@@ -689,6 +1114,141 @@ function renderDailyRecords(records, dateStr) {
     loadAuthImages(recordsContent);
 }
 
+// 일간 스케줄 렌더링 (새 Calendar Schedule API 응답 형식)
+// 응답: [{ scheduleId, book, reader, startDate, endDate, status }]
+// 같은 책(bookId)을 읽는 여러 독자를 하나의 카드로 묶어서 표시
+function renderDailySchedules(schedules, dateStr) {
+    const recordsContent = document.getElementById('recordsContent');
+
+    if (!schedules || schedules.length === 0) {
+        recordsContent.innerHTML = `
+            <div class="empty-records">
+                <p>이 날의 독서 기록이 없습니다.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // 디버깅: 첫 번째 스케줄의 구조 확인
+    if (schedules.length > 0) {
+        console.log('[Calendar Debug] 첫 번째 스케줄 구조:', JSON.stringify(schedules[0], null, 2));
+    }
+
+    // 같은 책(bookId)을 기준으로 스케줄 그룹화
+    const groupedByBook = {};
+    schedules.forEach(schedule => {
+        const book = schedule.book || {};
+        const bookId = book.bookId || schedule.bookId;
+
+        if (!groupedByBook[bookId]) {
+            groupedByBook[bookId] = {
+                book: book,
+                bookId: bookId,
+                readers: []
+            };
+        }
+        groupedByBook[bookId].readers.push({
+            scheduleId: schedule.scheduleId,  // detailsId 대신 scheduleId 사용
+            reader: schedule.reader || {},
+            startDate: schedule.startDate,
+            endDate: schedule.endDate,
+            status: schedule.status
+        });
+    });
+
+    console.log('[Calendar Debug] 책별 그룹화 결과:', Object.keys(groupedByBook).length, '권의 책');
+
+    recordsContent.innerHTML = Object.values(groupedByBook).map(group => {
+        const book = group.book;
+        const bookId = group.bookId;
+        const readers = group.readers;
+        const title = book.title || '제목 없음';
+        const author = book.author || '작자 미상';
+
+        // 이미지 정보 추출 (다양한 경로 지원 + 캐시 확인)
+        let imageId = book.image?.imageId || book.imageId || null;
+        let coverUrl = book.image?.imageUrl || book.coverUrl || book.cover || '';
+
+        // 캐시에서 이미지 정보 가져오기 (API 응답에 이미지가 없는 경우)
+        if (!imageId && !coverUrl && bookId) {
+            const cachedImage = getBookImageFromCache(bookId);
+            if (cachedImage) {
+                imageId = cachedImage.imageId;
+                coverUrl = cachedImage.coverUrl;
+                console.log('[Calendar Debug] 캐시에서 이미지 정보 사용:', bookId);
+            }
+        }
+
+        // 이미지 HTML 생성: imageId가 있으면 data-image-id 속성으로 비동기 로드
+        let coverHtml;
+        if (imageId) {
+            coverHtml = `<img data-image-id="${imageId}" alt="${escapeHtml(title)}" class="auth-image" style="width: 100%; height: 100%; object-fit: cover;">`;
+        } else if (coverUrl) {
+            coverHtml = `<img src="${coverUrl}" alt="${escapeHtml(title)}" style="width: 100%; height: 100%; object-fit: cover;">`;
+        } else {
+            coverHtml = `<div class="cover-placeholder">${title.substring(0, 4)}</div>`;
+        }
+
+        // 독자들 HTML 생성 (각 독자별 일정 포함) - scheduleId 기반
+        const readersHtml = readers.map(r => {
+            const reader = r.reader;
+            const readerColor = reader.color || '#20B2AA';
+            const readerBgColor = hexToRgba(readerColor, 0.15);
+            const readerBorderColor = hexToRgba(readerColor, 0.3);
+
+            // 일정 텍스트 생성
+            const startDate = r.startDate || '-';
+            const endDate = r.endDate || '-';
+            const scheduleText = `${startDate} ~ ${endDate}`;
+
+            return `
+                <div class="reader-schedule-item" style="--reader-bg-color: ${readerBgColor}; --reader-border-color: ${readerBorderColor};"
+                     data-schedule-id="${r.scheduleId}" onclick="event.stopPropagation(); openScheduleDetail(${r.scheduleId}, '${dateStr}')">
+                    <div class="reader-info-row">
+                        <span class="reader-dot" style="background: ${readerColor};"></span>
+                        <span class="reader-name">${escapeHtml(reader.readerName || '본인')}</span>
+                    </div>
+                    <div class="reader-schedule-date">${scheduleText}</div>
+                </div>
+            `;
+        }).join('');
+
+        // 대표 상태 계산 (status 필드 활용)
+        const today = new Date().toISOString().split('T')[0];
+        let status = 'reading';
+        // 모든 독자의 상태 확인
+        const allCompleted = readers.every(r => r.status === 'COMPLETED' || (r.endDate && r.endDate < today));
+        const allToRead = readers.every(r => r.status === 'TO_READ' || r.startDate > today);
+        if (allCompleted) {
+            status = 'completed';
+        } else if (allToRead) {
+            status = 'to_read';
+        }
+
+        // 첫 번째 독자의 scheduleId를 대표로 사용 (책 카드 클릭 시)
+        const firstScheduleId = readers[0].scheduleId;
+
+        return `
+        <div class="record-item record-item-grouped" data-book-id="${bookId}" onclick="openScheduleDetail(${firstScheduleId}, '${dateStr}')">
+            <div class="record-item-cover">
+                ${coverHtml}
+            </div>
+            <div class="record-item-info">
+                <div class="record-item-title">${escapeHtml(title)}</div>
+                <div class="record-item-author">${escapeHtml(author)}</div>
+                <div class="record-item-readers">
+                    ${readersHtml}
+                </div>
+                <span class="record-item-status ${status}">${getStatusText(status)}</span>
+            </div>
+        </div>
+    `;
+    }).join('');
+
+    // 인증된 이미지 비동기 로드
+    loadAuthImages(recordsContent);
+}
+
 // ==================== 통계 ====================
 
 // 월간 요약 업데이트 (백엔드 응답 형식에 맞춤)
@@ -749,7 +1309,7 @@ function updateMonthlySummaryFromEvents(year, month) {
 
 // 일정 등록 모달 열기
 function openScheduleModal(bookData, dropDate) {
-    pendingSchedule = {
+    pendingSchedule ={
         bookId: bookData.bookId,
         title: bookData.title,
         author: bookData.author,
@@ -778,10 +1338,10 @@ function openScheduleModal(bookData, dropDate) {
 // 일정 등록 모달 닫기
 function closeScheduleModal() {
     document.getElementById('scheduleModal').style.display = 'none';
-    pendingSchedule = null;
+    pendingSchedule =null;
 }
 
-// 일정 등록 확인 (다중 독자 지원)
+// 일정 등록 확인 (새 Calendar Schedule API 사용 - 다중 독자 지원)
 async function confirmSchedule() {
     if (!pendingSchedule) return;
 
@@ -811,94 +1371,21 @@ async function confirmSchedule() {
     confirmBtn.textContent = '등록 중...';
 
     try {
-        // 기존 도서 정보 조회 (덮어쓰기 모드에서 기존 일정 유지 필요)
-        const bookInfo = await apiClient.getBook(pendingSchedule.bookId);
-        const existingDetails = bookInfo.data?.bookDetails || [];
+        // 새 Calendar Schedule API 형식에 맞게 데이터 변환
+        // API 요청 형식: { bookId, schedules: [{ childId, startDate, endDate }] }
+        const calendarSchedules = schedules.map(schedule => ({
+            childId: schedule.childId,  // null이면 본인
+            startDate: schedule.startDate,
+            endDate: schedule.endDate
+        }));
 
-        // 백엔드가 덮어쓰기 모드이므로 모든 기존 일정을 포함해야 함
-        const bookDetailsUpdate = [];
-
-        // 1. 기존 일정 중 새로 추가/수정할 독자가 아닌 일정들 유지
-        const newReaderNames = schedules.map(schedule => {
-            if (schedule.childId === null) {
-                return currentUserInfo?.nickname || currentUserInfo?.username || currentUserInfo?.name || '';
-            } else {
-                const child = childrenData.find(c => (c.childId || c.id) === schedule.childId);
-                return child?.childName || child?.name || '';
-            }
+        console.log('[Debug] 일정 등록 요청 데이터 (새 API):', {
+            bookId: pendingSchedule.bookId,
+            schedules: calendarSchedules
         });
 
-        // 기존 일정 중 수정 대상이 아닌 것들은 그대로 유지
-        // bookcase.js 방식과 동일하게 childId/readerId만 사용 (detailsId 사용 안 함)
-        for (const detail of existingDetails) {
-            const existingReaderName = detail.readerResponse?.readerName || '';
-            if (!newReaderNames.includes(existingReaderName)) {
-                // 수정 대상이 아닌 기존 일정 - 그대로 유지
-                const item = {
-                    startDate: detail.startDate,
-                    endDate: detail.endDate
-                };
-                if (detail.readerResponse?.readerId) {
-                    item.readerId = detail.readerResponse.readerId;
-                }
-                if (detail.readerResponse?.childId) {
-                    item.childId = detail.readerResponse.childId;
-                }
-                bookDetailsUpdate.push(item);
-            }
-        }
-
-        // 2. 새로 추가/수정할 일정들 처리
-        for (const schedule of schedules) {
-            // 독자 이름 찾기
-            let newReaderName = '';
-            if (schedule.childId === null) {
-                newReaderName = currentUserInfo?.nickname || currentUserInfo?.username || currentUserInfo?.name || '';
-            } else {
-                const child = childrenData.find(c => (c.childId || c.id) === schedule.childId);
-                newReaderName = child?.childName || child?.name || '';
-            }
-
-            // 동일한 독자의 기존 일정이 있는지 확인
-            const existingDetail = existingDetails.find(d =>
-                d.readerResponse?.readerName === newReaderName
-            );
-
-            if (existingDetail) {
-                // 이미 해당 독자의 일정이 있음 - 날짜만 수정
-                const item = {
-                    startDate: schedule.startDate,
-                    endDate: schedule.endDate
-                };
-                if (existingDetail.readerResponse?.readerId) {
-                    item.readerId = existingDetail.readerResponse.readerId;
-                }
-                if (existingDetail.readerResponse?.childId) {
-                    item.childId = existingDetail.readerResponse.childId;
-                }
-                bookDetailsUpdate.push(item);
-            } else {
-                // 새 일정 추가 (childId만 전송, readerId는 백엔드에서 생성)
-                bookDetailsUpdate.push({
-                    childId: schedule.childId,
-                    startDate: schedule.startDate,
-                    endDate: schedule.endDate
-                });
-            }
-        }
-
-        const bookUpdateData = {
-            title: pendingSchedule.title,
-            author: pendingSchedule.author,
-            coverUrl: pendingSchedule.coverUrl || null,
-            bookDetailsUpdate: bookDetailsUpdate
-        };
-
-        console.log('[Debug] 일정 등록 요청 데이터:', JSON.stringify(bookUpdateData, null, 2));
-        console.log('[Debug] 기존 일정 수:', existingDetails.length);
-        console.log('[Debug] 전송할 일정 수:', bookDetailsUpdate.length);
-
-        const response = await apiClient.updateBook(pendingSchedule.bookId, bookUpdateData);
+        // 새 Calendar Schedule API 사용 - 개별 일정 등록, 다른 독자에게 영향 없음
+        const response = await apiClient.createCalendarSchedule(pendingSchedule.bookId, calendarSchedules);
 
         if (response.success || response.data) {
             const count = schedules.length;
@@ -918,18 +1405,7 @@ async function confirmSchedule() {
         }
     } catch (error) {
         console.error('일정 등록 실패:', error);
-
-        let errorMessage = error.message || '일정 등록에 실패했습니다.';
-        if (errorMessage.includes('독자 정보가 이미 존재')) {
-            errorMessage = '해당 독자의 기존 일정 정보가 있습니다. 페이지를 새로고침 후 다시 시도해주세요.';
-            try {
-                calendar.refetchEvents();
-            } catch (e) {
-                console.log('캘린더 새로고침 실패:', e);
-            }
-        }
-
-        showToast(errorMessage, 'error');
+        showToast(error.message || '일정 등록에 실패했습니다.', 'error');
     } finally {
         confirmBtn.disabled = false;
         confirmBtn.textContent = '등록';
@@ -983,7 +1459,7 @@ function openRecordDetail(detailsId, dateStr) {
     console.log('[Calendar Debug] openRecordDetail 이미지 정보:', { imageId, coverUrl, bookImage: book.image });
 
     // 현재 보고 있는 책 정보 저장 (수정/삭제용)
-    currentViewingRecord = {
+    currentViewingRecord ={
         bookId: bookId,
         title: book.title || '제목 없음',
         author: book.author || '작자 미상',
@@ -1023,6 +1499,144 @@ function openRecordDetail(detailsId, dateStr) {
 
     // 모달 표시
     document.getElementById('recordDetailModal').style.display = 'flex';
+}
+
+// 스케줄 상세 모달 열기 (scheduleId 기반 - 새 Calendar API용)
+function openScheduleDetail(scheduleId, dateStr) {
+    // 캐시된 일간 스케줄에서 해당 scheduleId 찾기
+    const targetDate = dateStr || selectedDate;
+    const schedules = dailyRecordsCache[targetDate] || [];
+    const schedule = schedules.find(s => s.scheduleId === scheduleId);
+
+    if (!schedule) {
+        showToast('일정을 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    // 백엔드 응답 구조에서 데이터 추출
+    const book = schedule.book || {};
+    const reader = schedule.reader || {};
+    const bookId = book.bookId;
+
+    // readerId 캐시 업데이트
+    if (reader.readerName && reader.readerId) {
+        saveReaderIdToCache(reader.readerName, reader.readerId);
+    }
+
+    // 같은 책의 모든 스케줄 찾기
+    const allSchedulesForBook = schedules.filter(s => {
+        const sBook = s.book || {};
+        return sBook.bookId === bookId;
+    });
+
+    // 이미지 정보 추출 (다양한 경로 지원 + 캐시 확인)
+    let imageId = book.image?.imageId || book.imageId || null;
+    let coverUrl = book.image?.imageUrl || book.coverUrl || book.cover || '';
+
+    // 캐시에서 이미지 정보 가져오기 (API 응답에 이미지가 없는 경우)
+    if (!imageId && !coverUrl && bookId) {
+        const cachedImage = getBookImageFromCache(bookId);
+        if (cachedImage) {
+            imageId = cachedImage.imageId;
+            coverUrl = cachedImage.coverUrl;
+            console.log('[Calendar Debug] openScheduleDetail - 캐시에서 이미지 정보 사용:', bookId);
+        }
+    }
+
+    console.log('[Calendar Debug] openScheduleDetail 이미지 정보:', { imageId, coverUrl, bookImage: book.image });
+
+    // 현재 보고 있는 책 정보 저장 (수정/삭제용) - scheduleId 기반
+    currentViewingRecord ={
+        bookId: bookId,
+        title: book.title || '제목 없음',
+        author: book.author || '작자 미상',
+        coverUrl: coverUrl,
+        imageId: imageId,
+        viewDate: targetDate,
+        allSchedules: allSchedulesForBook, // scheduleId 기반 일정 목록
+        useNewApi: true // 새 API 사용 플래그
+    };
+
+    // 모달 내용 업데이트
+    const coverEl = document.getElementById('recordCover');
+
+    // 이미지 로드: imageId가 있으면 인증된 요청으로, 없으면 coverUrl 사용
+    if (imageId) {
+        // 로딩 상태 표시
+        coverEl.innerHTML = `<div class="book-cover-placeholder"><h3>로딩중...</h3></div>`;
+        // 인증된 요청으로 이미지 로드
+        loadRecordCoverImage(coverEl, imageId, currentViewingRecord.title);
+    } else if (coverUrl) {
+        coverEl.innerHTML = `<img src="${coverUrl}" alt="${escapeHtml(currentViewingRecord.title)}" style="width: 100%; height: 100%; object-fit: cover;">`;
+    } else {
+        coverEl.innerHTML = `
+            <div class="book-cover-placeholder">
+                <h3>${escapeHtml(currentViewingRecord.title)}</h3>
+            </div>
+        `;
+    }
+
+    document.getElementById('recordTitle').textContent = currentViewingRecord.title;
+    document.getElementById('recordAuthor').textContent = currentViewingRecord.author;
+
+    // 모든 스케줄 렌더링 (scheduleId 기반)
+    renderModalScheduleList(allSchedulesForBook);
+
+    // 항상 보기 모드로 시작
+    switchToViewMode();
+
+    // 모달 표시
+    document.getElementById('recordDetailModal').style.display = 'flex';
+}
+
+// 모달 내 스케줄 목록 렌더링 (scheduleId 기반 - 새 Calendar API용)
+function renderModalScheduleList(schedules) {
+    const container = document.getElementById('modalReadersList');
+    if (!container) return;
+
+    const today = new Date().toISOString().split('T')[0];
+
+    const html = schedules.map(s => {
+        const reader = s.reader || {};
+        const readerColor = reader.color || '#20B2AA';
+        const readerName = reader.readerName || '본인';
+        const startDate = s.startDate || '';
+        const endDate = s.endDate || '';
+
+        // 상태 계산 (API status 값 우선 사용)
+        let status = 'reading';
+        if (s.status === 'COMPLETED' || (endDate && endDate < today)) {
+            status = 'completed';
+        } else if (s.status === 'TO_READ' || startDate > today) {
+            status = 'to_read';
+        }
+
+        // 배경색 계산
+        const bgColor = hexToRgba(readerColor, 0.08);
+        const borderColor = hexToRgba(readerColor, 0.3);
+
+        return `
+            <div class="modal-reader-item"
+                 style="--reader-bg-color: ${bgColor}; --reader-border-color: ${borderColor};"
+                 data-schedule-id="${s.scheduleId}">
+                <div class="modal-reader-header">
+                    <div class="modal-reader-dot" style="background: ${readerColor};"></div>
+                    <span class="modal-reader-name">${escapeHtml(readerName)}</span>
+                    <span class="modal-reader-status ${status}">${getStatusText(status)}</span>
+                </div>
+                <div class="modal-reader-dates">
+                    <span><span class="date-label">시작:</span> ${startDate || '-'}</span>
+                    <span><span class="date-label">완료:</span> ${endDate || '-'}</span>
+                </div>
+                <div class="modal-reader-actions">
+                    <button type="button" class="btn-sm btn-edit-sm" onclick="startEditScheduleById(${s.scheduleId})">수정</button>
+                    <button type="button" class="btn-sm btn-delete-sm" onclick="deleteScheduleById(${s.scheduleId})">삭제</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
 }
 
 // 모달 내 독자 목록 렌더링
@@ -1097,7 +1711,7 @@ function hexToRgba(hex, alpha) {
 // 기록 상세 모달 닫기
 function closeRecordDetailModal() {
     document.getElementById('recordDetailModal').style.display = 'none';
-    currentViewingRecord = null;
+    currentViewingRecord =null;
     currentEditingReader = null;
 }
 
@@ -1125,6 +1739,83 @@ function startEditReader(detailsId) {
 
     // 수정 모드로 전환
     switchToEditMode();
+}
+
+// 특정 스케줄의 수정 시작 (scheduleId 기반 - 새 Calendar API용)
+function startEditScheduleById(scheduleId) {
+    if (!currentViewingRecord || !currentViewingRecord.allSchedules) return;
+
+    // 해당 스케줄 찾기
+    const schedule = currentViewingRecord.allSchedules.find(s => s.scheduleId === scheduleId);
+    if (!schedule) {
+        showToast('일정 정보를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    // 현재 수정 중인 스케줄 저장 (scheduleId 기반)
+    currentEditingReader = {
+        scheduleId: schedule.scheduleId,  // scheduleId 사용
+        reader: schedule.reader,
+        startDate: schedule.startDate,
+        endDate: schedule.endDate,
+        useNewApi: true // 새 API 사용 플래그
+    };
+
+    // 수정 모드로 전환
+    switchToEditMode();
+}
+
+// 특정 스케줄 삭제 (scheduleId 기반 - 새 Calendar API용)
+// 다른 독자의 일정에 영향 없이 해당 일정만 삭제
+async function deleteScheduleById(scheduleId) {
+    if (!currentViewingRecord) return;
+
+    // 해당 스케줄 찾기
+    const schedule = currentViewingRecord.allSchedules?.find(s => s.scheduleId === scheduleId);
+    const readerName = schedule?.reader?.readerName || '본인';
+
+    const confirmed = await showConfirm(
+        `"${currentViewingRecord.title}"에서 ${readerName}의 일정을 삭제하시겠습니까?`,
+        '삭제',
+        '취소',
+        '일정 삭제'
+    );
+
+    if (!confirmed) return;
+
+    try {
+        console.log('[Debug] 스케줄 삭제 시도 (새 API) - scheduleId:', scheduleId);
+
+        // 새 Calendar Schedule API 사용 - 해당 일정만 삭제, 다른 독자에게 영향 없음
+        const response = await apiClient.deleteCalendarSchedule(scheduleId);
+
+        if (response.success || response.data || !response.error) {
+            showToast(`${readerName}의 일정이 삭제되었습니다.`, 'success');
+
+            // 남은 스케줄이 없으면 모달 닫기
+            const remainingSchedules = currentViewingRecord.allSchedules.filter(s => s.scheduleId !== scheduleId);
+            if (remainingSchedules.length === 0) {
+                closeRecordDetailModal();
+            } else {
+                // 남은 스케줄 목록 업데이트
+                currentViewingRecord.allSchedules = remainingSchedules;
+                renderModalScheduleList(remainingSchedules);
+            }
+
+            // 캘린더 새로고침
+            calendar.refetchEvents();
+
+            // 해당 날짜 다시 로드
+            if (selectedDate) {
+                loadDailyRecords(selectedDate);
+            }
+        } else {
+            throw new Error(response.message || '일정 삭제에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('스케줄 삭제 실패:', error);
+        showToast(error.message || '일정 삭제에 실패했습니다.', 'error');
+    }
 }
 
 // 특정 독자의 일정 삭제
@@ -1252,7 +1943,7 @@ function updateEndDateMin() {
     }
 }
 
-// 수정 저장
+// 수정 저장 (새 API와 기존 API 모두 지원)
 async function saveScheduleEdit() {
     if (!currentViewingRecord || !currentEditingReader) return;
 
@@ -1288,114 +1979,149 @@ async function saveScheduleEdit() {
         // 선택된 독자의 childId 결정 (본인이면 null, 자녀면 childId)
         const newChildId = selectedReaderValue === 'user' ? null : parseInt(selectedReaderValue);
 
-        // 독자가 변경되었는지 확인 (currentEditingReader 사용)
-        const originalReaderName = currentEditingReader.reader?.readerName || '';
-        let newReaderName = '';
-        if (newChildId === null) {
-            newReaderName = currentUserInfo?.nickname || currentUserInfo?.username || currentUserInfo?.name || '';
+        // 새 Calendar Schedule API 사용 여부 확인
+        if (currentEditingReader.useNewApi && currentEditingReader.scheduleId) {
+            // ============ 새 Calendar Schedule API 사용 ============
+            const scheduleId = currentEditingReader.scheduleId;
+
+            console.log('[Debug] 일정 수정 요청 (새 API) - scheduleId:', scheduleId);
+
+            // 새 API 형식에 맞게 데이터 구성
+            const updateData = {
+                childId: newChildId,
+                startDate: startDateStr,
+                endDate: endDateStr || null
+            };
+
+            console.log('[Debug] 수정 요청 데이터 (새 API):', updateData);
+
+            // 새 Calendar Schedule API 사용 - 해당 일정만 수정, 다른 독자에게 영향 없음
+            const response = await apiClient.updateCalendarSchedule(scheduleId, updateData);
+
+            if (response.success || response.data || !response.error) {
+                showToast('독서 일정이 수정되었습니다!', 'success');
+                closeRecordDetailModal();
+
+                // 캘린더 새로고침
+                calendar.refetchEvents();
+
+                // 해당 날짜 선택
+                selectDate(startDateStr);
+                highlightSelectedDate(startDateStr);
+            } else {
+                throw new Error(response.message || '일정 수정에 실패했습니다.');
+            }
         } else {
-            const child = childrenData.find(c => (c.childId || c.id) === newChildId);
-            newReaderName = child?.childName || child?.name || '';
-        }
-        const isReaderChanged = newReaderName !== originalReaderName;
+            // ============ 기존 updateBook API 사용 (레거시) ============
+            // 독자가 변경되었는지 확인 (currentEditingReader 사용)
+            const originalReaderName = currentEditingReader.reader?.readerName || '';
+            let newReaderName = '';
+            if (newChildId === null) {
+                newReaderName = currentUserInfo?.nickname || currentUserInfo?.username || currentUserInfo?.name || '';
+            } else {
+                const child = childrenData.find(c => (c.childId || c.id) === newChildId);
+                newReaderName = child?.childName || child?.name || '';
+            }
+            const isReaderChanged = newReaderName !== originalReaderName;
 
-        // currentEditingReader에서 detailsId 가져오기
-        const detailsId = currentEditingReader.detailsId;
-        const bookId = currentViewingRecord.bookId;
+            // currentEditingReader에서 detailsId 가져오기
+            const detailsId = currentEditingReader.detailsId;
+            const bookId = currentViewingRecord.bookId;
 
-        console.log('[Debug] 일정 수정 요청 - detailsId:', detailsId, 'bookId:', bookId);
-        console.log('[Debug] 독자 변경:', isReaderChanged, '(', originalReaderName, '->', newReaderName, ')');
+            console.log('[Debug] 일정 수정 요청 (레거시) - detailsId:', detailsId, 'bookId:', bookId);
+            console.log('[Debug] 독자 변경:', isReaderChanged, '(', originalReaderName, '->', newReaderName, ')');
 
-        // updateBook API 사용 (book-details API가 지원되지 않음)
-        // 기존 도서 정보 조회
-        const bookInfo = await apiClient.getBook(bookId);
-        const existingDetails = bookInfo.data?.bookDetails || [];
+            // updateBook API 사용 (book-details API가 지원되지 않음)
+            // 기존 도서 정보 조회
+            const bookInfo = await apiClient.getBook(bookId);
+            const existingDetails = bookInfo.data?.bookDetails || [];
 
-        console.log('[Debug] 기존 일정:', existingDetails.map(d => ({
-            id: d.bookDetailsId,
-            reader: d.readerResponse?.readerName,
-            readerId: d.readerResponse?.readerId,
-            childId: d.readerResponse?.childId
-        })));
+            console.log('[Debug] 기존 일정:', existingDetails.map(d => ({
+                id: d.bookDetailsId,
+                reader: d.readerResponse?.readerName,
+                readerId: d.readerResponse?.readerId,
+                childId: d.readerResponse?.childId
+            })));
 
-        // 수정할 일정만 새 값으로, 나머지는 기존 정보 유지 (readerId 포함)
-        const bookDetailsUpdate = existingDetails.map(detail => {
-            const readerResponse = detail.readerResponse || {};
+            // 수정할 일정만 새 값으로, 나머지는 기존 정보 유지 (readerId 포함)
+            const bookDetailsUpdate = existingDetails.map(detail => {
+                const readerResponse = detail.readerResponse || {};
 
-            if (detail.bookDetailsId === detailsId) {
-                // 수정할 일정
-                const updateItem = {
-                    startDate: startDateStr,
-                    endDate: endDateStr || null
-                };
+                if (detail.bookDetailsId === detailsId) {
+                    // 수정할 일정
+                    const updateItem = {
+                        startDate: startDateStr,
+                        endDate: endDateStr || null
+                    };
 
-                if (isReaderChanged) {
-                    // 독자가 변경된 경우: 새 독자의 childId 사용
-                    updateItem.childId = newChildId;
-                    // 새 독자의 기존 readerId 찾기 (있으면)
-                    const existingNewReader = existingDetails.find(d => {
-                        if (newChildId === null) {
-                            return !d.readerResponse?.childId;
-                        } else {
-                            return d.readerResponse?.childId === newChildId;
+                    if (isReaderChanged) {
+                        // 독자가 변경된 경우: 새 독자의 childId 사용
+                        updateItem.childId = newChildId;
+                        // 새 독자의 기존 readerId 찾기 (있으면)
+                        const existingNewReader = existingDetails.find(d => {
+                            if (newChildId === null) {
+                                return !d.readerResponse?.childId;
+                            } else {
+                                return d.readerResponse?.childId === newChildId;
+                            }
+                        });
+                        if (existingNewReader?.readerResponse?.readerId) {
+                            updateItem.readerId = existingNewReader.readerResponse.readerId;
                         }
-                    });
-                    if (existingNewReader?.readerResponse?.readerId) {
-                        updateItem.readerId = existingNewReader.readerResponse.readerId;
+                    } else {
+                        // 독자가 변경되지 않은 경우: 기존 정보 유지
+                        if (readerResponse.childId) {
+                            updateItem.childId = readerResponse.childId;
+                        }
+                        if (readerResponse.readerId) {
+                            updateItem.readerId = readerResponse.readerId;
+                        }
                     }
+
+                    return updateItem;
                 } else {
-                    // 독자가 변경되지 않은 경우: 기존 정보 유지
+                    // 다른 일정은 기존 정보 그대로 유지 (readerId 포함!)
+                    const keepItem = {
+                        startDate: detail.startDate,
+                        endDate: detail.endDate
+                    };
+
+                    // 기존 독자 정보 유지
                     if (readerResponse.childId) {
-                        updateItem.childId = readerResponse.childId;
+                        keepItem.childId = readerResponse.childId;
                     }
                     if (readerResponse.readerId) {
-                        updateItem.readerId = readerResponse.readerId;
+                        keepItem.readerId = readerResponse.readerId;
                     }
-                }
 
-                return updateItem;
+                    return keepItem;
+                }
+            });
+
+            const bookUpdateData = {
+                title: currentViewingRecord.title,
+                author: currentViewingRecord.author,
+                coverUrl: currentViewingRecord.coverUrl || null,
+                bookDetailsUpdate: bookDetailsUpdate
+            };
+
+            console.log('[Debug] 수정 요청 데이터 (레거시):', JSON.stringify(bookUpdateData, null, 2));
+
+            const response = await apiClient.updateBook(bookId, bookUpdateData);
+
+            if (response.success || response.data || !response.error) {
+                showToast('독서 일정이 수정되었습니다!', 'success');
+                closeRecordDetailModal();
+
+                // 캘린더 새로고침
+                calendar.refetchEvents();
+
+                // 해당 날짜 선택
+                selectDate(startDateStr);
+                highlightSelectedDate(startDateStr);
             } else {
-                // 다른 일정은 기존 정보 그대로 유지 (readerId 포함!)
-                const keepItem = {
-                    startDate: detail.startDate,
-                    endDate: detail.endDate
-                };
-
-                // 기존 독자 정보 유지
-                if (readerResponse.childId) {
-                    keepItem.childId = readerResponse.childId;
-                }
-                if (readerResponse.readerId) {
-                    keepItem.readerId = readerResponse.readerId;
-                }
-
-                return keepItem;
+                throw new Error(response.message || '일정 수정에 실패했습니다.');
             }
-        });
-
-        const bookUpdateData = {
-            title: currentViewingRecord.title,
-            author: currentViewingRecord.author,
-            coverUrl: currentViewingRecord.coverUrl || null,
-            bookDetailsUpdate: bookDetailsUpdate
-        };
-
-        console.log('[Debug] 수정 요청 데이터:', JSON.stringify(bookUpdateData, null, 2));
-
-        const response = await apiClient.updateBook(bookId, bookUpdateData);
-
-        if (response.success || response.data || !response.error) {
-            showToast('독서 일정이 수정되었습니다!', 'success');
-            closeRecordDetailModal();
-
-            // 캘린더 새로고침
-            calendar.refetchEvents();
-
-            // 해당 날짜 선택
-            selectDate(startDateStr);
-            highlightSelectedDate(startDateStr);
-        } else {
-            throw new Error(response.message || '일정 수정에 실패했습니다.');
         }
     } catch (error) {
         console.error('일정 수정 실패:', error);
@@ -1533,15 +2259,15 @@ async function loadReadersData() {
         // 사용자 정보 로드
         const userResponse = await apiClient.getUserInfo();
         if (userResponse.success && userResponse.data) {
-            currentUserInfo = userResponse.data;
+            currentUserInfo =userResponse.data;
         } else if (userResponse && !userResponse.success) {
-            currentUserInfo = null;
+            currentUserInfo =null;
         } else {
-            currentUserInfo = userResponse;
+            currentUserInfo =userResponse;
         }
     } catch (error) {
         console.error('사용자 정보 로드 실패:', error);
-        currentUserInfo = null;
+        currentUserInfo =null;
     }
 
     try {
@@ -1549,17 +2275,17 @@ async function loadReadersData() {
         const childrenResponse = await apiClient.getChildren();
 
         if (childrenResponse.success && childrenResponse.data) {
-            childrenData = childrenResponse.data;
+            childrenData =childrenResponse.data;
         } else if (childrenResponse.data && Array.isArray(childrenResponse.data)) {
-            childrenData = childrenResponse.data;
+            childrenData =childrenResponse.data;
         } else if (Array.isArray(childrenResponse)) {
-            childrenData = childrenResponse;
+            childrenData =childrenResponse;
         } else {
-            childrenData = [];
+            childrenData =[];
         }
     } catch (error) {
         console.error('자녀 목록 로드 실패:', error);
-        childrenData = [];
+        childrenData =[];
     }
 
 }
@@ -1588,8 +2314,8 @@ function initReaderDropdown() {
 
     // 컨테이너 초기화
     container.innerHTML = '';
-    readerRowIndex = 0;
-    readerDatePickers = {};
+    readerRowIndex =0;
+    readerDatePickers ={};
 
     // 첫 번째 독자 행 추가
     addReaderRow();
@@ -1854,11 +2580,11 @@ function initEditDatePickers() {
     // 기존 인스턴스 제거
     if (editStartPicker) {
         editStartPicker.destroy();
-        editStartPicker = null;
+        editStartPicker =null;
     }
     if (editEndPicker) {
         editEndPicker.destroy();
-        editEndPicker = null;
+        editEndPicker =null;
     }
 
     const flatpickrConfig = {
@@ -1874,7 +2600,7 @@ function initEditDatePickers() {
 
     // 시작일 picker
     if (startInput) {
-        editStartPicker = flatpickr(startInput, {
+        editStartPicker =flatpickr(startInput, {
             ...flatpickrConfig,
             defaultDate: startDate,
             onChange: function(selectedDates, dateStr) {
@@ -1893,7 +2619,7 @@ function initEditDatePickers() {
 
     // 종료일 picker
     if (endInput) {
-        editEndPicker = flatpickr(endInput, {
+        editEndPicker =flatpickr(endInput, {
             ...flatpickrConfig,
             defaultDate: endDate,
             minDate: startDate

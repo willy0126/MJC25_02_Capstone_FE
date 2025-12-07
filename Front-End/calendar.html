@@ -21,6 +21,9 @@
 
     <!-- Custom Calendar CSS -->
     <link rel="stylesheet" href="css/calendar.css">
+
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -69,30 +72,39 @@
             </aside>
         </section>
 
-        <!-- 독서 통계 요약 -->
-        <section class="reading-summary">
-            <h3>이번 달 독서 현황</h3>
-            <div class="summary-cards">
-                <div class="summary-card">
-                    <div class="summary-icon">📚</div>
-                    <div class="summary-info">
-                        <span class="summary-value" id="totalBooks">0</span>
-                        <span class="summary-label">읽은 책</span>
+        <!-- 독서 요약 (ApexCharts Radial Bar) -->
+        <section class="reading-summary-charts">
+            <div class="summary-charts-container">
+                <!-- 이번 달 진행률 (Radial Bar) -->
+                <div class="summary-chart-block">
+                    <div class="chart-header">
+                        <h4>이번 달 독서 진행률</h4>
+                    </div>
+                    <div id="monthProgressChart" class="radial-chart"></div>
+                    <div class="chart-legend" id="monthProgressLegend">
+                        <span id="totalBooks" style="display:none;">0</span>
+                        <span id="readingBooks" style="display:none;">0</span>
+                        <span id="readingDays" style="display:none;">0</span>
                     </div>
                 </div>
-                <div class="summary-card">
-                    <div class="summary-icon">📖</div>
-                    <div class="summary-info">
-                        <span class="summary-value" id="readingBooks">0</span>
-                        <span class="summary-label">읽는 중</span>
+
+                <!-- 오늘의 독서 -->
+                <div class="summary-chart-block today-block">
+                    <div class="chart-header">
+                        <h4>오늘의 독서</h4>
+                        <span class="today-date" id="todayDateLabel"></span>
+                    </div>
+                    <div class="today-reading-list" id="todayReadingList">
+                        <p class="summary-empty">오늘 읽을 책이 없습니다.</p>
                     </div>
                 </div>
-                <div class="summary-card">
-                    <div class="summary-icon">📅</div>
-                    <div class="summary-info">
-                        <span class="summary-value" id="readingDays">0</span>
-                        <span class="summary-label">독서일</span>
+
+                <!-- 이번 주 일정 (Mini Bar Chart) -->
+                <div class="summary-chart-block">
+                    <div class="chart-header">
+                        <h4>이번 주 일정</h4>
                     </div>
+                    <div id="weekBarChart" class="bar-chart"></div>
                 </div>
             </div>
         </section>
