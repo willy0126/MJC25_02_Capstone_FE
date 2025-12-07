@@ -70,16 +70,8 @@ function initSubscribeButton() {
 
     if (subscribeBtn) {
         subscribeBtn.addEventListener('click', () => {
-            // 로그인 여부 확인
-            if (isLoggedIn()) {
-                showToast('구독 기능은 준비 중입니다.', 'info');
-                // TODO: 구독 페이지로 이동 또는 모달 표시
-            } else {
-                showToast('로그인이 필요한 서비스입니다.', 'warning');
-                setTimeout(() => {
-                    window.location.href = '/login.html';
-                }, 1500);
-            }
+            // 구독 페이지로 이동 (preschool 플랜 선택 상태)
+            window.location.href = '/subscription.html?plan=preschool';
         });
     }
 }

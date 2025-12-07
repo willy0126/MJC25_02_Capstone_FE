@@ -63,13 +63,17 @@ function updateNavbarLoginState() {
                 if (userIcon && user.profileImg) {
                     // SVG 코드인 경우
                     if (user.profileImg.includes('<svg')) {
-                        userIcon.innerHTML = user.profileImg;
-                        // SVG 크기 조정
-                        const svgElement = userIcon.querySelector('svg');
-                        if (svgElement) {
-                            svgElement.style.width = '24px';
-                            svgElement.style.height = '24px';
-                            svgElement.style.display = 'block';
+                        // SVG sanitize 후 삽입 (XSS 방지)
+                        const safeSVG = sanitizeSVG(user.profileImg);
+                        if (safeSVG) {
+                            userIcon.innerHTML = safeSVG;
+                            // SVG 크기 조정
+                            const svgElement = userIcon.querySelector('svg');
+                            if (svgElement) {
+                                svgElement.style.width = '24px';
+                                svgElement.style.height = '24px';
+                                svgElement.style.display = 'block';
+                            }
                         }
                     } else {
                         // 이모지인 경우

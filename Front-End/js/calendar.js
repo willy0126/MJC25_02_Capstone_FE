@@ -196,7 +196,7 @@ function initializeDraggable() {
     if (!containerEl) return;
 
     // FullCalendar의 Draggable 클래스 사용
-    draggableInstance = new FullCalendar.Draggable(containerEl, {
+    draggableInstance =new FullCalendar.Draggable(containerEl, {
         itemSelector: '.draggable-book',
         eventData: function(eventEl) {
             // 드래그된 요소의 데이터 추출
@@ -300,13 +300,13 @@ async function loadWishlistBooks() {
         // 응답 형식에 따라 처리
         if (Array.isArray(response)) {
             // 배열로 직접 반환되는 경우
-            wishlistBooks = response;
+            wishlistBooks =response;
         } else if (response.success && response.data) {
             // { success: true, data: [...] } 형식
-            wishlistBooks = response.data;
+            wishlistBooks =response.data;
         } else if (response.data) {
             // { data: [...] } 형식
-            wishlistBooks = response.data;
+            wishlistBooks =response.data;
         } else {
             throw new Error('책 목록 응답 형식 오류');
         }
@@ -410,8 +410,8 @@ async function fetchEvents(info, successCallback, failureCallback) {
     const month = midDate.getMonth() + 1;
 
     // 현재 연/월 저장
-    currentCalendarYear = year;
-    currentCalendarMonth = month;
+    currentCalendarYear =year;
+    currentCalendarMonth =month;
 
     try {
         // 새 Calendar Schedule API 사용
@@ -443,7 +443,7 @@ async function fetchEvents(info, successCallback, failureCallback) {
 // 새 Calendar Schedule API 데이터 처리
 // 응답 형식: [{ scheduleId, book, reader, startDate, endDate, status }]
 function processScheduleData(schedules, year, month) {
-    monthlyRecords = {};
+    monthlyRecords ={};
     const events = [];
 
     // 날짜 범위 내의 일정만 필터링 및 각 날짜별로 이벤트 생성
@@ -489,7 +489,7 @@ function processScheduleData(schedules, year, month) {
         }
     });
 
-    allEvents = events;
+    allEvents =events;
 }
 
 // 스케줄을 FullCalendar 이벤트로 변환
@@ -862,7 +862,7 @@ function updateWeekBarChart(schedules, todayDate, today) {
 // 기존 캘린더 데이터 처리 (레거시 - book_details 기반)
 // 백엔드 응답: [{ day: number, readers: [{ readerId, color, readerName }] }]
 function processCalendarData(dayDataList, year, month) {
-    monthlyRecords = {};
+    monthlyRecords ={};
     const events = [];
 
     dayDataList.forEach(dayData => {
@@ -893,7 +893,7 @@ function processCalendarData(dayDataList, year, month) {
         }
     });
 
-    allEvents = events;
+    allEvents =events;
 }
 
 // 레코드를 FullCalendar 이벤트로 변환 (독자 색상 기반)
@@ -918,7 +918,7 @@ function convertToEvent(record, index = 0) {
 
 // 날짜 선택
 function selectDate(dateStr) {
-    selectedDate = dateStr;
+    selectedDate =dateStr;
     loadDailyRecords(dateStr);
 }
 
@@ -1309,7 +1309,7 @@ function updateMonthlySummaryFromEvents(year, month) {
 
 // 일정 등록 모달 열기
 function openScheduleModal(bookData, dropDate) {
-    pendingSchedule = {
+    pendingSchedule ={
         bookId: bookData.bookId,
         title: bookData.title,
         author: bookData.author,
@@ -1338,7 +1338,7 @@ function openScheduleModal(bookData, dropDate) {
 // 일정 등록 모달 닫기
 function closeScheduleModal() {
     document.getElementById('scheduleModal').style.display = 'none';
-    pendingSchedule = null;
+    pendingSchedule =null;
 }
 
 // 일정 등록 확인 (새 Calendar Schedule API 사용 - 다중 독자 지원)
@@ -1459,7 +1459,7 @@ function openRecordDetail(detailsId, dateStr) {
     console.log('[Calendar Debug] openRecordDetail 이미지 정보:', { imageId, coverUrl, bookImage: book.image });
 
     // 현재 보고 있는 책 정보 저장 (수정/삭제용)
-    currentViewingRecord = {
+    currentViewingRecord ={
         bookId: bookId,
         title: book.title || '제목 없음',
         author: book.author || '작자 미상',
@@ -1546,7 +1546,7 @@ function openScheduleDetail(scheduleId, dateStr) {
     console.log('[Calendar Debug] openScheduleDetail 이미지 정보:', { imageId, coverUrl, bookImage: book.image });
 
     // 현재 보고 있는 책 정보 저장 (수정/삭제용) - scheduleId 기반
-    currentViewingRecord = {
+    currentViewingRecord ={
         bookId: bookId,
         title: book.title || '제목 없음',
         author: book.author || '작자 미상',
@@ -1711,7 +1711,7 @@ function hexToRgba(hex, alpha) {
 // 기록 상세 모달 닫기
 function closeRecordDetailModal() {
     document.getElementById('recordDetailModal').style.display = 'none';
-    currentViewingRecord = null;
+    currentViewingRecord =null;
     currentEditingReader = null;
 }
 
@@ -2259,15 +2259,15 @@ async function loadReadersData() {
         // 사용자 정보 로드
         const userResponse = await apiClient.getUserInfo();
         if (userResponse.success && userResponse.data) {
-            currentUserInfo = userResponse.data;
+            currentUserInfo =userResponse.data;
         } else if (userResponse && !userResponse.success) {
-            currentUserInfo = null;
+            currentUserInfo =null;
         } else {
-            currentUserInfo = userResponse;
+            currentUserInfo =userResponse;
         }
     } catch (error) {
         console.error('사용자 정보 로드 실패:', error);
-        currentUserInfo = null;
+        currentUserInfo =null;
     }
 
     try {
@@ -2275,17 +2275,17 @@ async function loadReadersData() {
         const childrenResponse = await apiClient.getChildren();
 
         if (childrenResponse.success && childrenResponse.data) {
-            childrenData = childrenResponse.data;
+            childrenData =childrenResponse.data;
         } else if (childrenResponse.data && Array.isArray(childrenResponse.data)) {
-            childrenData = childrenResponse.data;
+            childrenData =childrenResponse.data;
         } else if (Array.isArray(childrenResponse)) {
-            childrenData = childrenResponse;
+            childrenData =childrenResponse;
         } else {
-            childrenData = [];
+            childrenData =[];
         }
     } catch (error) {
         console.error('자녀 목록 로드 실패:', error);
-        childrenData = [];
+        childrenData =[];
     }
 
 }
@@ -2314,8 +2314,8 @@ function initReaderDropdown() {
 
     // 컨테이너 초기화
     container.innerHTML = '';
-    readerRowIndex = 0;
-    readerDatePickers = {};
+    readerRowIndex =0;
+    readerDatePickers ={};
 
     // 첫 번째 독자 행 추가
     addReaderRow();
@@ -2580,11 +2580,11 @@ function initEditDatePickers() {
     // 기존 인스턴스 제거
     if (editStartPicker) {
         editStartPicker.destroy();
-        editStartPicker = null;
+        editStartPicker =null;
     }
     if (editEndPicker) {
         editEndPicker.destroy();
-        editEndPicker = null;
+        editEndPicker =null;
     }
 
     const flatpickrConfig = {
@@ -2600,7 +2600,7 @@ function initEditDatePickers() {
 
     // 시작일 picker
     if (startInput) {
-        editStartPicker = flatpickr(startInput, {
+        editStartPicker =flatpickr(startInput, {
             ...flatpickrConfig,
             defaultDate: startDate,
             onChange: function(selectedDates, dateStr) {
@@ -2619,7 +2619,7 @@ function initEditDatePickers() {
 
     // 종료일 picker
     if (endInput) {
-        editEndPicker = flatpickr(endInput, {
+        editEndPicker =flatpickr(endInput, {
             ...flatpickrConfig,
             defaultDate: endDate,
             minDate: startDate

@@ -33,119 +33,11 @@
                     <input type="text" placeholder="대화 기록 검색" id="searchInput">
                 </div>
 
-                <!-- 대화 기록 리스트 -->
+                <!-- 대화 기록 리스트 (API에서 동적으로 로드) -->
                 <div class="conversation-list" id="conversationList">
-                    <!-- 대화 카드 1 -->
-                    <div class="conversation-card active">
-                        <div class="conversation-info">
-                            <span class="conversation-date">2025.11.30</span>
-                            <h3 class="conversation-title">어린 왕자를 읽고</h3>
-                            <div class="emotion-tags">
-                                <span class="emotion-tag">🙂즐거움</span>
-                            </div>
-                        </div>
-                        <button class="btn-edit-conversation" title="수정">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <button class="btn-delete-conversation" title="삭제">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 6L6 18M6 6l12 12" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- 대화 카드 2 -->
-                    <div class="conversation-card">
-                        <div class="conversation-info">
-                            <span class="conversation-date">2025.11.30</span>
-                            <h3 class="conversation-title">&lt;대화 내용 요약&gt;</h3>
-                            <div class="emotion-tags">
-                                <span class="emotion-tag">🙂즐거움</span>
-                                <span class="emotion-tag">🥹감동</span>
-                            </div>
-                        </div>
-                        <button class="btn-edit-conversation" title="수정">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <button class="btn-delete-conversation" title="삭제">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 6L6 18M6 6l12 12" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- 대화 카드 3 -->
-                    <div class="conversation-card">
-                        <div class="conversation-info">
-                            <span class="conversation-date">2025.11.30</span>
-                            <h3 class="conversation-title">&lt;대화 내용 요약&gt;</h3>
-                            <div class="emotion-tags">
-                                <span class="emotion-tag">😐보통</span>
-                                <span class="emotion-tag">🥹감동</span>
-                            </div>
-                        </div>
-                        <button class="btn-edit-conversation" title="수정">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <button class="btn-delete-conversation" title="삭제">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 6L6 18M6 6l12 12" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- 대화 카드 4 -->
-                    <div class="conversation-card">
-                        <div class="conversation-info">
-                            <span class="conversation-date">2025.11.30</span>
-                            <h3 class="conversation-title">&lt;대화 내용 요약&gt;</h3>
-                            <div class="emotion-tags">
-                                <span class="emotion-tag">🙂즐거움</span>
-                                <span class="emotion-tag">🥹감동</span>
-                            </div>
-                        </div>
-                        <button class="btn-edit-conversation" title="수정">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <button class="btn-delete-conversation" title="삭제">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 6L6 18M6 6l12 12" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- 대화 카드 5 -->
-                    <div class="conversation-card">
-                        <div class="conversation-info">
-                            <span class="conversation-date">2025.11.30</span>
-                            <h3 class="conversation-title">&lt;대화 내용 요약&gt;</h3>
-                            <div class="emotion-tags">
-                                <span class="emotion-tag">🙂즐거움</span>
-                            </div>
-                        </div>
-                        <button class="btn-edit-conversation" title="수정">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <button class="btn-delete-conversation" title="삭제">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 6L6 18M6 6l12 12" stroke="#4a3f3a" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </button>
+                    <!-- 로딩 상태 -->
+                    <div class="loading-state">
+                        <p>대화 기록을 불러오는 중...</p>
                     </div>
                 </div>
             </aside>
@@ -164,13 +56,13 @@
                     <div class="emotion-selector">
                         <h2 class="emotion-label">오늘의 감정</h2>
                         <div class="emotion-buttons">
-                            <button class="emotion-btn active" data-emotion="happy">
+                            <button class="emotion-btn" data-emotion="happy">
                                 <span>🙂즐거움</span>
                             </button>
                             <button class="emotion-btn" data-emotion="normal">
                                 <span>😐보통</span>
                             </button>
-                            <button class="emotion-btn active" data-emotion="touched">
+                            <button class="emotion-btn" data-emotion="touched">
                                 <span>🥹감동</span>
                             </button>
                             <button class="emotion-btn" data-emotion="difficult">

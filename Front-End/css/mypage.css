@@ -376,6 +376,7 @@ section h2 {
     font-size: 3rem;
     font-weight: 700;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .color-indicator {
@@ -551,6 +552,147 @@ section h2 {
 .subscription-details p {
     color: #666;
     line-height: 1.6;
+}
+
+/* 여러 구독 표시 스타일 */
+.subscription-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 15px 0;
+}
+
+.subscription-item:first-child {
+    padding-top: 0;
+}
+
+.subscription-item:last-child {
+    padding-bottom: 0;
+}
+
+.subscription-info-content {
+    flex: 1;
+}
+
+.subscription-actions {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.subscription-divider {
+    border: none;
+    border-top: 1px dashed #ddd;
+    margin: 10px 0;
+}
+
+.subscription-item p {
+    margin: 8px 0;
+}
+
+.subscription-item p strong {
+    color: #333;
+    min-width: 80px;
+    display: inline-block;
+}
+
+/* 취소 신청 버튼 */
+.btn-cancel-subscription {
+    padding: 8px 16px;
+    background-color: #fff;
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-cancel-subscription:hover {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+/* 취소 철회 버튼 */
+.btn-withdraw-cancel {
+    padding: 8px 16px;
+    background-color: #fff;
+    color: #20B2AA;
+    border: 1px solid #20B2AA;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-withdraw-cancel:hover {
+    background-color: #20B2AA;
+    color: #fff;
+}
+
+/* 취소 예정 텍스트 */
+.cancel-scheduled {
+    color: #e74c3c;
+    font-weight: 500;
+}
+
+/* 구독 취소 모달 */
+.cancel-subscription-modal {
+    max-width: 480px;
+}
+
+.cancel-info-box {
+    text-align: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.cancel-plan-name {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.cancel-description {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* 취소 안내 박스 */
+.cancel-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 20px;
+    background-color: #fff8e1;
+    border: 1px solid #ffcc02;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.notice-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.notice-content p {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.notice-content p:first-child {
+    margin-bottom: 5px;
 }
 
 .btn-subscribe {

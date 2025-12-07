@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>구독 플랜 선택 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+
+    <!-- CSS 파일 -->
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/subscription.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/footer.css">
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main class="subscription-container">
+        <!-- 헤더 섹션 -->
+        <section class="subscription-header">
+            <h1>구독 플랜 선택</h1>
+            <p class="header-subtitle">우리 가족에게 맞는 독서 프로그램을 선택하세요</p>
+        </section>
+
+        <!-- 현재 구독 상태 (로그인 시 표시) -->
+        <section class="current-subscription" id="currentSubscription" style="display: none;">
+            <div class="current-subscription-card">
+                <div class="current-info">
+                    <span class="current-label">현재 구독 중</span>
+                    <h3 id="currentPlanName">-</h3>
+                    <p id="currentPlanPeriod">-</p>
+                </div>
+                <div class="current-actions">
+                    <button class="btn-manage" onclick="goToMypage()">구독 관리</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 플랜 카드 섹션 -->
+        <section class="plans-section">
+            <div class="plans-grid">
+                <!-- 영·유아 패키지 -->
+                <div class="plan-card" data-plan="preschool">
+                    <div class="plan-badge">0-7세</div>
+                    <div class="plan-header">
+                        <div class="plan-icon">👶</div>
+                        <h2>영·유아 패키지</h2>
+                        <p class="plan-tagline">우리 아이의 첫 독서 여정</p>
+                    </div>
+                    <div class="plan-price">
+                        <span class="price-amount">19,900</span>
+                        <span class="price-unit">원/월</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>매달 4-5권의 엄선된 그림책</li>
+                        <li>부모 가이드북 & 독후 활동지</li>
+                        <li>월별 특별 굿즈</li>
+                        <li>전국 무료 배송</li>
+                        <li>온라인 독서 기록 관리</li>
+                    </ul>
+                    <button class="btn-select-plan" onclick="selectPlan('preschool')">
+                        이 플랜 선택하기
+                    </button>
+                    <a href="preschool.html" class="plan-detail-link">자세히 보기 →</a>
+                </div>
+
+                <!-- 초등·청소년 패키지 -->
+                <div class="plan-card featured" data-plan="students">
+                    <div class="plan-badge">8-13세</div>
+                    <div class="featured-badge">인기</div>
+                    <div class="plan-header">
+                        <div class="plan-icon">📚</div>
+                        <h2>초등·청소년 패키지</h2>
+                        <p class="plan-tagline">생각의 깊이를 키우는 독서</p>
+                    </div>
+                    <div class="plan-price">
+                        <span class="price-amount">24,900</span>
+                        <span class="price-unit">원/월</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>매달 5-6권의 학년별 맞춤 도서</li>
+                        <li>독서 활동 워크북 제공</li>
+                        <li>오디오북 무제한 이용</li>
+                        <li>온라인 독서 챌린지 참여</li>
+                        <li>창작 대회 및 이벤트 우선 참여</li>
+                        <li>전국 무료 배송</li>
+                    </ul>
+                    <button class="btn-select-plan" onclick="selectPlan('students')">
+                        이 플랜 선택하기
+                    </button>
+                    <a href="students.html" class="plan-detail-link">자세히 보기 →</a>
+                </div>
+
+                <!-- 부모 패키지 -->
+                <div class="plan-card" data-plan="parents">
+                    <div class="plan-badge">부모</div>
+                    <div class="plan-header">
+                        <div class="plan-icon">👨‍👩‍👧</div>
+                        <h2>부모 패키지</h2>
+                        <p class="plan-tagline">부모의 성장이 자녀의 성장으로</p>
+                    </div>
+                    <div class="plan-price">
+                        <span class="price-amount">22,900</span>
+                        <span class="price-unit">원/월</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>매달 2-3권의 베스트셀러 도서</li>
+                        <li>독서 노트 & 실천 가이드</li>
+                        <li>온라인 북클럽 참여권 (월 1회)</li>
+                        <li>오디오북 무제한 이용</li>
+                        <li>전문가 특강 영상 (분기별)</li>
+                        <li>전국 무료 배송</li>
+                    </ul>
+                    <button class="btn-select-plan" onclick="selectPlan('parents')">
+                        이 플랜 선택하기
+                    </button>
+                    <a href="parents.html" class="plan-detail-link">자세히 보기 →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 특별 혜택 안내 -->
+        <section class="family-discount">
+            <div class="discount-card">
+                <div class="discount-icon">📚</div>
+                <div class="discount-content">
+                    <h3>전문가 맞춤 큐레이션</h3>
+                    <p>아동 발달 전문가와 현직 교사가 <strong>자녀의 연령과 독서 수준에 맞는 도서</strong>를 직접 선정해드립니다.</p>
+                </div>
+            </div>
+            <div class="discount-card">
+                <div class="discount-icon">🚚</div>
+                <div class="discount-content">
+                    <h3>전국 무료 배송</h3>
+                    <p>매월 첫째 주, <strong>전국 어디서나 무료</strong>로 배송해드립니다. 배송 전 알림톡으로 안내드려요.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 공통 혜택 -->
+        <section class="common-benefits">
+            <h2>모든 플랜 공통 혜택</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-icon">🚚</div>
+                    <h4>전국 무료 배송</h4>
+                    <p>매월 첫째 주 일괄 배송</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">📱</div>
+                    <h4>온라인 독서 기록</h4>
+                    <p>읽은 책 기록 및 관리</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">🔄</div>
+                    <h4>언제든 변경/해지</h4>
+                    <p>위약금 없이 자유롭게</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">📞</div>
+                    <h4>고객 지원</h4>
+                    <p>평일 9-18시 상담 가능</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="subscription-faq">
+            <h2>자주 묻는 질문</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Q. 구독은 언제부터 시작되나요?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>결제 완료 후 다음 달 첫째 주부터 도서가 배송됩니다. 배송 전 알림톡으로 안내해드립니다.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Q. 플랜 변경은 어떻게 하나요?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>마이페이지 > 구독 관리에서 언제든 플랜을 변경하실 수 있습니다. 변경된 플랜은 다음 결제일부터 적용됩니다.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Q. 해지하면 위약금이 있나요?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>아니요, 위약금 없이 언제든 해지 가능합니다. 해지 신청 후에도 이미 결제된 기간까지는 서비스를 이용하실 수 있습니다.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Q. 여러 플랜을 동시에 구독할 수 있나요?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>네! 가족 구성원에 맞게 여러 플랜을 동시에 구독하실 수 있으며, 2개 이상 구독 시 각 플랜에서 10% 할인 혜택이 적용됩니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 구독 확인 모달 -->
+    <div class="modal" id="subscribeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalPlanName">플랜 구독</h2>
+            </div>
+            <div class="modal-body">
+                <p id="modalPlanDesc">이 플랜을 구독하시겠습니까?</p>
+                <div class="modal-plan-info">
+                    <div class="plan-info-item">
+                        <span class="info-label">대상</span>
+                        <span class="info-value" id="modalTargetAge">-</span>
+                    </div>
+                    <div class="plan-info-item">
+                        <span class="info-label">월 구독료</span>
+                        <span class="info-value" id="modalPrice">-</span>
+                    </div>
+                </div>
+                <div class="payment-method-section">
+                    <label class="payment-label">결제 수단</label>
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="CARD" checked>
+                            <span class="payment-icon">💳</span>
+                            <span class="payment-text">신용/체크카드</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="BANK_TRANSFER">
+                            <span class="payment-icon">🏦</span>
+                            <span class="payment-text">계좌이체</span>
+                        </label>
+                    </div>
+                </div>
+                <p class="modal-notice">구독은 다음 달 첫째 주부터 시작됩니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-cancel" onclick="closeSubscribeModal()">취소</button>
+                <button class="btn-modal-confirm" id="btnModalConfirm">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/subscription.js"></script>
+</body>
+
+</html>

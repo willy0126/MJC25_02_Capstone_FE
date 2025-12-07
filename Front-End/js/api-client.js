@@ -22,8 +22,15 @@ class ApiClient {
         localStorage.removeItem('accessToken');
     }
 
-    // Make HTTP request with optional authentication
-    async request(endpoint, options = {}) {
+    // Make HTTP request with optional authentication and retry logic
+    async request(endpoint, options = {}, retryCount = 0) {
+        // 오프라인 상태 체크
+        if (!navigator.onLine) {
+            const offlineError = new Error('인터넷 연결이 없습니다. 네트워크 상태를 확인해주세요.');
+            offlineError.isOffline = true;
+            throw offlineError;
+        }
+
         const url = `${this.baseURL}${endpoint}`;
         const headers = {
             'Content-Type': 'application/json',
@@ -61,11 +68,51 @@ class ApiClient {
                 }
             }
 
+            // 5xx 서버 에러 시 재시도
+            if (response.status >= 500 && retryCount < API_CONFIG.MAX_RETRIES) {
+                console.warn(`서버 에러 (${response.status}), 재시도 ${retryCount + 1}/${API_CONFIG.MAX_RETRIES}...`);
+                await this.delay(API_CONFIG.RETRY_DELAY);
+                return this.request(endpoint, options, retryCount + 1);
+            }
+
             return await this.handleResponse(response);
         } catch (error) {
+            // 네트워크 에러 (fetch 실패) 시 재시도
+            if (this.isRetryableError(error) && retryCount < API_CONFIG.MAX_RETRIES) {
+                console.warn(`네트워크 에러, 재시도 ${retryCount + 1}/${API_CONFIG.MAX_RETRIES}...`, error.message);
+                await this.delay(API_CONFIG.RETRY_DELAY);
+                return this.request(endpoint, options, retryCount + 1);
+            }
+
             console.error('API Request Error:', error);
             throw error;
         }
+    }
+
+    // 재시도 가능한 에러인지 확인
+    isRetryableError(error) {
+        // 오프라인 에러는 재시도하지 않음
+        if (error.isOffline) return false;
+
+        // TypeError는 보통 네트워크 연결 실패
+        if (error instanceof TypeError) return true;
+
+        // fetch 관련 네트워크 에러
+        if (error.message && (
+            error.message.includes('Failed to fetch') ||
+            error.message.includes('Network request failed') ||
+            error.message.includes('net::ERR_') ||
+            error.message.includes('NetworkError')
+        )) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // 지연 함수 (재시도 간격)
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     // Handle API response
@@ -315,6 +362,19 @@ class ApiClient {
         return await this.request('/users/verify-password', {
             method: 'POST',
             body: JSON.stringify(passwordData)
+        });
+    }
+
+    /**
+     * 비밀번호 변경 (로그인된 사용자용)
+     * @param {string} newPassword - 새 비밀번호
+     * @param {string} confirmPassword - 비밀번호 확인
+     * @returns {Promise<Object>} 변경 결과
+     */
+    async changePassword(newPassword, confirmPassword) {
+        return await this.request('/users/change-password', {
+            method: 'PUT',
+            body: JSON.stringify({ newPassword, confirmPassword })
         });
     }
 
@@ -867,6 +927,198 @@ class ApiClient {
      */
     async deleteReply(boardId, replyId) {
         return await this.request(`/boards/${boardId}/replies/${replyId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // ==================== Subscription Plan APIs (인증 불필요) ====================
+
+    /**
+     * 활성 구독 플랜 목록 조회
+     * @returns {Promise<Object>} 구독 플랜 목록
+     */
+    async getSubscriptionPlans() {
+        return await this.request('/subscription-plans', {
+            method: 'GET',
+            skipAuth: true
+        });
+    }
+
+    /**
+     * 구독 플랜 상세 조회
+     * @param {number} planId - 플랜 ID
+     * @returns {Promise<Object>} 구독 플랜 상세 정보
+     */
+    async getSubscriptionPlan(planId) {
+        return await this.request(`/subscription-plans/${planId}`, {
+            method: 'GET',
+            skipAuth: true
+        });
+    }
+
+    // ==================== Subscription APIs ====================
+
+    /**
+     * 내 구독 목록 조회
+     * @returns {Promise<Object>} 구독 목록
+     */
+    async getSubscriptions() {
+        return await this.request('/subscriptions', {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 구독 생성
+     * @param {Object} subscriptionData - 구독 정보
+     * @param {number} subscriptionData.planId - 구독 플랜 ID (1: 영·유아, 2: 초등·청소년, 3: 부모)
+     * @param {string} subscriptionData.paymentMethod - 결제 수단 ('CARD' | 'BANK_TRANSFER')
+     * @param {boolean} subscriptionData.autoRenew - 자동 갱신 여부
+     * @returns {Promise<Object>} 생성된 구독 정보
+     */
+    async createSubscription(subscriptionData) {
+        return await this.request('/subscriptions', {
+            method: 'POST',
+            body: JSON.stringify(subscriptionData)
+        });
+    }
+
+    /**
+     * 구독 상세 조회
+     * @param {number} subscriptionId - 구독 ID
+     * @returns {Promise<Object>} 구독 상세 정보
+     */
+    async getSubscription(subscriptionId) {
+        return await this.request(`/subscriptions/${subscriptionId}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 구독 취소
+     * @param {number} subscriptionId - 구독 ID
+     * @returns {Promise<Object>} 취소 결과
+     */
+    async cancelSubscription(subscriptionId) {
+        return await this.request(`/subscriptions/${subscriptionId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    /**
+     * 자동 갱신 설정 변경
+     * @param {number} subscriptionId - 구독 ID
+     * @param {boolean} autoRenew - 자동 갱신 여부
+     * @returns {Promise<Object>} 변경 결과
+     */
+    async updateAutoRenew(subscriptionId, autoRenew) {
+        // 백엔드가 Query Parameter로 기대함 (@RequestParam)
+        return await this.request(`/subscriptions/${subscriptionId}/auto-renew?autoRenew=${autoRenew}`, {
+            method: 'PATCH'
+        });
+    }
+
+    /**
+     * 활성 구독 존재 여부 확인
+     * @returns {Promise<Object>} { hasActiveSubscription: boolean }
+     */
+    async checkSubscription() {
+        return await this.request('/subscriptions/check', {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 활성 구독 조회
+     * @returns {Promise<Object>} 활성 구독 정보
+     */
+    async getActiveSubscription() {
+        return await this.request('/subscriptions/active', {
+            method: 'GET'
+        });
+    }
+
+    // ==================== Dialogue (독후 활동) APIs ====================
+
+    /**
+     * 대화 기록 목록 조회 (페이징, 필터링)
+     * @param {Object} options - 조회 옵션
+     * @param {number} options.page - 페이지 번호 (1부터 시작, 기본값 1)
+     * @param {number} options.size - 페이지 크기 (기본값 20)
+     * @param {number} options.bookId - 특정 도서의 대화만 조회 (선택)
+     * @param {Array<string>} options.emotions - 감정 필터 (선택)
+     * @returns {Promise<Object>} 페이징된 대화 기록 목록
+     */
+    async getDialogueConversations(options = {}) {
+        const params = new URLSearchParams();
+
+        if (options.page) params.append('page', options.page);
+        if (options.size) params.append('size', options.size);
+        if (options.bookId) params.append('bookId', options.bookId);
+        if (options.emotions && options.emotions.length > 0) {
+            options.emotions.forEach(e => params.append('emotions', e));
+        }
+
+        const queryString = params.toString();
+        const endpoint = `/dialogue/conversations${queryString ? '?' + queryString : ''}`;
+
+        return await this.request(endpoint, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 대화 기록 상세 조회
+     * @param {number} conversationId - 대화 기록 ID
+     * @returns {Promise<Object>} 대화 기록 상세 정보
+     */
+    async getDialogueConversation(conversationId) {
+        return await this.request(`/dialogue/conversations/${conversationId}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * 대화 기록 등록
+     * @param {Object} conversationData - 대화 기록 정보
+     * @param {number} conversationData.bookId - 도서 ID (선택)
+     * @param {string} conversationData.title - 제목 (필수)
+     * @param {string} conversationData.content - 대화 내용 (필수)
+     * @param {Array<string>} conversationData.emotions - 감정 태그 목록 (필수)
+     * @param {string} conversationData.aiQuestion - AI 질문 (선택)
+     * @returns {Promise<Object>} 등록된 대화 기록 정보
+     */
+    async createDialogueConversation(conversationData) {
+        return await this.request('/dialogue/conversations', {
+            method: 'POST',
+            body: JSON.stringify(conversationData)
+        });
+    }
+
+    /**
+     * 대화 기록 수정
+     * @param {number} conversationId - 대화 기록 ID
+     * @param {Object} conversationData - 수정할 대화 기록 정보
+     * @param {string} conversationData.title - 제목 (선택)
+     * @param {string} conversationData.content - 대화 내용 (선택)
+     * @param {Array<string>} conversationData.emotions - 감정 태그 목록 (선택)
+     * @param {string} conversationData.aiQuestion - AI 질문 (선택)
+     * @returns {Promise<Object>} 수정된 대화 기록 정보
+     */
+    async updateDialogueConversation(conversationId, conversationData) {
+        return await this.request(`/dialogue/conversations/${conversationId}`, {
+            method: 'PUT',
+            body: JSON.stringify(conversationData)
+        });
+    }
+
+    /**
+     * 대화 기록 삭제 (Soft Delete)
+     * @param {number} conversationId - 대화 기록 ID
+     * @returns {Promise<Object>} 삭제 결과
+     */
+    async deleteDialogueConversation(conversationId) {
+        return await this.request(`/dialogue/conversations/${conversationId}`, {
             method: 'DELETE'
         });
     }
