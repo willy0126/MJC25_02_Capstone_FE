@@ -1,0 +1,804 @@
+/* ==================== 독후 활동 페이지 전체 레이아웃 ==================== */
+.dialogue-container {
+    margin-top: 100px;
+    background-color: #F9F7F3;
+    padding: 40px 0;
+}
+
+.dialogue-wrapper {
+    display: flex;
+    max-width: 1680px;
+    margin: 0 auto;
+}
+
+/* ==================== 사이드바 (대화 기록 목록) ==================== */
+.dialogue-sidebar {
+    width: 550px;
+    min-width: 550px;
+    background-color: #f2e7de;
+    border-radius: 25px 0 0 25px;
+    padding: 35px 45px;
+    overflow-y: auto;
+}
+
+/* 검색창 */
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #fdfdfd;
+    border-radius: 30px;
+    padding: 12px 20px;
+    margin-bottom: 35px;
+}
+
+.search-box .search-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 20px;
+    font-family: 'Paperlogy', sans-serif;
+    background: transparent;
+    color: #333;
+}
+
+.search-box input::placeholder {
+    color: #938a80;
+}
+
+/* 대화 기록 리스트 */
+.conversation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 대화 카드 */
+.conversation-card {
+    display: flex;
+    align-items: flex-start;
+    background-color: #fdfdfd;
+    border-radius: 25px;
+    padding: 28px 30px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.conversation-card:hover {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.conversation-card.active {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 대화 정보 */
+.conversation-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.conversation-date {
+    font-size: 15px;
+    color: #777069;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.conversation-title {
+    font-size: 25px;
+    font-weight: 700;
+    color: #524031;
+    margin: 0 0 15px 0;
+    line-height: 1.3;
+}
+
+/* 감정 태그 */
+.emotion-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.emotion-tag {
+    display: inline-block;
+    background-color: #eadbc8;
+    border: 1px solid #eae0d5;
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #4a3f3a;
+}
+
+/* 수정/삭제 버튼 */
+.btn-edit-conversation,
+.btn-delete-conversation {
+    position: absolute;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.conversation-card:hover .btn-edit-conversation,
+.conversation-card:hover .btn-delete-conversation {
+    opacity: 1;
+}
+
+.btn-edit-conversation {
+    top: 28px;
+    right: 45px;
+}
+
+.btn-delete-conversation {
+    top: 28px;
+    right: 15px;
+}
+
+.btn-edit-conversation:hover svg path,
+.btn-delete-conversation:hover svg path {
+    stroke: #d79c7b;
+}
+
+/* ==================== 메인 콘텐츠 영역 ==================== */
+.dialogue-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 활동 기록 섹션 */
+.activity-section {
+    background-color: #f9f7f3;
+    border-radius: 0 25px 0 0;
+    padding: 35px 70px 50px;
+}
+
+/* 활동 헤더 */
+.activity-header {
+    margin-bottom: 25px;
+}
+
+.activity-title {
+    font-size: 40px;
+    font-weight: 700;
+    color: #524031;
+    margin: 0 0 10px 0;
+}
+
+.activity-subtitle {
+    font-size: 30px;
+    color: #524031;
+    margin: 0;
+}
+
+/* ==================== 감정 선택 영역 ==================== */
+.emotion-selector {
+    margin-bottom: 30px;
+}
+
+.emotion-label {
+    font-size: 25px;
+    font-weight: 700;
+    color: #524031;
+    margin: 0 0 15px 0;
+}
+
+.emotion-buttons {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.emotion-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border: 1px solid #eae0d5;
+    border-radius: 30px;
+    padding: 10px 22px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #4a3f3a;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.emotion-btn:hover {
+    background-color: #f5ebe0;
+}
+
+.emotion-btn.active {
+    background-color: #eadbc8;
+    border-color: #d9d0ca;
+}
+
+/* ==================== 대화 기록 입력 영역 ==================== */
+.conversation-input-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.conversation-textarea {
+    width: 100%;
+    height: 169px;
+    background-color: #feffff;
+    border: 2px solid #d9d0ca;
+    border-radius: 25px;
+    padding: 28px 25px;
+    font-size: 20px;
+    font-family: 'Paperlogy', sans-serif;
+    color: #333;
+    resize: none;
+    box-sizing: border-box;
+}
+
+.conversation-textarea::placeholder {
+    color: #9a958e;
+}
+
+.conversation-textarea:focus {
+    outline: none;
+    border-color: #d79c7b;
+}
+
+.btn-register {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+    background-color: #f2e7de;
+    border: none;
+    border-radius: 30px;
+    padding: 8px 20px;
+    font-size: 15px;
+    color: #4a3f3a;
+    cursor: pointer;
+    font-family: 'Paperlogy', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.btn-register:hover {
+    background-color: #eadbc8;
+}
+
+/* ==================== AI 질문 제안 박스 ==================== */
+.ai-suggestion-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding: 25px 30px;
+    background: transparent;
+    position: relative;
+}
+
+.ai-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #f5d5c8 0%, #e8c4b8 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.brain-emoji {
+    font-size: 40px;
+}
+
+.ai-suggestion-content {
+    flex: 1;
+    background-color: transparent;
+}
+
+.ai-suggestion-content p {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4a3f3a;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.suggestion-label {
+    color: #4a3f3a;
+}
+
+.suggestion-text {
+    color: #4a3f3a;
+    transition: opacity 0.2s ease;
+    display: inline-block;
+}
+
+/* 스켈레톤 로딩 상태 */
+.suggestion-text.skeleton {
+    position: relative;
+    background-color: #e8ddd4;
+    color: transparent !important;
+    border-radius: 8px;
+    min-width: 400px;
+    height: 28px;
+    display: inline-block;
+    overflow: hidden;
+    user-select: none;
+    vertical-align: middle;
+}
+
+/* Shimmer 효과 */
+.suggestion-text.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        transparent 100%
+    );
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -150%;
+    }
+    100% {
+        left: 150%;
+    }
+}
+
+.btn-refresh-suggestion {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.btn-refresh-suggestion:hover {
+    transform: rotate(180deg);
+}
+
+/* ==================== AI 추천 버튼 ==================== */
+.btn-ai-recommend {
+    width: 100%;
+    background-color: #d7b7a5;
+    border: none;
+    border-radius: 30px;
+    padding: 15px 30px;
+    font-size: 25px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Paperlogy', sans-serif;
+    box-shadow: 4px 5px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-ai-recommend:hover {
+    background-color: #c9a08a;
+    transform: translateY(-2px);
+    box-shadow: 4px 7px 15px rgba(0, 0, 0, 0.35);
+}
+
+/* ==================== AI 분석 섹션 ==================== */
+.ai-analysis-section {
+    background-color: #fbf2ea;
+    border-radius: 0 0 25px 0;
+    padding: 50px 70px;
+}
+
+.ai-analysis-card {
+    background-color: #fcf8f4;
+    border: 1px solid #b09382;
+    border-radius: 25px;
+    padding: 30px 40px;
+}
+
+.analysis-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4a3f3a;
+    margin: 0 0 15px 0;
+}
+
+.analysis-highlight {
+    font-size: 35px;
+    font-weight: 700;
+    color: #4a3f3a;
+    margin: 0 0 20px 0;
+}
+
+.analysis-highlight .highlight-text {
+    color: #d79c7b;
+}
+
+.analysis-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.analysis-description {
+    font-size: 15px;
+    font-weight: 500;
+    color: #4a3f3a;
+    margin: 0;
+    flex: 1;
+}
+
+.btn-full-analysis {
+    background-color: #fcf8f4;
+    border: 1px solid #b09382;
+    border-radius: 30px;
+    padding: 10px 25px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #4a3f3a;
+    cursor: pointer;
+    font-family: 'Paperlogy', sans-serif;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-full-analysis:hover {
+    background-color: #f5ebe0;
+}
+
+/* ==================== 반응형 디자인 ==================== */
+@media (max-width: 1400px) {
+    .dialogue-sidebar {
+        width: 450px;
+        min-width: 450px;
+        padding: 30px 35px;
+    }
+
+    .activity-section,
+    .ai-analysis-section {
+        padding: 30px 50px;
+    }
+
+    .activity-title {
+        font-size: 32px;
+    }
+
+    .activity-subtitle {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .dialogue-wrapper {
+        flex-direction: column;
+    }
+
+    .dialogue-sidebar {
+        width: 100%;
+        min-width: unset;
+        border-radius: 25px 25px 0 0;
+        max-height: 400px;
+    }
+
+    .dialogue-main {
+        border-radius: 0 0 25px 25px;
+    }
+
+    .activity-section {
+        border-radius: 0;
+    }
+
+    .ai-analysis-section {
+        border-radius: 0 0 25px 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dialogue-container {
+        margin-top: 85px;
+    }
+
+    .dialogue-sidebar {
+        padding: 25px 20px;
+    }
+
+    .conversation-card {
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .book-thumbnail {
+        width: 70px;
+        height: 70px;
+    }
+
+    .conversation-title {
+        font-size: 20px;
+    }
+
+    .emotion-tag {
+        font-size: 16px;
+        padding: 6px 14px;
+    }
+
+    .activity-section,
+    .ai-analysis-section {
+        padding: 25px 20px;
+    }
+
+    .activity-title {
+        font-size: 26px;
+    }
+
+    .activity-subtitle {
+        font-size: 18px;
+    }
+
+    .emotion-btn {
+        font-size: 16px;
+        padding: 8px 16px;
+    }
+
+    .conversation-textarea {
+        height: 150px;
+        font-size: 16px;
+        padding: 20px;
+    }
+
+    .ai-suggestion-content p {
+        font-size: 16px;
+    }
+
+    .btn-ai-recommend {
+        font-size: 18px;
+        padding: 12px 20px;
+    }
+
+    .analysis-highlight {
+        font-size: 24px;
+    }
+
+    .analysis-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ==================== 스크롤바 스타일 ==================== */
+.dialogue-sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dialogue-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dialogue-sidebar::-webkit-scrollbar-thumb {
+    background-color: #d9d0ca;
+    border-radius: 4px;
+}
+
+.dialogue-sidebar::-webkit-scrollbar-thumb:hover {
+    background-color: #c9c0ba;
+}
+
+/* ==================== 애니메이션 ==================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.conversation-card {
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+.conversation-card:nth-child(1) { animation-delay: 0.1s; }
+.conversation-card:nth-child(2) { animation-delay: 0.2s; }
+.conversation-card:nth-child(3) { animation-delay: 0.3s; }
+.conversation-card:nth-child(4) { animation-delay: 0.4s; }
+.conversation-card:nth-child(5) { animation-delay: 0.5s; }
+
+/* ==================== 빈 상태 ==================== */
+.empty-conversations {
+    text-align: center;
+    padding: 60px 20px;
+    color: #938a80;
+}
+
+.empty-conversations p {
+    font-size: 18px;
+    margin: 0;
+}
+
+.empty-conversations .empty-hint {
+    font-size: 14px;
+    margin-top: 10px;
+    color: #b0a89e;
+}
+
+/* ==================== 확인 모달 ==================== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-container {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 0;
+    min-width: 400px;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-header {
+    padding: 30px 35px 20px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.modal-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #4a3f3a;
+    margin: 0;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.modal-body {
+    padding: 30px 35px;
+}
+
+.modal-message {
+    font-size: 18px;
+    color: #4a3f3a;
+    line-height: 1.6;
+    margin: 0;
+    font-family: 'Paperlogy', sans-serif;
+    text-align: center;
+}
+
+.modal-footer {
+    padding: 20px 35px 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.modal-btn {
+    padding: 14px 35px;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 500;
+    font-family: 'Paperlogy', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.modal-btn-cancel {
+    background-color: #f0f0f0;
+    color: #666;
+}
+
+.modal-btn-cancel:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.modal-btn-confirm {
+    background-color: #20B2AA;
+    color: #ffffff;
+}
+
+.modal-btn-confirm:hover {
+    background-color: #1a9890;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3);
+}
+
+/* 모달 애니메이션 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ==================== 독후 활동 가이드 ==================== */
+.guide-box {
+    margin-top: 30px;
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #fff9f5 0%, #fef5ef 100%);
+    border-radius: 15px;
+    border: 1px solid #f0e5dc;
+}
+
+.guide-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.guide-icon {
+    font-size: 28px;
+}
+
+.guide-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #4a3f3a;
+    margin: 0;
+}
+
+.guide-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.guide-list li {
+    font-size: 16px;
+    color: #6b5d54;
+    padding: 10px 0 10px 28px;
+    position: relative;
+    line-height: 1.5;
+}
+
+.guide-list li::before {
+    content: '•';
+    position: absolute;
+    left: 10px;
+    color: #d4a88a;
+    font-size: 20px;
+    font-weight: bold;
+}

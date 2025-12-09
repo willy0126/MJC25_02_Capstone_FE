@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 책장 | 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/bookcase.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main class="bookcase-container">
+        <!-- Hero Section -->
+        <section class="bookcase-hero">
+            <h1>도서 목록</h1>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="검색어를 입력해주세요">
+                <button class="search-btn">🔍</button>
+            </div>
+        </section>
+
+        <!-- Book Count -->
+        <section class="book-count-section">
+            <div class="count-info">
+                <span>총 <strong id="book-count">6</strong>권</span>
+            </div>
+            <button class="add-book-btn">등록</button>
+        </section>
+
+        <!-- Books Grid -->
+        <section class="books-grid" id="booksGrid">
+            <!-- 도서 목록이 동적으로 렌더링됩니다 -->
+            <div class="empty-books" id="emptyBooks">
+                <p>등록된 도서가 없습니다.</p>
+                <p class="empty-hint">도서를 등록하여 나만의 책장을 만들어보세요!</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 도서 상세보기 모달 -->
+    <div class="modal" id="bookDetailModal" style="display: none;">
+        <div class="modal-content book-detail-modal">
+            <button class="modal-close" id="bookDetailModalClose">&times;</button>
+            <div class="book-detail-content">
+                <div class="book-detail-cover" id="detailCover">
+                    <div class="book-cover-placeholder blue">
+                        <h3 id="detailCoverTitle">책 제목</h3>
+                    </div>
+                </div>
+                <div class="book-detail-info">
+                    <div class="detail-row">
+                        <span class="detail-label">제목</span>
+                        <span class="detail-value" id="detailTitle">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">저자</span>
+                        <span class="detail-value" id="detailAuthor">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">출판사</span>
+                        <span class="detail-value" id="detailPublisher">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">출판년도</span>
+                        <span class="detail-value" id="detailYear">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">ISBN</span>
+                        <span class="detail-value" id="detailIsbn">-</span>
+                    </div>
+                    <div class="detail-description">
+                        <span class="detail-label">책 소개</span>
+                        <p class="detail-value" id="detailDescription">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="book-detail-actions">
+                <button class="btn-edit-book" id="btnEditBook">수정</button>
+                <button class="btn-delete-book" id="btnDeleteBook">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 도서 수정 모달 -->
+    <div class="modal" id="editBookModal" style="display: none;">
+        <div class="modal-content edit-book-modal">
+            <div class="modal-header">
+                <h2>도서 정보 수정</h2>
+                <button class="modal-close" id="editBookModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editBookForm">
+                    <div class="form-group">
+                        <label for="editTitle">제목 <span class="required">*</span></label>
+                        <input type="text" id="editTitle" name="title" placeholder="책 제목을 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAuthor">저자 <span class="required">*</span></label>
+                        <input type="text" id="editAuthor" name="author" placeholder="저자명을 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPublisher">출판사</label>
+                        <input type="text" id="editPublisher" name="publisher" placeholder="출판사를 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="editYear">출판년도</label>
+                        <input type="text" id="editYear" name="publicationYear" placeholder="예: 2024" maxlength="4" pattern="\d*" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="form-group">
+                        <label for="editIsbn">ISBN</label>
+                        <input type="text" id="editIsbn" name="isbn" placeholder="10자리 또는 13자리 숫자" maxlength="13" pattern="\d*" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="form-group">
+                        <label for="editCoverUrl">책 표지 이미지</label>
+                        <div class="cover-upload-section">
+                            <div class="cover-preview" id="editCoverPreview">
+                                <span class="cover-placeholder-text">이미지 없음</span>
+                            </div>
+                            <div class="cover-upload-controls-vertical">
+                                <div class="cover-upload-buttons">
+                                    <input type="file" id="editCoverInput" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn-upload-cover" id="btnEditUploadCover">
+                                        <span class="upload-icon">📷</span>
+                                        <span>이미지 업로드</span>
+                                    </button>
+                                    <button type="button" class="btn-remove-cover-edit" id="btnEditRemoveCover">제거</button>
+                                </div>
+                                <div class="url-input-row">
+                                    <input type="text" id="editCoverUrl" name="coverUrl" placeholder="또는 이미지 URL 입력" onblur="previewEditCoverFromUrl(this.value)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDescription">책 소개</label>
+                        <textarea id="editDescription" name="description" placeholder="책에 대한 간단한 소개를 입력하세요" rows="3"></textarea>
+                    </div>
+
+                    <!-- 독서 일정 설정 섹션 -->
+                    <div class="reading-schedule-section">
+                        <div class="section-header">
+                            <h3 class="section-title">📅 독서 일정 설정</h3>
+                            <button type="button" class="btn-add-schedule" id="btnAddSchedule" title="독자 추가">
+                                <span>+</span>
+                            </button>
+                        </div>
+                        <p class="section-description">독서 일정을 설정하면 캘린더에서 확인할 수 있습니다.</p>
+
+                        <!-- 일정 목록 컨테이너 -->
+                        <div class="schedule-entries-container" id="scheduleEntriesContainer">
+                            <!-- 첫 번째 일정 항목 -->
+                            <div class="schedule-entry" data-index="0">
+                                <div class="schedule-entry-header">
+                                    <span class="schedule-entry-label">독자 1</span>
+                                    <button type="button" class="btn-remove-schedule" title="삭제" style="display: none;">×</button>
+                                </div>
+                                <div class="form-group">
+                                    <label>독자 선택</label>
+                                    <div class="reader-select-wrapper">
+                                        <select name="reader" class="form-select schedule-reader-select">
+                                            <option value="">선택 안 함</option>
+                                        </select>
+                                        <div class="reader-color-indicator schedule-color-indicator"></div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>시작일</label>
+                                        <input type="text" name="startDate" class="form-input flatpickr-input schedule-start-date" placeholder="시작일 선택" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>완료일</label>
+                                        <input type="text" name="endDate" class="form-input flatpickr-input schedule-end-date" placeholder="완료일 선택" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="schedule-info-box">
+                            <span class="info-icon">ℹ️</span>
+                            <span>독서 일정을 설정하면 캘린더 페이지에서 자동으로 확인할 수 있습니다.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeEditBookModal()">취소</button>
+                        <button type="submit" class="btn-confirm">저장</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 도서 삭제 확인 모달 -->
+    <div class="modal" id="deleteBookModal" style="display: none;">
+        <div class="modal-content delete-book-modal">
+            <h2>도서 삭제</h2>
+            <div class="warning-box">
+                <p>이 도서를 책장에서 삭제하시겠습니까?</p>
+                <p class="book-name-display" id="deleteBookName"></p>
+            </div>
+            <p class="confirm-message">이 작업은 되돌릴 수 없습니다.</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeDeleteBookModal()">취소</button>
+                <button type="button" class="btn-delete-confirm" id="btnConfirmDelete">삭제하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 도서 등록 모달 -->
+    <div class="modal" id="addBookModal" style="display: none;">
+        <div class="modal-content add-book-modal">
+            <div class="modal-header">
+                <h2>도서 등록</h2>
+                <button class="modal-close" id="addBookModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 검색 탭 -->
+                <div class="add-book-tabs">
+                    <button class="tab-btn active" data-tab="search">도서 검색</button>
+                    <button class="tab-btn" data-tab="manual">직접 입력</button>
+                </div>
+
+                <!-- 도서 검색 탭 -->
+                <div class="tab-content active" id="searchTab">
+                    <div class="book-search-container">
+                        <input type="text" class="book-search-input" id="bookSearchInput" placeholder="책 제목을 입력하세요">
+                        <button class="book-search-btn" id="bookSearchBtn">검색</button>
+                    </div>
+                    <div class="search-results" id="searchResults">
+                        <!-- 검색 결과가 여기에 표시됩니다 -->
+                        <div class="search-placeholder">
+                            <p>도서관 정보나루에서 책을 검색해보세요.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 직접 입력 탭 -->
+                <div class="tab-content" id="manualTab" style="display: none;">
+                    <form id="manualBookForm">
+                        <div class="manual-book-layout">
+                            <div class="manual-book-cover">
+                                <div class="book-cover-preview" id="manualCoverPreview">
+                                    <div class="book-cover-placeholder blue" id="manualCoverPlaceholder">
+                                        <h3 id="manualCoverTitle">책 제목</h3>
+                                    </div>
+                                    <img id="manualCoverImage" class="cover-image-preview" style="display: none;" alt="책 표지">
+                                </div>
+                                <div class="cover-upload-controls">
+                                    <input type="file" id="manualCoverInput" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn-upload-cover" id="btnUploadCover">
+                                        <span class="upload-icon">📷</span>
+                                        <span>표지 업로드</span>
+                                    </button>
+                                    <button type="button" class="btn-remove-cover" id="btnRemoveCover" style="display: none;">
+                                        <span>×</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="manual-book-fields">
+                                <div class="form-group">
+                                    <label for="manualTitle">제목</label>
+                                    <input type="text" id="manualTitle" name="title" placeholder="책 제목을 입력하세요" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="manualAuthor">저자</label>
+                                    <input type="text" id="manualAuthor" name="author" placeholder="저자명을 입력하세요" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="manualPublisher">출판사</label>
+                                    <input type="text" id="manualPublisher" name="publisher" placeholder="출판사를 입력하세요">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="book-details-section">
+                            <div class="section-header">
+                                <span class="section-title">도서 상세</span>
+                                <button type="button" class="btn-add-detail" id="btnAddBookDetail">
+                                    <span>+</span>
+                                </button>
+                            </div>
+                            <div class="book-details-list" id="bookDetailsList">
+                                <!-- 자녀 + 날짜 행이 동적으로 추가됩니다 -->
+                            </div>
+                        </div>
+
+                        <div class="form-actions-right">
+                            <button type="submit" class="btn-register">등록</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <script src="js/env-config.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+    <script src="js/bookcase.js"></script>
+    <script src="js/bookcase-schedule.js"></script>
+</body>
+</html>

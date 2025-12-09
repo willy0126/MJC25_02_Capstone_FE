@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!-- HEAD: 메타데이터 및 스타일시트 -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>책·이음 | 책으로 이어지는 우리 가족의 시간</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/toast.css">
+</head>
+
+<!-- BODY: 메인 콘텐츠 -->
+<body>
+    <!-- 네비게이션 섹션 -->
+    <div id="navbar-placeholder"></div>
+
+    <!-- 메인 슬라이드 섹션 -->
+    <div class="card-container">
+        <div class="slide">
+            <div class="item" style="background-image: url('assets/pics/main1.jpg');">
+                <div class="content">
+                    <div class="name">구독형 시스템</div>
+                    <div class="des">어떤 책을 읽을 지 고민하지 마세요.</div>
+                    <button><a href="preschool.html">자세히 보기</a></button>
+                </div>
+            </div>
+
+            <div class="item" style="background-image: url('assets/pics/main2.jpg');">
+                <div class="content">
+                    <div class="name">나의 책장</div>
+                    <div class="des">한 눈에 내가 읽은 책을 확인하세요.</div>
+                    <button><a href="bookcase.html">자세히 보기</a></button>
+                </div>
+            </div>
+
+            <div class="item" style="background-image: url('assets/pics/main3.jpg');">
+                <div class="content">
+                    <div class="name">커뮤니티</div>
+                    <div class="des">서로 소통하며 기쁨을 나누세요.</div>
+                    <button><a href="freeboard.html">자세히 보기</a></button>
+                </div>
+            </div>
+
+            <div class="item" style="background-image: url('assets/pics/main4.jpg');">
+                <div class="content">
+                    <div class="name">이벤트</div>
+                    <div class="des">다양한 챌린지가 준비되어 있습니다.</div>
+                    <button><a href="#">자세히 보기</a></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="button">
+            <button class="prev">◁</button>
+            <button class="auto-toggle" title="자동 전환">⏸</button>
+            <button class="next">▷</button>
+        </div>
+    </div>
+
+    <!-- 최근 활동 타임라인 섹션 (로그인 사용자만) -->
+    <div class="recent-activity-section" id="recentActivitySection" style="display: none;">
+        <div class="section-header">
+            <h2 class="reveal-on-scroll">나의 최근 활동</h2>
+            <a href="bookcase.html" class="view-all-link">전체보기 →</a>
+        </div>
+
+        <div class="activity-timeline" id="activityTimeline">
+            <!-- 스켈레톤 로더 -->
+            <div class="activity-skeleton">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-content">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-desc"></div>
+                </div>
+            </div>
+            <div class="activity-skeleton">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-content">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-desc"></div>
+                </div>
+            </div>
+            <div class="activity-skeleton">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-content">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-desc"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 인기 도서 섹션 -->
+    <div class="trending-books-section">
+        <h2 class="reveal-on-scroll">요즘 부모님들은 이 책에 관심 있어요</h2>
+
+        <div class="trending-tabs">
+            <button class="tab-btn active" data-tab="top5">지난주 인기 TOP 5</button>
+            <button class="tab-btn" data-tab="community">커뮤니티 화제의 책</button>
+        </div>
+
+        <div class="tab-content active" id="top5-content">
+            <div class="masonry-grid" id="top5-grid">
+                <!-- 동적으로 생성 -->
+            </div>
+        </div>
+
+        <div class="tab-content" id="community-content">
+            <div class="masonry-grid" id="community-grid">
+                <!-- 동적으로 생성 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 최신 공지사항 섹션 -->
+    <div class="latest-notices-section">
+        <div class="section-header">
+            <h2 class="reveal-on-scroll">최신 공지사항</h2>
+            <a href="notice.html" class="view-all-link">전체보기 →</a>
+        </div>
+
+        <div class="notices-grid" id="latest-notices-grid">
+            <!-- 동적으로 생성 -->
+            <div class="notice-skeleton">
+                <div class="skeleton-badge"></div>
+                <div class="skeleton-title"></div>
+                <div class="skeleton-date"></div>
+            </div>
+            <div class="notice-skeleton">
+                <div class="skeleton-badge"></div>
+                <div class="skeleton-title"></div>
+                <div class="skeleton-date"></div>
+            </div>
+            <div class="notice-skeleton">
+                <div class="skeleton-badge"></div>
+                <div class="skeleton-title"></div>
+                <div class="skeleton-date"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 푸터 섹션 -->
+    <div id="footer-placeholder"></div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- 외부 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- 애플리케이션 스크립트 -->
+    <script src="js/env-config.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/library-api.js"></script>
+    <script src="js/index.js"></script>
+</body>
+</html>

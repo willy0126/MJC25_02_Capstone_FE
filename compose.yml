@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # ==================================
+  # 1. 프론트엔드 (FE) - 핫 리로딩 적용
+  # ==================================
+  frontend:
+    # image: willy0126/capstone-fe:v1.0.3 (개발 시에는 주석 처리)
+    build:
+      context: .
+    container_name: frontend_container
+    ports:
+      - "8080:80"
+    volumes:
+      # [핫 리로딩]
+      - ./Front-End:/usr/share/nginx/html
+    depends_on:
+      - backend
+    networks:
+      - capstone
+    platform: linux/arm64/v8  # ARM64 아키텍처 사용
+
+  mysql:
+    container_name: mysql_container
+    image: mysql:8.0
+    env_file:
+      - .env
+    ports:
+      # 로컬 PC의 13333 포트 -> 컨테이너의 3306 포트로 연결
+      - "13333:3306"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      # .env 파일에서 직접 로드하거나 여기에 명시 (현재는 명시된 값 사용)
+      - TZ=Asia/Seoul
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    networks:
+      - capstone
+    platform: linux/arm64/v8  # ARM64 아키텍처 사용
+
+  backend:
+    image: jhh0101/capstone:v1.0.29
+    container_name: backend_container
+    env_file:
+      - .env
+    ports:
+      # 로컬 PC의 18888 포트 -> 컨테이너의 8082 포트로 연결
+      - "18888:8082"
+    environment:
+      - TZ=Asia/Seoul
+      - SPRING_PROFILES_ACTIVE=dev
+
+      # 🎯 .env 값 주입 (application.yml의 Placeholder와 일치)
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+
+      # DB 접속 URL (Host는 Docker 네트워크 상의 'mysql' 서비스 이름)
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/capstone?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none # application.yml의 ddl-auto 설정을 따르기 위해 none으로 변경
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect # 명시
+    depends_on:
+      - mysql
+    networks:
+      - capstone
+
+volumes:
+  mysql_data:
+
+networks:
+  capstone:
+    driver: bridge

@@ -1,0 +1,122 @@
+/* Footer Styles */
+.footer {
+    position: static;
+    width: 100%;
+    height: auto;
+    min-height: 250px;
+    background: #26292b;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: auto;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 30px 240px 20px 240px;
+    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.footer-section {
+    flex: 1;
+    margin-right: 40px;
+}
+
+.footer-section:last-child {
+    margin-right: 0;
+}
+
+.footer-section h3 {
+    font-size: 25px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #f1e4a6;
+}
+
+.footer-section h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #98d3e2;
+}
+
+.footer-section p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #bdc3c7;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 8px;
+}
+
+.footer-section ul li a {
+    color: #bdc3c7;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.3s ease;
+}
+
+.footer-section ul li a:hover {
+    color: #00b493;
+}
+
+.footer-bottom {
+    background-color: #cccccc;
+    text-align: center;
+    margin-top: 10px;
+    padding: 15px 240px;
+}
+
+.footer-bottom p {
+    margin: 0;
+    font-size: 12px;
+    color: #777;
+}
+
+
+/* 반응형 웹을 위한 미디어 쿼리 */
+@media (max-width: 1280px) {
+    .footer-content {
+        padding: 30px 80px 20px 80px;
+    }
+
+    .footer-bottom {
+        padding: 15px 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer {
+        height: auto;
+        min-height: 200px;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        padding: 30px 20px 20px 20px;
+        gap: 20px;
+    }
+
+    .footer-section {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .footer-bottom {
+        padding: 15px 20px;
+    }
+}
