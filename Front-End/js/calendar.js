@@ -196,7 +196,7 @@ function initializeDraggable() {
     if (!containerEl) return;
 
     // FullCalendar의 Draggable 클래스 사용
-    draggableInstance =new FullCalendar.Draggable(containerEl, {
+    draggableInstance = new FullCalendar.Draggable(containerEl, {
         itemSelector: '.draggable-book',
         eventData: function(eventEl) {
             // 드래그된 요소의 데이터 추출
@@ -893,7 +893,7 @@ function processCalendarData(dayDataList, year, month) {
         }
     });
 
-    allEvents =events;
+    allEvents = events;
 }
 
 // 레코드를 FullCalendar 이벤트로 변환 (독자 색상 기반)
@@ -918,7 +918,7 @@ function convertToEvent(record, index = 0) {
 
 // 날짜 선택
 function selectDate(dateStr) {
-    selectedDate =dateStr;
+    selectedDate = dateStr;
     loadDailyRecords(dateStr);
 }
 
@@ -1309,7 +1309,7 @@ function updateMonthlySummaryFromEvents(year, month) {
 
 // 일정 등록 모달 열기
 function openScheduleModal(bookData, dropDate) {
-    pendingSchedule ={
+    pendingSchedule = {
         bookId: bookData.bookId,
         title: bookData.title,
         author: bookData.author,
@@ -1459,7 +1459,7 @@ function openRecordDetail(detailsId, dateStr) {
     console.log('[Calendar Debug] openRecordDetail 이미지 정보:', { imageId, coverUrl, bookImage: book.image });
 
     // 현재 보고 있는 책 정보 저장 (수정/삭제용)
-    currentViewingRecord ={
+    currentViewingRecord = {
         bookId: bookId,
         title: book.title || '제목 없음',
         author: book.author || '작자 미상',
@@ -1711,7 +1711,7 @@ function hexToRgba(hex, alpha) {
 // 기록 상세 모달 닫기
 function closeRecordDetailModal() {
     document.getElementById('recordDetailModal').style.display = 'none';
-    currentViewingRecord =null;
+    currentViewingRecord = null;
     currentEditingReader = null;
 }
 
@@ -2600,7 +2600,7 @@ function initEditDatePickers() {
 
     // 시작일 picker
     if (startInput) {
-        editStartPicker =flatpickr(startInput, {
+        editStartPicker = flatpickr(startInput, {
             ...flatpickrConfig,
             defaultDate: startDate,
             onChange: function(selectedDates, dateStr) {
@@ -2619,7 +2619,7 @@ function initEditDatePickers() {
 
     // 종료일 picker
     if (endInput) {
-        editEndPicker =flatpickr(endInput, {
+        editEndPicker = flatpickr(endInput, {
             ...flatpickrConfig,
             defaultDate: endDate,
             minDate: startDate

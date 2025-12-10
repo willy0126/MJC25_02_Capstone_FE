@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결과물 목록 - 책·이음</title>
+    <link rel="icon" type="image/png" href="../assets/logo/tplogo.png">
+
+    <!-- Google Fonts: Paperlogy -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/play-result.css">
+    <link rel="stylesheet" href="../css/toast.css">
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main class="result-container">
+        <!-- 헤더 -->
+        <section class="result-header">
+            <h1>결과물 목록</h1>
+            <p>AI가 생성한 그림책을 확인해보세요</p>
+        </section>
+
+        <!-- 빈 상태 -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">📚</div>
+            <h2>결과물이 없습니다</h2>
+            <p>창작 놀이에서 그림책을 생성해보세요!</p>
+            <a href="play.html" class="back-btn">창작 놀이 바로가기</a>
+        </div>
+
+        <!-- 그림책 목록 -->
+        <div id="picturebookList" class="picturebook-list">
+            <!-- JS에서 동적 생성 -->
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 공용 JS -->
+    <script src="../js/toast.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/constants.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <!-- include.js: Navbar/Footer 동적 로드 -->
+    <script src="../js/include.js"></script>
+
+    <!-- 페이지 전용 JS -->
+    <script src="../js/play-result.js"></script>
+    <script src="../js/cursor.js"></script>
+</body>
+</html>
