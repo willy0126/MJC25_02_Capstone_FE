@@ -527,15 +527,18 @@ CREATE TABLE `dialogue_answer` (
 -- Table: vote
 CREATE TABLE `vote` (
     `vote_id` BIGINT NOT NULL AUTO_INCREMENT,
+    `details_id` BIGINT NOT NULL,
     `story_id` BIGINT NOT NULL,
     `user_id` BIGINT NOT NULL,
     `voted_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`vote_id`),
     KEY `idx_story_id` (`story_id`),
     KEY `idx_user_id` (`user_id`),
+    KEY `idx_details_id` (`details_id`),
+    UNIQUE KEY `uk_story_user` (`story_id`, `user_id`),
     CONSTRAINT `fk_vote_story` FOREIGN KEY (`story_id`) REFERENCES `story` (`story_id`) ON DELETE CASCADE,
     CONSTRAINT `fk_vote_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-    UNIQUE KEY `uk_story_user` (`story_id`, `user_id`)
+    CONSTRAINT `fk_vote_details` FOREIGN KEY (`details_id`) REFERENCES `contest_details` (`details_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: result_images
