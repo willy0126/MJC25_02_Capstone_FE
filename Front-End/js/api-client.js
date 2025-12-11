@@ -32,10 +32,12 @@ class ApiClient {
         }
 
         const url = `${this.baseURL}${endpoint}`;
-        const headers = {
-            'Content-Type': 'application/json',
-            ...options.headers
-        };
+
+        // FormData인 경우 Content-Type을 설정하지 않음 (브라우저가 자동 설정)
+        const isFormData = options.body instanceof FormData;
+        const headers = isFormData
+            ? { ...options.headers }
+            : { 'Content-Type': 'application/json', ...options.headers };
 
         // Add Authorization header if access token exists
         const accessToken = this.getAccessToken();
@@ -1119,7 +1121,29 @@ class ApiClient {
      */
     async deleteDialogueConversation(conversationId) {
         return await this.request(`/dialogue/conversations/${conversationId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+        });
+    }
+    
+    /**
+     * 대회 AI 이미지 생성 (비동기)
+     * @param {number} contestId - 대회 ID
+     * @returns {Promise<Object>} jobId 반환 (진행 상황은 GET /status/{jobId}로 확인)
+     */
+    async generateContestImages(contestId) {
+        return await this.request(`/admin/contest/${contestId}/generate-images`, {
+            method: 'POST',
+        });
+    }
+
+    /**
+     * 이미지 생성 작업 상태 확인
+     * @param {string} jobId - 작업 ID
+     * @returns {Promise<Object>} 작업 상태 및 결과
+     */
+    async getImageGenerationStatus(jobId) {
+        return await this.request(`/status/${jobId}`, {
+            method: 'GET',
         });
     }
 }

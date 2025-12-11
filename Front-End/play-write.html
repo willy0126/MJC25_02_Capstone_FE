@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이어쓰기 - 책·이음</title>
+    <link rel="icon" type="image/png" href="../assets/logo/tplogo.png">
+
+    <!-- Google Fonts: Paperlogy -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/play-write.css">
+    <link rel="stylesheet" href="../css/toast.css">
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main class="write-container">
+        <!-- 뒤로가기 버튼 -->
+        <a href="play-detail.html" class="back-btn" id="backBtn">
+            ← 대회 상세로
+        </a>
+
+        <!-- 페이지 헤더 -->
+        <div class="write-header">
+            <h1>✍️ 이야기 이어쓰기</h1>
+            <p>앞의 이야기를 읽고 당신만의 이야기를 이어가세요</p>
+        </div>
+
+        <!-- 첫 문장 영역 -->
+        <section class="first-sentence">
+            <div class="sentence-label">📖 이야기의 시작</div>
+            <p class="sentence-text" id="firstSentence">
+                첫 문장을 불러오는 중...
+            </p>
+            <div class="sentence-info">
+                <span class="contest-name" id="contestName">대회 정보 로딩 중...</span>
+            </div>
+        </section>
+
+        <!-- 글 작성 폼 -->
+        <section class="write-form">
+            <div class="form-header">
+                <h2>내 이야기 작성</h2>
+                <p>이야기의 흐름에 맞게 자연스럽게 이어서 작성해주세요.</p>
+            </div>
+
+            <div class="form-content">
+                <textarea 
+                    id="storyContent" 
+                    class="story-textarea" 
+                    placeholder="이야기를 이어서 작성해주세요..."
+                    maxlength="2000"
+                ></textarea>
+                <div class="textarea-info">
+                    <span class="char-count"><span id="charCount">0</span> / 2000자</span>
+                    <span class="min-count">최소 50자 이상</span>
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button class="cancel-btn" id="cancelBtn">취소</button>
+                <button class="submit-btn" id="submitBtn">등록하기</button>
+            </div>
+        </section>
+
+        <!-- 등록된 글 목록 -->
+        <section class="story-list">
+            <div class="list-header">
+                <h2>📚 이어쓴 이야기들</h2>
+                <span class="story-count">총 <span id="storyCount">0</span>개</span>
+            </div>
+
+            <div class="story-items" id="storyItems">
+                <!-- 글이 없을 때 -->
+                <div class="empty-story" id="emptyStory">
+                    <p>아직 등록된 이야기가 없습니다.</p>
+                    <p>첫 번째 이야기를 작성해보세요!</p>
+                </div>
+
+                <!-- 등록된 글 예시 (JS로 동적 생성) -->
+                <!--
+                <div class="story-item">
+                    <div class="story-header">
+                        <div class="author-info">
+                            <span class="author-name">작성자닉네임</span>
+                            <span class="write-date">2025.01.20 14:30</span>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>나는 조심스럽게 그 책을 집어 들었다. 표지에는 아무런 글씨도 없었고...</p>
+                    </div>
+                    <div class="story-footer">
+                        <button class="like-btn">
+                            <span class="like-icon">👍</span>
+                            <span class="like-count">12</span>
+                        </button>
+                    </div>
+                </div>
+                -->
+            </div>
+        </section>
+
+        <!-- 작성 팁 -->
+        <section class="write-tips">
+            <h3>💡 작성 팁</h3>
+            <ul>
+                <li>앞의 이야기 흐름을 자연스럽게 이어주세요.</li>
+                <li>다른 참가자들이 이어쓸 수 있도록 열린 결말로 작성해보세요.</li>
+                <li>추천을 많이 받은 글은 최종 이야기에 포함됩니다!</li>
+            </ul>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 공용 JS -->
+    <script src="../js/toast.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/constants.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <!-- include.js: Navbar/Footer 동적 로드 -->
+    <script src="../js/include.js"></script>
+
+    <!-- 페이지 전용 JS -->
+    <script src="../js/play-write.js"></script>
+    <script src="../js/cursor.js"></script>
+</body>
+</html>
