@@ -403,7 +403,7 @@ CREATE TABLE `contest_details` (
     CONSTRAINT `fk_contest_details_contest` FOREIGN KEY (`contest_id`) REFERENCES `contest` (`contest_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Table: share_board
+-- Table: share_board (도서 나눔 게시판)
 CREATE TABLE `share_board` (
     `share_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT NOT NULL,
@@ -412,19 +412,21 @@ CREATE TABLE `share_board` (
     `content` TEXT NULL,
     `image_id` BIGINT NULL,
     `location` VARCHAR(255) NULL,
-    `meet_status` ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED') NULL,
+    `meet_status` ENUM('SHARING', 'RESERVED', 'COMPLETED') NOT NULL DEFAULT 'SHARING' COMMENT '나눔중/예약중/완료',
     `max_participants` INT NULL,
     `current_participants` INT NOT NULL DEFAULT 1,
     `datetime` DATETIME NULL,
     `price` INT NULL DEFAULT 0,
     `book_status` ENUM('A', 'B', 'C') NOT NULL DEFAULT 'A' COMMENT '등급 : A, B, C',
+    `views` INT NOT NULL DEFAULT 0 COMMENT '조회수',
     `create_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    `update_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `update_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`share_id`),
     KEY `idx_user_id` (`user_id`),
     KEY `idx_category_id` (`category_id`),
     KEY `idx_image_id` (`image_id`),
     KEY `idx_datetime` (`datetime`),
+    KEY `idx_meet_status` (`meet_status`),
     CONSTRAINT `fk_share_board_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
     CONSTRAINT `fk_share_board_category` FOREIGN KEY (`category_id`) REFERENCES `package_categories` (`category_id`) ON DELETE SET NULL,
     CONSTRAINT `fk_share_board_image` FOREIGN KEY (`image_id`) REFERENCES `image` (`image_id`) ON DELETE SET NULL

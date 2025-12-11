@@ -185,6 +185,88 @@
     color: #666;
 }
 
+/* Status Badge Styles (나눔 상태) */
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-sharing {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+}
+
+.status-reserved {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: white;
+}
+
+.status-completed {
+    background: #9E9E9E;
+    color: white;
+}
+
+/* Action Buttons in Table */
+.edit-btn, .delete-btn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 3px;
+}
+
+.edit-btn {
+    background: #667eea;
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #5a6fd6;
+    transform: translateY(-1px);
+}
+
+.delete-btn {
+    background: #ff6b6b;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #ff5252;
+    transform: translateY(-1px);
+}
+
+/* Status Change Buttons in Detail Modal */
+.btn-status {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #FF9800;
+    color: white;
+}
+
+.btn-status:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.btn-status.btn-complete {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+.btn-status.btn-complete:hover {
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
 /* Pagination */
 .pagination {
     display: flex;
@@ -506,7 +588,7 @@
    Write Modal - Centered & Styled
    =============================== */
 #writeModal {
-    display: none; /* 초기 숨김 */
+    display: none; /* 초기 숨김 - JS에서 flex로 변경 */
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -514,14 +596,8 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
-
-    display: flex;
     justify-content: center;
     align-items: center;
-}
-
-#writeModal.show {
-    display: flex;
 }
 
 /* Modal content */
@@ -765,4 +841,236 @@
         padding: 8px 12px;
         font-size: 0.85rem;
     }
+}
+
+/* ===============================
+   Alert Modal Styles
+   =============================== */
+.alert-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.alert-modal.show {
+    display: flex;
+}
+
+.alert-modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 35px 30px;
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    animation: alertSlideUp 0.3s ease;
+}
+
+@keyframes alertSlideUp {
+    from {
+        transform: scale(0.8) translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+.alert-modal-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.alert-modal-icon svg {
+    width: 40px;
+    height: 40px;
+    display: none;
+}
+
+/* Success */
+.alert-modal.alert-success .alert-modal-icon {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+.alert-modal.alert-success .icon-success {
+    display: block;
+    stroke: white;
+}
+
+.alert-modal.alert-success .alert-modal-btn {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+/* Error */
+.alert-modal.alert-error .alert-modal-icon {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+}
+
+.alert-modal.alert-error .icon-error {
+    display: block;
+    stroke: white;
+}
+
+.alert-modal.alert-error .alert-modal-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+}
+
+/* Warning */
+.alert-modal.alert-warning .alert-modal-icon {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+}
+
+.alert-modal.alert-warning .icon-warning {
+    display: block;
+    stroke: white;
+}
+
+.alert-modal.alert-warning .alert-modal-btn {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+}
+
+/* Info */
+.alert-modal.alert-info .alert-modal-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.alert-modal.alert-info .icon-info {
+    display: block;
+    stroke: white;
+}
+
+.alert-modal.alert-info .alert-modal-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.alert-modal-message {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    white-space: pre-line;
+    word-break: keep-all;
+}
+
+.alert-modal-btn {
+    padding: 12px 40px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.alert-modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ===============================
+   Confirm Modal Styles
+   =============================== */
+.confirm-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.confirm-modal.show {
+    display: flex;
+}
+
+.confirm-modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 35px 30px;
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    animation: alertSlideUp 0.3s ease;
+}
+
+.confirm-modal-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.confirm-modal-icon svg {
+    width: 40px;
+    height: 40px;
+    stroke: white;
+}
+
+.confirm-modal-message {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    word-break: keep-all;
+}
+
+.confirm-modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.confirm-modal-btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.confirm-btn-cancel {
+    background: #e0e0e0;
+    color: #666;
+}
+
+.confirm-btn-cancel:hover {
+    background: #d0d0d0;
+}
+
+.confirm-btn-ok {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+    color: white;
+}
+
+.confirm-btn-ok:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
 }

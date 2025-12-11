@@ -32,10 +32,12 @@ class ApiClient {
         }
 
         const url = `${this.baseURL}${endpoint}`;
-        const headers = {
-            'Content-Type': 'application/json',
-            ...options.headers
-        };
+
+        // FormData인 경우 Content-Type을 설정하지 않음 (브라우저가 자동 설정)
+        const isFormData = options.body instanceof FormData;
+        const headers = isFormData
+            ? { ...options.headers }
+            : { 'Content-Type': 'application/json', ...options.headers };
 
         // Add Authorization header if access token exists
         const accessToken = this.getAccessToken();
