@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!-- HEAD: 메타데이터 및 스타일시트 -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/toast.css">
+</head>
+
+<!-- BODY: 로그인 페이지 -->
+<body>
+    <!-- 네비게이션 -->
+    <div id="navbar-placeholder"></div>
+
+    <!-- 로그인 폼 섹션 -->
+    <main class="login-container">
+        <div class="login-background"></div>
+
+        <div class="login-content">
+            <form class="form-container" id="loginForm">
+                <div class="input-group">
+                    <img class="icon-small" src="assets/pics/person.png" alt="사용자 아이콘">
+                    <input type="email" id="email" name="email" placeholder="Email" required lang="en" inputmode="email">
+                </div>
+
+                <div class="input-group">
+                    <img class="icon-small" src="assets/pics/lock.png" alt="자물쇠 아이콘">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                </div>
+
+                <button type="submit" class="login-button">LOG IN</button>
+            </form>
+
+            <div class="links">
+                <a href="resetpw.html" class="link">비밀번호 재설정</a>
+            </div>
+
+            <div class="signup">
+                아직 계정이 없으신가요?
+                <a href="register.html" class="signup-link">회원가입</a>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- 소셜 로그인 -->
+            <div class="social-login">
+                <p class="social-title">소셜 계정으로 로그인 해보세요</p>
+                <div class="social-icons">
+                    <button type="button" class="social-button kakao" aria-label="카카오 로그인">
+                        <img class="icon" src="assets/pics/kakao.png" alt="카카오">
+                    </button>
+                    <button type="button" class="social-button naver" aria-label="네이버 로그인">
+                        <img class="icon" src="assets/pics/naver.png" alt="네이버">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <div id="footer-placeholder"></div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- 애플리케이션 스크립트 -->
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>

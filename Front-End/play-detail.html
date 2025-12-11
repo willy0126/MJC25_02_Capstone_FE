@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대회 상세 - 책·이음</title>
+    <link rel="icon" type="image/png" href="../assets/logo/tplogo.png">
+
+    <!-- Google Fonts: Paperlogy -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/play-detail.css">
+    <link rel="stylesheet" href="../css/toast.css">
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main class="detail-container">
+        <!-- 뒤로가기 버튼 -->
+        <a href="play.html" class="back-btn">
+            ← 대회 목록으로
+        </a>
+
+        <!-- 상단 영역: 포스터 + 기본 정보 -->
+        <section class="detail-header">
+            <div class="poster-wrapper">
+                <img src="../assets/pics/창작 그림책 공모전.jpg" alt="대회 포스터" class="poster-image" id="posterImage">
+            </div>
+            
+            <div class="basic-info">
+                <span class="contest-status status-ongoing" id="contestStatus">진행중</span>
+                <h1 class="contest-title" id="contestTitle">창작 그림책 공모전</h1>
+                <p class="contest-date" id="contestDate">📅 2025.01.15 ~ 2025.02.28</p>
+                
+                <div class="info-divider"></div>
+                
+                <div class="info-item">
+                    <span class="info-label">주최</span>
+                    <span class="info-value" id="contestHost">책·이음</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">참가 대상</span>
+                    <span class="info-value" id="contestTarget">누구나 참여 가능</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">참가 비용</span>
+                    <span class="info-value" id="contestFee">무료</span>
+                </div>
+                
+                <button class="participate-btn" id="writeBtn">이어쓰기</button>
+            </div>
+        </section>
+
+        <!-- 상세 내용 탭 -->
+        <section class="detail-content">
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="description">대회 소개</button>
+                <button class="tab-btn" data-tab="how">참가 방법</button>
+                <button class="tab-btn" data-tab="prize">시상 내역</button>
+            </div>
+
+            <!-- 대회 소개 -->
+            <div class="tab-content active" id="tab-description">
+                <h2>대회 소개</h2>
+                <p id="contestDescription">
+                    창작 그림책 공모전에 여러분을 초대합니다!<br><br>
+                    이번 공모전은 자유로운 주제로 여러분의 창의력을 마음껏 발휘할 수 있는 기회입니다. <br><br>
+                    관리자의 첫 문구를 이어받아 여러분의 아이디어로 이야기를 이어가주세요.<br><br>
+                    추천수가 많은 문구들로 선정되며 최종적으로 하나의 이야기가 만들어집니다.
+                    초보자부터 전문가까지 누구나 환영합니다!
+                </p>
+            </div>
+<!-- 참가 방법 -->
+<div class="tab-content" id="tab-how">
+    <h2>참가 방법</h2>
+    <div class="steps">
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>첫 문장 확인</h3>
+                <p>관리자가 제시한 첫 문장을 확인하고 이야기의 시작을 읽어보세요.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>이야기 이어쓰기</h3>
+                <p>'참가하기' 버튼을 눌러 앞의 내용에 이어지는 글을 작성합니다.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>추천하기</h3>
+                <p>마음에 드는 글에 추천을 눌러주세요. 내 글도 추천받을 수 있어요!</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>최종 이야기 완성</h3>
+                <p>대회 종료 후, 각 단계에서 가장 많은 추천을 받은 글들이 모여 하나의 완성된 이야기가 탄생합니다.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- 시상 내역 -->
+            <div class="tab-content" id="tab-prize">
+                <h2>시상 내역</h2>
+                <div class="prize-list">
+                    <div class="prize-item gold">
+                        <div class="prize-rank">🥇 대상</div>
+                        <div class="prize-reward">상금 100만원 + 상장</div>
+                        <div class="prize-count">1명</div>
+                    </div>
+                    <div class="prize-item silver">
+                        <div class="prize-rank">🥈 최우수상</div>
+                        <div class="prize-reward">상금 50만원 + 상장</div>
+                        <div class="prize-count">2명</div>
+                    </div>
+                    <div class="prize-item bronze">
+                        <div class="prize-rank">🥉 우수상</div>
+                        <div class="prize-reward">상금 30만원 + 상장</div>
+                        <div class="prize-count">3명</div>
+                    </div>
+                    <div class="prize-item special">
+                        <div class="prize-rank">🎨 인기상</div>
+                        <div class="prize-reward">상금 10만원 + 상장</div>
+                        <div class="prize-count">5명</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 차수 선택 모달 -->
+    <div id="stageSelectModal" class="modal" style="display: none;">
+        <div class="modal-content stage-modal">
+            <h2>이어쓰기 차수 선택</h2>
+            <p class="modal-description">참여하실 차수를 선택해주세요</p>
+
+            <div class="stage-list">
+                <button class="stage-btn" data-stage="1">
+                    <div class="stage-number">1차 (12/2 ~ 12/8)</div>
+                    <div class="stage-status status-available">참여 가능</div>
+                </button>
+
+                <button class="stage-btn locked" data-stage="2">
+                    <div class="stage-number">2차 (12/9 ~ 12/15)</div>
+                    <div class="stage-status status-locked">1차 진행 중</div>
+                </button>
+
+                <button class="stage-btn locked" data-stage="3">
+                    <div class="stage-number">3차 (12/16 ~ 12/22)</div>
+                    <div class="stage-status status-locked">1차 진행 중</div>
+                </button>
+
+                <button class="stage-btn locked" data-stage="4">
+                    <div class="stage-number">4차 (12/23 ~ 12/29)</div>
+                    <div class="stage-status status-locked">1차 진행 중</div>
+                </button>
+            </div>
+
+            <button class="modal-close-btn" id="closeStageModal">취소</button>
+        </div>
+    </div>
+
+    <!-- 공용 JS -->
+    <script src="../js/toast.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/constants.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <!-- include.js: Navbar/Footer 동적 로드 -->
+    <script src="../js/include.js"></script>
+
+    <!-- 페이지 전용 JS -->
+    <script src="../js/play-detail.js"></script>
+    <script src="../js/cursor.js"></script>
+</body>
+</html>

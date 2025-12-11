@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!-- HEAD: 메타데이터 및 스타일시트 -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/mypage.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+
+<!-- BODY: 마이페이지 메인 -->
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <!-- 비밀번호 재확인 -->
+    <div id="passwordVerifyModal" class="modal">
+        <div class="modal-content">
+            <h2>비밀번호 확인</h2>
+            <p>회원정보 보호를 위해 비밀번호를 다시 한 번 입력해주세요.</p>
+            <form id="passwordVerifyForm">
+                <div class="input-group">
+                    <img class="icon-small" src="assets/pics/lock.png" alt="자물쇠 아이콘">
+                    <input type="password" id="verifyPassword" name="password" placeholder="비밀번호" required autocomplete="current-password">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="window.history.back()">취소</button>
+                    <button type="submit" class="btn-confirm">확인</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 프로필 및 자녀 관리 섹션 -->
+    <main class="mypage-container" id="mypageContent" style="display: none;">
+        <div class="mypage-header">
+            <h1>마이페이지</h1>
+            <p class="subtitle">내 정보를 관리하고 활동 내역을 확인하세요</p>
+        </div>
+
+        <div class="mypage-content">
+            <!-- 프로필 섹션 -->
+            <section class="profile-section">
+                <h2>프로필 정보</h2>
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <div class="avatar-circle" id="userAvatar">
+                            <span id="userInitial">U</span>
+                        </div>
+                        <div class="color-indicator" id="userColor"></div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="info-row">
+                            <label>이메일</label>
+                            <span id="userEmail">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>이름</label>
+                            <span id="userName">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>닉네임</label>
+                            <span id="userNickname">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>전화번호</label>
+                            <span id="userPhone">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>생년월일</label>
+                            <span id="userBirth">-</span>
+                        </div>
+                        <div class="info-row">
+                            <label>주소</label>
+                            <span id="userAddress">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn-edit" onclick="editProfile()">정보 수정</button>
+                    <button class="btn-change-password" onclick="resetPassword()">비밀번호 재설정</button>
+                </div>
+            </section>
+
+            <!-- 자녀 관리 섹션 -->
+            <section class="children-section">
+                <div class="section-header">
+                    <h2>자녀 관리</h2>
+                    <button class="btn-add-child" onclick="openAddChildModal()">
+                        <span class="plus-icon">+</span> 자녀 추가
+                    </button>
+                </div>
+                <div class="children-list" id="childrenList">
+                    <!-- 자녀 카드들이 여기에 동적으로 추가됩니다 -->
+                    <div class="empty-children">
+                        <p>등록된 자녀가 없습니다.</p>
+                        <p class="empty-hint">자녀를 추가하여 맞춤형 도서를 추천받으세요!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 구독 정보 섹션 -->
+            <section class="subscription-section">
+                <h2>구독 정보</h2>
+                <div class="subscription-card">
+                    <div class="subscription-status">
+                        <span class="status-badge" id="subscriptionStatus">미구독</span>
+                    </div>
+                    <div class="subscription-details" id="subscriptionDetails">
+                        <p>현재 구독 중인 플랜이 없습니다.</p>
+                    </div>
+                    <button class="btn-subscribe" onclick="goToSubscription()">구독 플랜 보기</button>
+                </div>
+            </section>
+
+            <!-- 계정 관리 섹션 -->
+            <section class="account-section">
+                <h2>계정 탈퇴</h2>
+                <div class="account-actions">
+                    <button class="btn-logout" onclick="logout()">로그아웃</button>
+                    <button class="btn-delete-account" onclick="deleteAccount()">회원 탈퇴</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 각종 모달 (회원탈퇴, 프로필수정, 로그아웃, 비밀번호재설정, 자녀관리) -->
+    <div id="deleteAccountModal" class="modal" style="display: none;">
+        <div class="modal-content delete-modal">
+            <h2>회원 탈퇴</h2>
+            <div class="warning-box">
+                <p>⚠️ 회원 탈퇴 시 모든 정보가 삭제됩니다.</p>
+                <p>이 작업은 되돌릴 수 없습니다.</p>
+            </div>
+            <p class="confirm-message">정말로 탈퇴하시겠습니까? 비밀번호를 입력해주세요.</p>
+            <form id="deleteAccountForm">
+                <div class="input-group">
+                    <img class="icon-small" src="assets/pics/lock.png" alt="자물쇠 아이콘">
+                    <input type="password" id="deletePassword" name="password" placeholder="비밀번호" required autocomplete="current-password">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeDeleteModal()">취소</button>
+                    <button type="submit" class="btn-delete-confirm">탈퇴하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 프로필 수정 모달 -->
+    <div id="editProfileModal" class="modal" style="display: none;">
+        <div class="modal-content edit-profile-modal">
+            <h2>프로필 수정</h2>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label for="editNickname">닉네임</label>
+                    <input type="text" id="editNickname" name="nickname" placeholder="닉네임을 입력하세요" maxlength="20">
+                </div>
+
+                <div class="form-group">
+                    <label for="editPhone">전화번호</label>
+                    <input type="tel" id="editPhone" name="phone" placeholder="010-1234-5678" maxlength="13">
+                </div>
+
+                <div class="form-group">
+                    <label for="editAddress">주소</label>
+                    <div class="input-with-button">
+                        <input type="text" id="editAddress" name="address" placeholder="주소 찾기 버튼을 클릭하세요" readonly>
+                        <button type="button" class="btn-secondary" id="findAddress">주소 찾기</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDetailAddress">상세 주소</label>
+                    <input type="text" id="editDetailAddress" name="detailAddress" placeholder="상세 주소를 입력하세요">
+                </div>
+
+                <div class="form-group">
+                    <label>프로필 색상</label>
+                    <div class="color-picker">
+                        <div class="color-palette" id="colorPalette">
+                            <!-- 색상 옵션들이 JavaScript로 동적 생성 -->
+                        </div>
+                        <div class="selected-color-display">
+                            <span>선택된 색상:</span>
+                            <div class="color-preview" id="selectedColorPreview"></div>
+                            <span class="color-hex" id="selectedColorHex">#20B2AA</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>프로필 아바타</label>
+                    <div class="avatar-selector">
+                        <div class="avatar-preview-container">
+                            <div class="avatar-preview" id="userAvatarPreview">
+                                <img id="userAvatarImg" src="" alt="아바타 미리보기">
+                            </div>
+                            <button type="button" class="btn-change-avatar" onclick="showUserAvatarSelection()">아바타 변경</button>
+                        </div>
+                        <div class="avatar-grid" id="userAvatarGrid" style="display: none;">
+                            <!-- 아바타 옵션들이 JavaScript로 동적 생성 -->
+                        </div>
+                        <div class="avatar-refresh-container" id="userAvatarRefreshContainer" style="display: none; margin-top: 10px; text-align: center;">
+                            <button type="button" class="btn-secondary" onclick="refreshUserAvatars()">
+                                🔄 다른 아바타 보기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()">취소</button>
+                    <button type="submit" class="btn-confirm">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 로그아웃 확인 모달 -->
+    <div id="logoutModal" class="modal" style="display: none;">
+        <div class="modal-content logout-modal">
+            <h2>로그아웃</h2>
+            <p class="confirm-message">정말 로그아웃 하시겠습니까?</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeLogoutModal()">취소</button>
+                <button type="button" class="btn-confirm" onclick="confirmLogout()">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 비밀번호 재설정 모달 -->
+    <div id="resetPasswordModal" class="modal" style="display: none;">
+        <div class="modal-content reset-password-modal">
+            <h2>비밀번호 재설정</h2>
+            <p class="description">비밀번호를 재설정하려면 로그아웃 후 비밀번호 재설정 페이지로 이동합니다.</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeResetPasswordModal()">취소</button>
+                <button type="button" class="btn-confirm" id="confirmResetPasswordBtn">계속</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 자녀 추가/수정 모달 -->
+    <div id="childModal" class="modal" style="display: none;">
+        <div class="modal-content child-modal">
+            <h2 id="childModalTitle">자녀 추가</h2>
+            <form id="childForm">
+                <input type="hidden" id="childId" name="childId">
+
+                <div class="form-group">
+                    <label for="childName">자녀 이름 <span class="required">*</span></label>
+                    <input type="text" id="childName" name="childName" placeholder="자녀 이름을 입력하세요" maxlength="20" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="childBirth">생년월일</label>
+                    <input type="text" id="childBirth" name="childBirth" placeholder="YYYY-MM-DD" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>성별 <span class="required">*</span></label>
+                    <div class="gender-options">
+                        <label class="gender-option">
+                            <input type="radio" name="gender" value="M" required>
+                            <span class="gender-label">남자</span>
+                        </label>
+                        <label class="gender-option">
+                            <input type="radio" name="gender" value="F" required>
+                            <span class="gender-label">여자</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthOrder">출생 순서</label>
+                    <input type="number" id="birthOrder" name="birthOrder" placeholder="예: 1 (첫째), 2 (둘째)" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label>프로필 색상</label>
+                    <div class="color-picker">
+                        <div class="color-palette" id="childColorPalette">
+                            <!-- 색상 옵션들이 JavaScript로 동적 생성 -->
+                        </div>
+                        <div class="selected-color-display">
+                            <span>선택된 색상:</span>
+                            <div class="color-preview" id="childSelectedColorPreview"></div>
+                            <span class="color-hex" id="childSelectedColorHex">#FFB6C1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>프로필 아바타</label>
+                    <div class="avatar-selector">
+                        <div class="avatar-preview-container">
+                            <div class="avatar-preview" id="childAvatarPreview">
+                                <img id="childAvatarImg" src="" alt="아바타 미리보기">
+                            </div>
+                            <button type="button" class="btn-change-avatar" onclick="showAvatarSelection()">아바타 변경</button>
+                        </div>
+                        <div class="avatar-grid" id="childAvatarGrid" style="display: none;">
+                            <!-- 아바타 옵션들이 JavaScript로 동적 생성 -->
+                        </div>
+                        <div class="avatar-refresh-container" id="childAvatarRefreshContainer" style="display: none; margin-top: 10px; text-align: center;">
+                            <button type="button" class="btn-secondary" onclick="refreshChildAvatars()">
+                                🔄 다른 아바타 보기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeChildModal()">취소</button>
+                    <button type="submit" class="btn-confirm">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 자녀 삭제 확인 모달 -->
+    <div id="deleteChildModal" class="modal" style="display: none;">
+        <div class="modal-content delete-modal">
+            <h2>자녀 삭제</h2>
+            <div class="warning-box">
+                <p>⚠️ 자녀 정보를 삭제하시겠습니까?</p>
+                <p class="child-name-display" id="deleteChildName"></p>
+            </div>
+            <p class="confirm-message">이 작업은 되돌릴 수 없습니다.</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeDeleteChildModal()">취소</button>
+                <button type="button" class="btn-delete-confirm" onclick="confirmDeleteChild()">삭제하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 구독 취소 모달 -->
+    <div id="cancelSubscriptionModal" class="modal" style="display: none;">
+        <div class="modal-content cancel-subscription-modal">
+            <h2>구독 취소 신청</h2>
+            <div class="cancel-info-box">
+                <p class="cancel-plan-name"><strong id="cancelPlanName">-</strong></p>
+                <p class="cancel-description">구독을 취소하시겠습니까?</p>
+            </div>
+
+            <div class="cancel-notice">
+                <div class="notice-icon">📅</div>
+                <div class="notice-content">
+                    <p>현재 구독 기간이 끝날 때까지 서비스를 이용하실 수 있으며,</p>
+                    <p>이후 자동 갱신되지 않습니다.</p>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeCancelSubscriptionModal()">취소</button>
+                <button type="button" class="btn-confirm" onclick="requestCancelSubscription()">취소 신청</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 취소 철회 모달 -->
+    <div id="withdrawCancelModal" class="modal" style="display: none;">
+        <div class="modal-content withdraw-cancel-modal">
+            <h2>취소 신청 철회</h2>
+            <div class="cancel-info-box">
+                <p class="cancel-plan-name"><strong id="withdrawPlanName">-</strong></p>
+                <p class="cancel-description">취소 신청을 철회하시겠습니까?</p>
+            </div>
+
+            <div class="cancel-notice withdraw-notice">
+                <div class="notice-icon">🔄</div>
+                <div class="notice-content">
+                    <p>취소 신청이 철회되며,</p>
+                    <p>자동 갱신이 다시 활성화됩니다.</p>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeWithdrawCancelModal()">취소</button>
+                <button type="button" class="btn-confirm" onclick="confirmWithdrawCancellation()">철회</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- 외부 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+    <!-- 애플리케이션 스크립트 -->
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/mypage.js"></script>
+</body>
+</html>

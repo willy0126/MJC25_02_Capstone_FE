@@ -1,0 +1,498 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Paperlogy', sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* 단계별 폼 */
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.register-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo img {
+    width: 150px;
+    height: auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.input-with-button {
+    display: flex;
+    gap: 10px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.input-with-button input {
+    flex: 1;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #20B2AA;
+}
+
+/* 비밀번호 필드는 JavaScript 유효성 검사로 색상 관리 */
+.form-group input[type="password"]:focus {
+    border-color: inherit;
+}
+
+/* 읽기 전용 입력란 스타일 */
+.form-group input[readonly] {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.form-group input[readonly]:focus {
+    border-color: #ddd;
+}
+
+.btn-primary {
+    background-color: #20B2AA;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+
+.btn-primary:hover {
+    background-color: #1a9d96;
+}
+
+.btn-secondary {
+    background-color: #20B2AA;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #1a9d96;
+}
+
+.validation-message {
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+.validation-message.info {
+    color: #666;
+}
+
+.validation-message.error {
+    color: #e74c3c;
+}
+
+.validation-message.success {
+    color: #27ae60;
+}
+
+.birth-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.birth-group select {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.birth-group span {
+    color: #666;
+}
+
+.submit-btn {
+    width: 100%;
+    background-color: #20B2AA;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 30px;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #1a9d96;
+}
+
+.help-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #666;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 14px;
+    font-size: 12px;
+    color: #666;
+    cursor: help;
+    margin-left: 5px;
+}
+
+/* 약관 동의 스타일 */
+.terms-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 20px;
+}
+
+.terms-item {
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.terms-item:hover {
+    background-color: #f9f9f9;
+}
+
+.terms-item label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+}
+
+.terms-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    cursor: pointer;
+}
+
+.terms-item.all-agree {
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.terms-item.all-agree label {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.terms-item.required label::before {
+    content: "";
+    margin-right: 5px;
+}
+
+.terms-item.optional label::before {
+    content: "";
+    margin-right: 5px;
+}
+
+.terms-description {
+    margin-left: 32px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.terms-detail {
+    margin-left: auto;
+    color: #999;
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s;
+    padding: 10px 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.terms-detail:hover {
+    color: #20B2AA;
+}
+
+.step-indicator {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.step {
+    height: 10px;
+    width: 10px;
+    margin: 0 5px;
+    background-color: #ddd;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.step.active {
+    background-color: #20B2AA;
+}
+
+.btn-container {
+    margin-top: 30px;
+    display: flex;
+    gap: 25px;
+}
+
+.prev-btn {
+    flex: 0.5;
+    background-color: #999;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.prev-btn:hover {
+    background-color: #777;
+}
+
+.btn-container .submit-btn {
+    flex: 1;
+    margin-top: 0;
+}
+
+/* 프로필 설정 스타일 */
+.profile-section {
+    margin-bottom: 40px;
+}
+
+.profile-section h3 {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.section-description {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* 아바타 그리드 */
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.avatar-option {
+    cursor: pointer;
+}
+
+.avatar-option input[type="radio"] {
+    display: none;
+}
+
+.avatar-box {
+    border: 3px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s;
+    background-color: #f9f9f9;
+}
+
+.avatar-box:hover {
+    border-color: #20B2AA;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-option input[type="radio"]:checked + .avatar-box {
+    border-color: #20B2AA;
+    background-color: rgba(32, 178, 170, 0.1);
+    box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3);
+}
+
+.avatar-box img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.avatar-label {
+    display: block;
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+}
+
+.avatar-actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.avatar-actions button {
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+/* 색상 선택 컨테이너 */
+.color-picker-container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.color-preview-wrapper {
+    flex: 1;
+}
+
+.color-preview-wrapper label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #555;
+}
+
+.color-preview {
+    width: 100%;
+    height: 120px;
+    border-radius: 10px;
+    border: 3px solid #ddd;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.color-preview-wrapper label,
+.color-palette-wrapper label {
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+    font-size: 14px;
+}
+
+.color-hex-display {
+    margin-top: 10px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+}
+
+.color-palette-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.color-palette-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 8px;
+}
+
+.color-option {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.color-option.selected {
+    border-color: #333;
+    transform: scale(1.05);
+}
+
+.color-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 600px) {
+    .avatar-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .color-picker-container {
+        flex-direction: column;
+    }
+}

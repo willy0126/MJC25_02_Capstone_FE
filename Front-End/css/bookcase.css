@@ -1,0 +1,1935 @@
+/* Bookcase Page Styles */
+
+/* Container */
+.bookcase-container {
+    min-height: 100vh;
+    padding-top: 80px;
+    background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* Hero Section */
+.bookcase-hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+    background: url('../assets/bookshelf-bg.jpg') center/cover no-repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+    color: white;
+    position: relative;
+}
+
+.bookcase-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.bookcase-hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Search Container */
+.search-container {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    position: relative;
+    z-index: 2;
+}
+
+.search-input {
+    flex: 1;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-family: 'Paperlogy', sans-serif;
+    outline: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-btn {
+    padding: 15px 30px;
+    background: #00b493;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    background: #00957a;
+    transform: scale(1.05);
+}
+
+/* Book Count Section */
+.book-count-section {
+    max-width: 1400px;
+    margin: 100px auto 30px;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.count-info {
+    font-size: 18px;
+    color: #4a5568;
+}
+
+.count-info strong {
+    color: #00b493;
+    font-size: 20px;
+}
+
+.add-book-btn {
+    padding: 12px 30px;
+    background: #e63946;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.add-book-btn:hover {
+    background: #d62828;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+}
+
+/* Books Grid */
+.books-grid {
+    max-width: 1400px;
+    margin: 0 auto 80px;
+    padding: 0 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.book-item {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.book-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.book-cover {
+    width: 100%;
+    height: 130px;
+    overflow: hidden;
+}
+
+.book-cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    padding: 20px;
+}
+
+.book-cover-placeholder.blue {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.book-cover-placeholder.red {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.book-cover-placeholder.green {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.book-cover-placeholder h3 {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.book-info {
+    padding: 12px;
+}
+
+.book-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-meta {
+    font-size: 11px;
+    color: #718096;
+    margin-bottom: 8px;
+}
+
+.book-rating {
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.star {
+    color: #ffd700;
+}
+
+.book-summary {
+    font-size: 12px;
+    line-height: 1.4;
+    color: #4a5568;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .bookcase-hero h1 {
+        font-size: 36px;
+    }
+
+    .books-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .bookcase-container {
+        padding-top: 60px;
+    }
+
+    .bookcase-hero {
+        padding: 40px 20px 30px;
+    }
+
+    .bookcase-hero h1 {
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    .search-container {
+        flex-direction: column;
+    }
+
+    .search-btn {
+        width: 100%;
+    }
+
+    .book-count-section {
+        padding: 0 20px;
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .add-book-btn {
+        width: 100%;
+    }
+
+    .books-grid {
+        padding: 0 15px;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+    }
+
+    .book-info {
+        padding: 10px;
+    }
+
+    .book-title {
+        font-size: 13px;
+    }
+
+    .book-summary {
+        font-size: 11px;
+    }
+
+    .book-cover {
+        height: 110px;
+    }
+}
+
+@media (max-width: 480px) {
+    .books-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Hidden class for filtering */
+.book-item.hidden {
+    display: none;
+}
+
+/* Empty Books State */
+.empty-books {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: #718096;
+}
+
+.empty-books p {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.empty-books .empty-hint {
+    font-size: 14px;
+    color: #a0aec0;
+}
+
+/* Modal Base Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    margin: 20px;
+}
+
+.add-book-modal {
+    max-width: 500px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #718096;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #2d3748;
+}
+
+.modal-body {
+    padding: 25px;
+    overflow-y: auto;
+    max-height: calc(90vh - 100px);
+}
+
+/* Tab Styles */
+.add-book-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px 20px;
+    background: #f8f9fa;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.tab-btn:hover {
+    background: #e9ecef;
+}
+
+.tab-btn.active {
+    background: #00b493;
+    color: white;
+    border-color: #00b493;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Book Search Styles */
+.book-search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.book-search-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Paperlogy', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.book-search-input:focus {
+    border-color: #00b493;
+}
+
+.book-search-btn {
+    padding: 12px 25px;
+    background: #00b493;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.book-search-btn:hover {
+    background: #00957a;
+}
+
+/* Search Results */
+.search-results {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.search-placeholder {
+    text-align: center;
+    padding: 40px 20px;
+    color: #718096;
+}
+
+.search-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #718096;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+}
+
+.search-result-item:hover {
+    border-color: #00b493;
+    box-shadow: 0 2px 8px rgba(0, 180, 147, 0.1);
+}
+
+.search-result-cover {
+    width: 60px;
+    height: 85px;
+    object-fit: cover;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    flex-shrink: 0;
+}
+
+.search-result-cover.no-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+    text-align: center;
+    padding: 5px;
+}
+
+.search-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-result-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-result-meta {
+    font-size: 12px;
+    color: #718096;
+    margin-bottom: 3px;
+}
+
+.search-result-add {
+    width: 36px;
+    height: 36px;
+    background: #00b493;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-result-add:hover {
+    background: #00957a;
+    transform: scale(1.1);
+}
+
+/* Manual Form Styles */
+#manualBookForm .form-group {
+    margin-bottom: 18px;
+}
+
+#manualBookForm label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+#manualBookForm .required {
+    color: #e63946;
+}
+
+#manualBookForm input,
+#manualBookForm textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Paperlogy', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+#manualBookForm input:focus,
+#manualBookForm textarea:focus {
+    border-color: #00b493;
+}
+
+#manualBookForm textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.form-actions .btn-cancel,
+.form-actions .btn-confirm {
+    flex: 1;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.form-actions .btn-cancel {
+    background: #f8f9fa;
+    color: #4a5568;
+}
+
+.form-actions .btn-cancel:hover {
+    background: #e9ecef;
+}
+
+.form-actions .btn-confirm {
+    background: #00b493;
+    color: white;
+}
+
+.form-actions .btn-confirm:hover {
+    background: #00957a;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 30px 20px;
+    color: #718096;
+}
+
+.no-results p {
+    margin-bottom: 15px;
+}
+
+.no-results .btn-manual {
+    padding: 10px 20px;
+    background: #00b493;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.no-results .btn-manual:hover {
+    background: #00957a;
+}
+
+/* ========================================
+   도서 상세보기 모달
+======================================== */
+.book-detail-modal {
+    max-width: 550px;
+    padding: 0;
+}
+
+.book-detail-modal .modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.book-detail-content {
+    display: flex;
+    gap: 25px;
+    padding: 30px;
+}
+
+.book-detail-cover {
+    width: 160px;
+    height: 230px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.book-detail-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-detail-cover .book-cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.book-detail-cover .book-cover-placeholder h3 {
+    font-size: 16px;
+    line-height: 1.4;
+    text-align: center;
+    word-break: keep-all;
+}
+
+.book-detail-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 12px;
+    align-items: flex-start;
+}
+
+.detail-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #718096;
+    min-width: 70px;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    font-size: 14px;
+    color: #2d3748;
+    font-weight: 500;
+    word-break: break-word;
+}
+
+#detailTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+.detail-description {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.detail-description .detail-label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.detail-description .detail-value {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #4a5568;
+    max-height: 80px;
+    overflow-y: auto;
+}
+
+.book-detail-actions {
+    display: flex;
+    gap: 10px;
+    padding: 20px 30px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8f9fa;
+}
+
+.btn-edit-book,
+.btn-delete-book {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.btn-edit-book {
+    background: #00b493;
+    color: white;
+}
+
+.btn-edit-book:hover {
+    background: #00957a;
+}
+
+.btn-delete-book {
+    background: #e63946;
+    color: white;
+}
+
+.btn-delete-book:hover {
+    background: #d62828;
+}
+
+/* ========================================
+   도서 수정 모달
+======================================== */
+.edit-book-modal {
+    max-width: 500px;
+}
+
+#editBookForm .form-group {
+    margin-bottom: 18px;
+}
+
+#editBookForm label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+#editBookForm .required {
+    color: #e63946;
+}
+
+#editBookForm input,
+#editBookForm textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Paperlogy', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+#editBookForm input:focus,
+#editBookForm textarea:focus {
+    border-color: #00b493;
+}
+
+#editBookForm textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* 책 표지 이미지 업로드 섹션 */
+.cover-upload-section {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.cover-preview {
+    width: 100px;
+    height: 140px;
+    border: 2px dashed #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8fafc;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.cover-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cover-placeholder-text {
+    font-size: 12px;
+    color: #a0aec0;
+    text-align: center;
+}
+
+.cover-upload-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.cover-upload-controls input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Paperlogy', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.cover-upload-controls input[type="text"]:focus {
+    border-color: #00b493;
+}
+
+.btn-upload-cover {
+    padding: 10px 15px;
+    background-color: #00b493;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-upload-cover:hover {
+    background-color: #009b7d;
+}
+
+.btn-remove-cover {
+    padding: 8px 12px;
+    background-color: #f8fafc;
+    color: #e63946;
+    border: 2px solid #e63946;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-remove-cover:hover {
+    background-color: #e63946;
+    color: white;
+}
+
+/* ========================================
+   도서 삭제 확인 모달
+======================================== */
+.delete-book-modal {
+    max-width: 400px;
+    padding: 30px;
+    text-align: center;
+}
+
+.delete-book-modal h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 20px;
+}
+
+.delete-book-modal .warning-box {
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.delete-book-modal .warning-box p {
+    color: #c53030;
+    font-size: 14px;
+    margin: 0;
+}
+
+.delete-book-modal .book-name-display {
+    font-weight: 600;
+    margin-top: 10px;
+    color: #2d3748;
+}
+
+.delete-book-modal .confirm-message {
+    font-size: 13px;
+    color: #718096;
+    margin-bottom: 20px;
+}
+
+.delete-book-modal .modal-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.delete-book-modal .btn-cancel,
+.delete-book-modal .btn-delete-confirm {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.delete-book-modal .btn-cancel {
+    background: #f8f9fa;
+    color: #4a5568;
+}
+
+.delete-book-modal .btn-cancel:hover {
+    background: #e9ecef;
+}
+
+.delete-book-modal .btn-delete-confirm {
+    background: #e63946;
+    color: white;
+}
+
+.delete-book-modal .btn-delete-confirm:hover {
+    background: #d62828;
+}
+
+/* ========================================
+   반응형 - 상세보기 모달
+======================================== */
+@media (max-width: 580px) {
+    .book-detail-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .book-detail-cover {
+        width: 140px;
+        height: 200px;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .detail-label {
+        min-width: auto;
+    }
+
+    .book-detail-actions {
+        flex-direction: column;
+    }
+}
+
+/* ========================================
+   직접 입력 폼 - 새 레이아웃
+======================================== */
+.add-book-modal {
+    max-width: 600px;
+}
+
+.manual-book-layout {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.manual-book-cover {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 표지 업로드 컨트롤 */
+.cover-upload-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-upload-cover {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    background: white;
+    border: 2px solid #20B2AA;
+    border-radius: 20px;
+    color: #20B2AA;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-upload-cover:hover {
+    background: #20B2AA;
+    color: white;
+}
+
+.btn-upload-cover .upload-icon {
+    font-size: 14px;
+}
+
+.btn-remove-cover {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e53e3e;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-remove-cover:hover {
+    background: #c53030;
+    transform: scale(1.1);
+}
+
+/* 표지 이미지 미리보기 */
+.cover-image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 수정 모달 표지 업로드 컨트롤 (세로 배치) */
+.cover-upload-controls-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.cover-upload-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-remove-cover-edit {
+    padding: 8px 12px;
+    background: #e53e3e;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-remove-cover-edit:hover {
+    background: #c53030;
+}
+
+.url-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.url-input-row input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.url-input-row input:focus {
+    outline: none;
+    border-color: #20B2AA;
+}
+
+.book-cover-preview {
+    width: 160px;
+    height: 220px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.book-cover-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-cover-preview .book-cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.book-cover-preview .book-cover-placeholder h3 {
+    font-size: 16px;
+    line-height: 1.4;
+    text-align: center;
+    word-break: keep-all;
+    color: white;
+}
+
+.manual-book-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.manual-book-fields .form-group {
+    margin-bottom: 0;
+}
+
+.manual-book-fields label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #718096;
+    margin-bottom: 6px;
+}
+
+.manual-book-fields input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Paperlogy', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    background: #f8f9fa;
+}
+
+.manual-book-fields input:focus {
+    border-color: #00b493;
+    background: white;
+}
+
+/* 도서 상세 섹션 */
+.book-details-section {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 20px;
+    margin-top: 10px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.btn-add-detail {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #718096;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-add-detail:hover {
+    border-color: #00b493;
+    color: #00b493;
+}
+
+/* 도서 상세 행 */
+.book-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.book-detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.reader-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.reader-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.reader-select {
+    width: 110px;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Paperlogy', sans-serif;
+    background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 30px;
+    color: #2d3748;
+    transition: all 0.2s ease;
+}
+
+.reader-select:hover {
+    border-color: #cbd5e0;
+    background-color: #f8f9fa;
+}
+
+.reader-select:focus {
+    border-color: #00b493;
+    box-shadow: 0 0 0 3px rgba(0, 180, 147, 0.1);
+}
+
+.reader-select option {
+    padding: 10px;
+    background: white;
+    color: #2d3748;
+}
+
+.date-input {
+    width: 145px;
+    min-width: 145px;
+    flex-shrink: 0;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'Paperlogy', sans-serif;
+    background: white;
+    outline: none;
+    text-align: center;
+}
+
+.date-input:focus {
+    border-color: #00b493;
+}
+
+.date-separator {
+    color: #718096;
+    font-size: 14px;
+}
+
+.btn-add-row,
+.btn-remove-row,
+.btn-remove-detail {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #718096;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-add-row:hover {
+    border-color: #00b493;
+    color: #00b493;
+}
+
+.btn-remove-row:hover,
+.btn-remove-detail:hover {
+    border-color: #e63946;
+    color: #e63946;
+}
+
+/* 등록 버튼 */
+.form-actions-right {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.btn-register {
+    padding: 10px 30px;
+    background: #00b493;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Paperlogy', sans-serif;
+    transition: background 0.2s;
+}
+
+.btn-register:hover {
+    background: #00957a;
+}
+
+/* 반응형 - 직접 입력 폼 */
+@media (max-width: 580px) {
+    .manual-book-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .book-cover-preview {
+        width: 140px;
+        height: 190px;
+    }
+
+    .manual-book-fields {
+        width: 100%;
+    }
+
+    .book-detail-row {
+        flex-wrap: wrap;
+    }
+
+    .date-input {
+        width: 120px;
+        min-width: 120px;
+        font-size: 11px;
+    }
+
+    .custom-select {
+        width: 150px;
+        min-width: 150px;
+    }
+}
+
+/* 반응형 - 모달 (작은 화면) */
+@media (max-height: 700px) {
+    .modal {
+        align-items: flex-start;
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        max-height: none;
+        margin: 10px auto;
+    }
+
+    .modal-body {
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .add-book-modal {
+        max-height: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .add-book-tabs {
+        flex-direction: column;
+    }
+
+    .book-search-container {
+        flex-direction: column;
+    }
+
+    .book-search-btn {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   Flatpickr 기본 스타일 (자녀 관리와 동일)
+======================================== */
+.date-input.flatpickr-input,
+.book-detail-row .date-input,
+.book-detail-row input.flatpickr-input {
+    width: 145px !important;
+    min-width: 145px !important;
+    max-width: 145px !important;
+    flex-shrink: 0;
+    padding: 8px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* ========================================
+   커스텀 드롭다운 스타일
+======================================== */
+.custom-select {
+    position: relative;
+    width: 180px;
+    min-width: 180px;
+    flex-shrink: 0;
+    font-family: 'Paperlogy', sans-serif;
+}
+
+.custom-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #2d3748;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.custom-select-trigger:hover {
+    border-color: #cbd5e0;
+    background-color: #f8f9fa;
+}
+
+.custom-select.open .custom-select-trigger {
+    border-color: #00b493;
+    box-shadow: 0 0 0 3px rgba(0, 180, 147, 0.1);
+}
+
+.custom-select-value {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.custom-select-arrow {
+    font-size: 8px;
+    color: #a0aec0;
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+}
+
+.custom-select.open .custom-select-arrow {
+    transform: rotate(180deg);
+}
+
+/* 선택된 아이콘 (트리거 내부) */
+.selected-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.custom-select-options {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+}
+
+.custom-select.open .custom-select-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.custom-select-option {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #4a5568;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.custom-select-option:first-child {
+    border-radius: 9px 9px 0 0;
+}
+
+.custom-select-option:last-child {
+    border-radius: 0 0 9px 9px;
+}
+
+.custom-select-option:hover {
+    background: #f0fdf9;
+    color: #00b493;
+}
+
+.custom-select-option.selected {
+    background: #e6f7f4;
+    color: #00b493;
+    font-weight: 500;
+}
+
+.custom-select-option .option-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.custom-select-option .option-text {
+    flex: 1;
+}
+
+.custom-select-option .option-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: #e6f7f4;
+    color: #00b493;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.custom-select-option.placeholder {
+    color: #a0aec0;
+    font-style: italic;
+}
+
+.custom-select-option.placeholder:hover {
+    background: #f8f9fa;
+    color: #718096;
+}
+
+/* 스크롤바 스타일 */
+.custom-select-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-select-options::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.custom-select-options::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.custom-select-options::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* ========================================
+   독서 일정 설정 섹션
+======================================== */
+.reading-schedule-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid #e2e8f0;
+}
+
+.reading-schedule-section .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.reading-schedule-section .section-description {
+    font-size: 14px;
+    color: #718096;
+    margin-bottom: 20px;
+}
+
+.reading-schedule-section .form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2d3748;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reading-schedule-section .form-select:focus {
+    outline: none;
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
+}
+
+.reading-schedule-section .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.reading-schedule-section .form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2d3748;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reading-schedule-section .form-input:focus {
+    outline: none;
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
+}
+
+.reading-schedule-section .form-input.flatpickr-input {
+    cursor: pointer;
+}
+
+.schedule-info-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 15px;
+    background-color: #e6f7f7;
+    border-left: 4px solid #20B2AA;
+    border-radius: 6px;
+    margin-top: 15px;
+}
+
+.schedule-info-box .info-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.schedule-info-box span:last-child {
+    font-size: 13px;
+    color: #2d3748;
+    line-height: 1.5;
+}
+
+/* 다중 일정 등록 스타일 */
+.reading-schedule-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.reading-schedule-section .section-header .section-title {
+    margin-bottom: 0;
+}
+
+.btn-add-schedule {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #20B2AA;
+    border-radius: 50%;
+    background: white;
+    color: #20B2AA;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-add-schedule:hover {
+    background: #20B2AA;
+    color: white;
+}
+
+.schedule-entries-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.schedule-entry {
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fafafa;
+    position: relative;
+}
+
+.schedule-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.schedule-entry-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #20B2AA;
+}
+
+.btn-remove-schedule {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: #e53e3e;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-schedule:hover {
+    background: #c53030;
+}
+
+.schedule-entry .form-group {
+    margin-bottom: 12px;
+}
+
+.schedule-entry .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-entry .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 0;
+}
+
+.schedule-entry .form-row .form-group {
+    margin-bottom: 0;
+}
+
+/* Flatpickr 커스터마이징 */
+.flatpickr-calendar {
+    font-family: 'Paperlogy', sans-serif;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.flatpickr-day.selected {
+    background: #20B2AA;
+    border-color: #20B2AA;
+}
+
+.flatpickr-day.selected:hover {
+    background: #1a9d96;
+    border-color: #1a9d96;
+}
+
+/* 독자 선택 색상 아이콘 */
+.reader-select-wrapper {
+    position: relative;
+}
+
+.reader-color-indicator {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background-color: #f7fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.color-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.color-badge-text {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.color-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
+}

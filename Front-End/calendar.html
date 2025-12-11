@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독서 캘린더 | 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/toast.css">
+
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/light.css">
+
+    <!-- Custom Calendar CSS -->
+    <link rel="stylesheet" href="css/calendar.css">
+
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main class="calendar-container">
+        <!-- Hero Section -->
+        <section class="calendar-hero">
+            <h1>독서 캘린더</h1>
+            <p class="hero-description">책을 드래그하여 독서 일정을 등록해보세요</p>
+        </section>
+
+        <!-- Calendar Wrapper (3 columns) -->
+        <section class="calendar-wrapper-3col">
+            <!-- 왼쪽: 읽고 싶은 책 (Draggable) -->
+            <aside class="book-wishlist" id="bookWishlist">
+                <div class="wishlist-header">
+                    <h3>📚 내 책장</h3>
+                    <button class="btn-refresh-books" id="refreshBooks" title="새로고침">↻</button>
+                </div>
+                <div class="wishlist-content" id="wishlistContent">
+                    <div class="wishlist-loading">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                <div class="wishlist-footer">
+                    <a href="bookcase.html" class="btn-add-book">+ 책 추가하기</a>
+                </div>
+            </aside>
+
+            <!-- 가운데: FullCalendar -->
+            <div class="fullcalendar-container">
+                <div id="fullCalendar"></div>
+            </div>
+
+            <!-- 오른쪽: 선택된 날짜의 독서 기록 -->
+            <aside class="daily-records" id="dailyRecords">
+                <div class="records-header">
+                    <h3 id="selectedDate">날짜를 선택하세요</h3>
+                </div>
+                <div class="records-content" id="recordsContent">
+                    <div class="empty-records">
+                        <p>캘린더에서 날짜를 선택하면</p>
+                        <p>해당 날짜의 독서 기록을 확인할 수 있습니다.</p>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <!-- 독서 요약 (ApexCharts Radial Bar) -->
+        <section class="reading-summary-charts">
+            <div class="summary-charts-container">
+                <!-- 이번 달 진행률 (Radial Bar) -->
+                <div class="summary-chart-block">
+                    <div class="chart-header">
+                        <h4>이번 달 독서 진행률</h4>
+                    </div>
+                    <div id="monthProgressChart" class="radial-chart"></div>
+                    <div class="chart-legend" id="monthProgressLegend">
+                        <span id="totalBooks" style="display:none;">0</span>
+                        <span id="readingBooks" style="display:none;">0</span>
+                        <span id="readingDays" style="display:none;">0</span>
+                    </div>
+                </div>
+
+                <!-- 오늘의 독서 -->
+                <div class="summary-chart-block today-block">
+                    <div class="chart-header">
+                        <h4>오늘의 독서</h4>
+                        <span class="today-date" id="todayDateLabel"></span>
+                    </div>
+                    <div class="today-reading-list" id="todayReadingList">
+                        <p class="summary-empty">오늘 읽을 책이 없습니다.</p>
+                    </div>
+                </div>
+
+                <!-- 이번 주 일정 (Mini Bar Chart) -->
+                <div class="summary-chart-block">
+                    <div class="chart-header">
+                        <h4>이번 주 일정</h4>
+                    </div>
+                    <div id="weekBarChart" class="bar-chart"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 독서 기록 상세 모달 -->
+    <div class="modal" id="recordDetailModal" style="display: none;">
+        <div class="modal-content record-detail-modal">
+            <button class="modal-close" id="recordDetailModalClose">&times;</button>
+            <div class="record-detail-content">
+                <div class="record-book-cover" id="recordCover">
+                    <div class="book-cover-placeholder">
+                        <h3 id="recordCoverTitle">책 제목</h3>
+                    </div>
+                </div>
+                <div class="record-book-info">
+                    <h2 id="recordTitle">책 제목</h2>
+                    <p class="record-author" id="recordAuthor">저자</p>
+
+                    <!-- 보기 모드: 다중 독자 일정 표시 -->
+                    <div id="recordViewMode">
+                        <div class="modal-readers-section">
+                            <h4 class="modal-readers-title">독자별 일정</h4>
+                            <div class="modal-readers-list" id="modalReadersList">
+                                <!-- 동적으로 생성됨 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 수정 모드 -->
+                    <div id="recordEditMode" style="display: none;">
+                        <!-- 독서 일정 설정 섹션 (bookcase 스타일) -->
+                        <div class="reading-schedule-section-edit">
+                            <div class="schedule-entry-edit">
+                                <div class="form-group">
+                                    <label>독자 선택</label>
+                                    <div class="reader-select-wrapper">
+                                        <select id="editReader" name="editReader" class="form-select schedule-reader-select">
+                                            <option value="">선택 안 함</option>
+                                        </select>
+                                        <div class="reader-color-indicator schedule-color-indicator" id="editReaderColorIndicator"></div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>시작일</label>
+                                        <input type="text" id="editRecordStartDate" class="form-input flatpickr-input schedule-start-date" placeholder="시작일 선택" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>완료일</label>
+                                        <input type="text" id="editRecordEndDate" class="form-input flatpickr-input schedule-end-date" placeholder="완료일 선택" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="record-actions">
+                            <button type="button" class="btn-cancel" id="editCancelBtn">취소</button>
+                            <button type="button" class="btn-confirm" id="editSaveBtn">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 독서 일정 등록 확인 모달 -->
+    <div class="modal" id="scheduleModal" style="display: none;">
+        <div class="modal-content schedule-modal">
+            <div class="modal-header">
+                <h2>독서 일정 등록</h2>
+                <button class="modal-close" id="scheduleModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="schedule-book-info">
+                    <div class="schedule-book-cover" id="scheduleBookCover"></div>
+                    <div class="schedule-book-details">
+                        <h3 id="scheduleBookTitle">책 제목</h3>
+                        <p id="scheduleBookAuthor">저자</p>
+                    </div>
+                </div>
+                <div class="schedule-form-info">
+                    <!-- 독자별 일정 (다중 선택) -->
+                    <div class="reader-details-header">
+                        <label>독자별 일정</label>
+                    </div>
+                    <div class="reader-details-container" id="readerDetailsContainer">
+                        <!-- 동적으로 생성됨 -->
+                    </div>
+                    <button type="button" class="btn-add-reader" id="addReaderBtn">
+                        <span>+</span> 독자 추가
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" id="scheduleCancel">취소</button>
+                <button type="button" class="btn-confirm" id="scheduleConfirm">등록</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Core Scripts -->
+    <script src="js/env-config.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+    <!-- Calendar Page Script -->
+    <script src="js/calendar.js"></script>
+</body>
+</html>

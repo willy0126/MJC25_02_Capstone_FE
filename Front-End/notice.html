@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<!-- HEAD: 메타데이터 및 스타일시트 -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공지사항 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/notice.css">
+    <link rel="stylesheet" href="css/toast.css">
+</head>
+
+<!-- BODY: 공지사항 게시판 -->
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <!-- 공지사항 메인 영역 -->
+    <main class="notice-container">
+        <section class="notice-hero">
+            <h1>공지사항</h1>
+            <p>책·이음의 새로운 소식과 중요한 공지를 확인하세요.</p>
+        </section>
+        <section class="notice-board">
+            <!-- 검색 및 작성 버튼 영역 -->
+            <div class="board-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="제목 또는 내용으로 검색">
+                    <button class="search-btn" id="searchBtn">🔍 검색</button>
+                </div>
+                <button class="write-btn" id="writeBtn" style="display: none;">
+                    ✏️ 글쓰기
+                </button>
+            </div>
+
+            <!-- 게시판 테이블 -->
+            <div class="notice-table-wrapper">
+                <table class="notice-table">
+                    <thead>
+                        <tr>
+                            <th class="col-num">번호</th>
+                            <th class="col-title">제목</th>
+                            <th class="col-author">작성자</th>
+                            <th class="col-date">작성일</th>
+                            <th class="col-views">조회수</th>
+                        </tr>
+                    </thead>
+                    <tbody id="noticeTableBody">
+                        <!-- JavaScript로 동적 생성 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div class="pagination" id="pagination">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+        </section>
+    </main>
+
+    <!-- 각종 모달 (글쓰기/수정, 상세보기) -->
+    <div class="modal" id="writeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">공지사항 작성</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="noticeForm">
+                    <input type="hidden" id="noticeId" value="">
+
+                    <div class="form-group">
+                        <label for="noticeTitle">제목</label>
+                        <input type="text" id="noticeTitle" placeholder="제목을 입력하세요" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="noticeContent">내용</label>
+                        <textarea id="noticeContent" rows="15" placeholder="내용을 입력하세요" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="noticeImage">이미지 첨부 (선택)</label>
+                        <input type="file" id="noticeImage" accept="image/*">
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImg" src="" alt="이미지 미리보기">
+                            <button type="button" class="btn-remove-image" id="removeImageBtn">&times; 이미지 제거</button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">저장</button>
+                        <button type="button" class="btn-cancel" id="cancelBtn">취소</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상세보기 모달 -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>공지사항</h2>
+                <button class="modal-close" id="viewModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="notice-detail">
+                    <h3 class="detail-title" id="detailTitle"></h3>
+                    <div class="detail-meta">
+                        <span id="detailAuthor"></span>
+                        <span id="detailDate"></span>
+                        <span id="detailViews"></span>
+                    </div>
+                    <div class="detail-image" id="detailImage" style="display: none;">
+                        <img id="detailImageContent" src="" alt="공지사항 이미지">
+                    </div>
+                    <div class="detail-content" id="detailContent"></div>
+                </div>
+                <div class="detail-actions" id="detailActions" style="display: none;">
+                    <button class="btn-edit" id="editBtn">수정</button>
+                    <button class="btn-delete" id="deleteBtn">삭제</button>
+                </div>
+                <div class="detail-close-wrapper">
+                    <button class="btn-close" id="closeViewBtn">목록으로</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- 애플리케이션 스크립트 -->
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/notice.js"></script>
+</body>
+</html>

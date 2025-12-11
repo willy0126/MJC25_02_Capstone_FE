@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>비밀번호 재설정 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+
+    <link rel="stylesheet" href="css/resetpw.css">
+    <link rel="stylesheet" href="css/toast.css">
+</head>
+<body>
+    <div class="resetpw-container">
+        <div class="logo">
+            <a href="landing.html">
+                <img src="assets/logo/tplogo.png" alt="로고" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22150%22 height=%22100%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22%3ELogo%3C/text%3E%3C/svg%3E'">
+            </a>
+        </div>
+
+        <div class="resetpw-content">
+            <!-- 단계 표시기 -->
+            <div class="step-indicator">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">이메일 입력</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">인증 코드</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">비밀번호 변경</div>
+                </div>
+            </div>
+
+            <!-- 1단계: 이메일 입력 -->
+            <div class="step-content active" id="step1">
+                <h2>비밀번호 재설정</h2>
+                <p class="description">가입 시 등록한 이메일 주소를 입력해주세요.<br>인증 코드를 발송해드립니다.</p>
+
+                <form id="emailForm">
+                    <div class="form-group">
+                        <label for="email">이메일</label>
+                        <input type="email" id="email" name="email" placeholder="이메일을 입력하세요" required>
+                    </div>
+
+                    <button type="submit" class="submit-btn">인증 코드 발송</button>
+                </form>
+            </div>
+
+            <!-- 2단계: 인증 코드 입력 -->
+            <div class="step-content" id="step2">
+                <h2>인증 코드 확인</h2>
+                <p class="description">입력하신 이메일로 발송된<br>인증 코드를 입력해주세요.</p>
+
+                <form id="codeForm">
+                    <div class="form-group">
+                        <label for="code">인증 코드</label>
+                        <input type="text" id="code" name="code" placeholder="6자리 인증 코드" required maxlength="10" autocomplete="off">
+                        <small class="hint">이메일로 받으신 인증 코드를 입력하세요</small>
+                    </div>
+
+                    <button type="submit" class="submit-btn">인증 코드 확인</button>
+                    <button type="button" class="back-btn" onclick="goToStep(1)">이전</button>
+                </form>
+            </div>
+
+            <!-- 3단계: 새 비밀번호 입력 -->
+            <div class="step-content" id="step3">
+                <h2>새 비밀번호 설정</h2>
+                <p class="description">새로운 비밀번호를 입력해주세요.</p>
+
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label for="newPassword">새 비밀번호</label>
+                        <input type="password" id="newPassword" name="newPassword" placeholder="영문, 숫자, 특수문자 포함 8자 이상" required>
+                        <small class="password-hint">영문, 숫자, 특수문자(@$!%*#?&)를 포함한 8자리 이상</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">새 비밀번호 확인</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="비밀번호를 다시 입력하세요" required>
+                        <small class="error-message" id="passwordError">비밀번호가 일치하지 않습니다.</small>
+                    </div>
+
+                    <button type="submit" class="submit-btn">비밀번호 재설정 완료</button>
+                    <button type="button" class="back-btn" onclick="goToStep(2)">이전</button>
+                </form>
+            </div>
+
+            <div class="back-to-login">
+                <a href="login.html">로그인 페이지로 돌아가기</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/resetpw.js"></script>
+</body>
+</html>

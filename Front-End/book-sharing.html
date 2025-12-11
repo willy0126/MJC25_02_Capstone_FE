@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도서나눔 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/book-sharing.css">
+</head>
+<body> 
+    <div id="navbar-placeholder"></div>
+
+    <main class="book-sharing-container">
+        <!-- Hero Section -->
+        <section class="book-sharing-hero">
+            <h1>도서나눔</h1>
+            <p>함께 나누는 책, 함께 나누는 행복</p>
+        </section>
+
+        <!-- Book-Sharing Board Section -->
+        <section class="book-sharing-board">
+            <!-- 검색 및 작성 버튼 영역 -->
+            <div class="board-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="제목 또는 내용으로 검색">
+                    <button class="search-btn" id="searchBtn">🔍 검색</button>
+                </div>
+                <button class="write-btn" id="writeBtn">✏️ 글쓰기</button>
+            </div>
+
+            <!-- 도서나눔 테이블 -->
+            <div class="book-sharing-table-wrapper">
+                <table class="book-sharing-table">
+                    <thead>
+                        <tr>
+                            <th>나눔책 목록</th>
+                            <th>글제목</th>
+                            <th>상태</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="book-sharingTableBody">
+                        <!-- JS로 동적 렌더 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 페이지 버튼 -->
+            <div class="pagination">
+                <button class="page-btn" id="prevPageBtn">이전</button>
+                <span id="pageInfo"></span>
+                <button class="page-btn" id="nextPageBtn">다음</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 글쓰기/수정 모달 -->
+    <div class="modal" id="writeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">글쓰기</h2>
+                <button class="modal-close" id="writeModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label>책 이미지:
+                    <input type="file" id="bookImageInput" accept="image/*">
+                    <br>
+                    <img id="bookImagePreview" src="" alt="책 이미지 미리보기" style="max-width:100px; display:none; margin-top:10px;">
+                </label>
+                <br><br>
+                <label>글 제목: <input type="text" id="bookTitleInput"></label><br><br>
+                <label>글 내용: <textarea id="bookContentInput" rows="4" cols="40" placeholder="내용을 입력하세요"></textarea></label><br><br>
+                <label>상태:
+                    <select id="bookStatusInput">
+                        <option value="나눔중">나눔중</option>
+                        <option value="예약중">예약중</option>
+                        <option value="완료">완료</option>
+                    </select>
+                </label><br><br>
+                <button id="saveBookBtn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상세보기 모달 -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>나눔정보</h2>
+                <button class="modal-close" id="viewModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="notice-detail">
+                    <div class="detail-badge" id="detailBadge" style="display:none;"></div>
+                    <div class="detail-header">
+                        <img src="" alt="책 이미지" class="detail-image" id="detailImage">
+                        <div class="detail-info">
+                            <h3 class="detail-title" id="detailTitle"></h3>
+                            <div class="detail-meta">
+                                <span id="detailAuthor"></span>
+                                <span id="detailDate"></span>
+                                <span id="detailViews"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-content" id="detailContent"></div>
+                    <div class="detail-actions" id="detailActions" style="display: none;"></div>
+                    <div class="detail-close-wrapper">
+                        <button class="btn-close" id="closeViewBtn">목록으로</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 알림 모달 -->
+    <div class="alert-modal" id="alertModal">
+        <div class="alert-modal-content">
+            <div class="alert-modal-icon" id="alertIcon">
+                <svg class="icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M8 12l2.5 2.5L16 9"></path>
+                </svg>
+                <svg class="icon-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M15 9l-6 6M9 9l6 6"></path>
+                </svg>
+                <svg class="icon-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 9v4M12 17h.01"></path>
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
+                </svg>
+                <svg class="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 16v-4M12 8h.01"></path>
+                </svg>
+            </div>
+            <p class="alert-modal-message" id="alertMessage"></p>
+            <button class="alert-modal-btn" id="alertConfirmBtn">확인</button>
+        </div>
+    </div>
+
+    <!-- 확인 모달 (confirm 대체) -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 8v4M12 16h.01"></path>
+                </svg>
+            </div>
+            <p class="confirm-modal-message" id="confirmMessage"></p>
+            <div class="confirm-modal-buttons">
+                <button class="confirm-modal-btn confirm-btn-cancel" id="confirmCancelBtn">취소</button>
+                <button class="confirm-modal-btn confirm-btn-ok" id="confirmOkBtn">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 커스텀 커서 -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <script src="js/constants.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/cursor.js"></script>
+    <script src="js/book-sharing.js"></script>
+</body>
+</html>
