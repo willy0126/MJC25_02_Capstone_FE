@@ -90,14 +90,8 @@ function initSubscribeButton() {
 
     if (subscribeBtn) {
         subscribeBtn.addEventListener('click', () => {
-            if (isLoggedIn()) {
-                showToast('구독 기능은 준비 중입니다.', 'info');
-            } else {
-                showToast('로그인이 필요한 서비스입니다.', 'warning');
-                setTimeout(() => {
-                    window.location.href = '/login.html';
-                }, 1500);
-            }
+            // 구독 페이지로 이동 (parents 플랜 선택 상태)
+            window.location.href = '/subscription.html?plan=parents';
         });
     }
 }

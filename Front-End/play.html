@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>창작놀이 - 책·이음</title>
+    <link rel="icon" type="image/png" href="../assets/logo/tplogo.png">
+
+    <!-- Google Fonts: Paperlogy -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/play.css">
+    <link rel="stylesheet" href="../css/toast.css">
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main class="play-container">
+        <!-- Hero Section -->
+        <section class="play-hero">
+            <h1>대회목록</h1>
+            <p>누구나 창작자가 될 수 있는 공간</p>
+        </section>
+
+        <!-- Board Section -->
+        <section class="play-board">
+            <!-- 카테고리 버튼 -->
+            <div class="category-buttons">
+                <button class="category-btn active" data-category="ongoing">진행중</button>
+                <button class="category-btn" data-category="upcoming">예정</button>
+                <button class="category-btn" data-category="completed">종료</button>
+                <button class="create-contest-btn" id="createContestBtn" style="display: none;">+ 대회 생성</button>
+            </div>
+
+            <!-- 대회 그리드 (API에서 동적으로 로드) -->
+            <div class="contest-grid" id="contestGrid">
+            </div>
+
+            <!-- 빈 상태 -->
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-state-icon">📭</div>
+                <p>해당 카테고리에 대회가 없습니다.</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- 대회 수정 모달 -->
+    <div id="editContestModal" class="contest-modal" style="display: none;">
+        <div class="modal-content contest-create-modal">
+            <div class="modal-header">
+                <h2>대회 수정</h2>
+                <button class="modal-close-btn" id="closeEditModal">&times;</button>
+            </div>
+
+            <form id="editContestForm" class="contest-form">
+                <input type="hidden" id="editContestId">
+
+                <div class="form-group">
+                    <label for="editContestTitle">대회 제목 *</label>
+                    <input type="text" id="editContestTitle" required placeholder="예: 창작 그림책 공모전">
+                </div>
+
+                <div class="form-group">
+                    <label for="editContestImage">포스터 이미지</label>
+                    <input type="file" id="editContestImage" accept="image/*">
+                    <div id="editImagePreview" style="margin-top: 10px;">
+                        <img id="editPreviewImg" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editContestDescription">대회 설명 *</label>
+                    <textarea id="editContestDescription" rows="4" required placeholder="대회에 대한 상세한 설명을 작성해주세요..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editStartPrompt">첫 문장 (이야기 시작) *</label>
+                    <textarea id="editStartPrompt" rows="4" required placeholder="참가자들이 이어쓸 첫 문장을 작성해주세요..."></textarea>
+                </div>
+
+                <!-- 차수별 날짜 설정 -->
+                <div class="form-section">
+                    <h3 class="section-title">차수별 일정 수정</h3>
+
+                    <div class="round-schedule" id="editRoundSchedule">
+                        <!-- JS에서 동적으로 생성 -->
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" id="cancelEditBtn">취소</button>
+                    <button type="submit" class="btn-submit">수정하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 대회 생성 모달 -->
+    <div id="createContestModal" class="contest-modal" style="display: none;">
+        <div class="modal-content contest-create-modal">
+            <div class="modal-header">
+                <h2>새 대회 생성</h2>
+                <button class="modal-close-btn" id="closeCreateModal">&times;</button>
+            </div>
+
+            <form id="createContestForm" class="contest-form">
+                <div class="form-group">
+                    <label for="contestTitle">대회 제목 *</label>
+                    <input type="text" id="contestTitle" required placeholder="예: 창작 그림책 공모전">
+                </div>
+
+                <div class="form-group">
+                    <label for="contestImage">포스터 이미지</label>
+                    <input type="file" id="contestImage" accept="image/*">
+                    <div id="imagePreview" style="display: none; margin-top: 10px;">
+                        <img id="previewImg" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contestDescription">대회 설명 *</label>
+                    <textarea id="contestDescription" rows="4" required placeholder="대회에 대한 상세한 설명을 작성해주세요..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="startPrompt">첫 문장 (이야기 시작) *</label>
+                    <textarea id="startPrompt" rows="4" required placeholder="참가자들이 이어쓸 첫 문장을 작성해주세요. 예: 깊은 산속 작은 마을에 '뭉치'라는 아기 곰이 살고 있었어요..."></textarea>
+                </div>
+
+                <!-- 차수별 날짜 설정 -->
+                <div class="form-section">
+                    <h3 class="section-title">차수별 일정 설정</h3>
+
+                    <div class="round-schedule">
+                        <div class="round-item">
+                            <span class="round-label">1차</span>
+                            <div class="round-dates">
+                                <input type="date" id="round1Start" required>
+                                <span>~</span>
+                                <input type="date" id="round1End" required>
+                            </div>
+                        </div>
+
+                        <div class="round-item">
+                            <span class="round-label">2차</span>
+                            <div class="round-dates">
+                                <input type="date" id="round2Start" required>
+                                <span>~</span>
+                                <input type="date" id="round2End" required>
+                            </div>
+                        </div>
+
+                        <div class="round-item">
+                            <span class="round-label">3차</span>
+                            <div class="round-dates">
+                                <input type="date" id="round3Start" required>
+                                <span>~</span>
+                                <input type="date" id="round3End" required>
+                            </div>
+                        </div>
+
+                        <div class="round-item">
+                            <span class="round-label">최종</span>
+                            <div class="round-dates">
+                                <input type="date" id="round4Start" required>
+                                <span>~</span>
+                                <input type="date" id="round4End" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" id="cancelCreateBtn">취소</button>
+                    <button type="submit" class="btn-submit">생성하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 그림책 생성 모달 (종료된 대회용) -->
+    <div id="picturebookModal" class="contest-modal" style="display: none;">
+        <div class="modal-content picturebook-modal">
+            <div class="modal-header">
+                <h2 id="picturebookTitle">그림책 만들기</h2>
+                <button class="modal-close-btn" id="closePicturebookModal">&times;</button>
+            </div>
+
+            <div class="picturebook-content">
+                <!-- 1위 이야기 목록 -->
+                <div class="winner-stories">
+                    <h3>각 차수별 1위 이야기</h3>
+                    <div id="winnerStoriesList" class="winner-list">
+                        <!-- JS에서 동적 생성 -->
+                    </div>
+                </div>
+
+                <!-- AI 그림책 생성 버튼 -->
+                <div class="generate-section">
+                    <button id="generatePicturebookBtn" class="generate-btn">
+                        AI 그림책 생성하기
+                    </button>
+                    <p class="generate-hint">각 차수별 이야기에 맞는 그림 4개 + 대표 표지 1개가 생성됩니다.</p>
+                </div>
+
+                <!-- 생성 진행 상태 -->
+                <div id="generateProgress" class="generate-progress" style="display: none;">
+                    <div class="progress-spinner"></div>
+                    <p id="progressText">그림책을 생성하고 있습니다...</p>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- 생성된 그림책 결과 -->
+                <div id="picturebookResult" class="picturebook-result" style="display: none;">
+                    <h3>생성된 그림책</h3>
+
+                    <!-- 대표 표지 -->
+                    <div class="cover-section">
+                        <h4>표지</h4>
+                        <div id="coverImage" class="cover-image"></div>
+                    </div>
+
+                    <!-- 차수별 그림 -->
+                    <div class="pages-section">
+                        <h4>내용</h4>
+                        <div id="pageImages" class="page-images"></div>
+                    </div>
+
+                    <!-- 다운로드/공유 버튼 -->
+                    <div class="result-actions">
+                        <button id="downloadPicturebookBtn" class="action-btn download-btn">다운로드</button>
+                        <button id="sharePicturebookBtn" class="action-btn share-btn">공유하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 공용 JS -->
+    <script src="../js/toast.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/constants.js"></script>
+    <script src="../js/api-client.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <!-- include.js: Navbar/Footer 동적 로드 -->
+    <script src="../js/include.js"></script>
+
+    <!-- 페이지 전용 JS -->
+    <script src="../js/play.js"></script>
+    <script src="../js/cursor.js"></script>
+</body>
+</html>

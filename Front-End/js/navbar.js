@@ -42,6 +42,7 @@ function updateNavbarLoginState() {
     const loginBtn = document.getElementById('login-btn');
     const userMenu = document.getElementById('user-menu');
     const userName = document.getElementById('user-name');
+    const userIcon = document.querySelector('.user-icon');
 
     if (!loginBtn || !userMenu) return;
 
@@ -51,10 +52,34 @@ function updateNavbarLoginState() {
 
         if (typeof getCurrentUser === 'function') {
             const user = getCurrentUser();
-            if (user && userName) {
+            if (user) {
                 // nickname이 있으면 nickname, 없으면 username 표시
-                const displayName = user.nickname || user.username || '사용자';
-                userName.textContent = displayName;
+                if (userName) {
+                    const displayName = user.nickname || user.username || '사용자';
+                    userName.textContent = displayName;
+                }
+
+                // 사용자 아바타 표시
+                if (userIcon && user.profileImg) {
+                    // SVG 코드인 경우
+                    if (user.profileImg.includes('<svg')) {
+                        // SVG sanitize 후 삽입 (XSS 방지)
+                        const safeSVG = sanitizeSVG(user.profileImg);
+                        if (safeSVG) {
+                            userIcon.innerHTML = safeSVG;
+                            // SVG 크기 조정
+                            const svgElement = userIcon.querySelector('svg');
+                            if (svgElement) {
+                                svgElement.style.width = '24px';
+                                svgElement.style.height = '24px';
+                                svgElement.style.display = 'block';
+                            }
+                        }
+                    } else {
+                        // 이모지인 경우
+                        userIcon.textContent = user.profileImg;
+                    }
+                }
             }
         }
     } else {
@@ -115,16 +140,8 @@ function initLogoutButton() {
                 userDropdown.classList.remove('show');
             }
 
-            // 현재 페이지 확인
-            const currentPage = window.location.pathname.split('/').pop();
-
-            // index.html에서 로그아웃하면 landing.html로 리다이렉트
-            if (currentPage === 'index.html' || currentPage === '') {
-                window.location.href = 'landing.html';
-            } else {
-                // 다른 페이지에서는 기존처럼 index.html로 이동
-                window.location.href = 'index.html';
-            }
+            // 로그아웃 시 항상 landing.html로 이동
+            window.location.href = 'landing.html';
         }
     });
 }

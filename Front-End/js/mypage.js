@@ -1,6 +1,19 @@
 // ==================== 전역 변수 ====================
 let isPasswordVerified = false;
 let userInfo = null;
+let currentSubscriptions = []; // 여러 구독 지원
+
+// ==================== 구독 플랜 상수 ====================
+const SUBSCRIPTION_PLANS = {
+    // 숫자 키 (planId)
+    1: { id: 'preschool', planId: 1, name: '영·유아 패키지', price: 19900, targetAge: '0-7세' },
+    2: { id: 'students', planId: 2, name: '초등·청소년 패키지', price: 24900, targetAge: '8-13세' },
+    3: { id: 'parents', planId: 3, name: '부모 패키지', price: 22900, targetAge: '부모' },
+    // 문자열 키 (호환성)
+    preschool: { id: 'preschool', planId: 1, name: '영·유아 패키지', price: 19900, targetAge: '0-7세' },
+    students: { id: 'students', planId: 2, name: '초등·청소년 패키지', price: 24900, targetAge: '8-13세' },
+    parents: { id: 'parents', planId: 3, name: '부모 패키지', price: 22900, targetAge: '부모' }
+};
 
 // ==================== 페이지 로드 시 초기화 ====================
 document.addEventListener('DOMContentLoaded', async function() {
@@ -11,11 +24,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    // 비밀번호 재확인 모달 표시 (백엔드 API 구현 전까지 주석 처리)
-    // showPasswordVerifyModal();
-    // document.getElementById('passwordVerifyForm').addEventListener('submit', handlePasswordVerify);
-
-    // 비밀번호 확인 없이 바로 마이페이지 표시
+    // 마이페이지 표시
     const modal = document.getElementById('passwordVerifyModal');
     const mypageContent = document.getElementById('mypageContent');
     modal.style.display = 'none';
@@ -24,89 +33,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     // 사용자 정보 로드
     await loadUserInfo();
 
+    // 구독 정보 로드
+    await loadSubscriptionInfo();
+
     // 자녀 관리 초기화
     initChildrenManagement();
 });
-
-// ==================== 비밀번호 재확인 (백엔드 API 구현 전까지 주석 처리) ====================
-/*
-function showPasswordVerifyModal() {
-    const modal = document.getElementById('passwordVerifyModal');
-    const mypageContent = document.getElementById('mypageContent');
-
-    modal.style.display = 'flex';
-    mypageContent.style.display = 'none';
-
-    // ESC 키로 모달 닫기 방지
-    document.addEventListener('keydown', preventEscape);
-}
-
-function preventEscape(e) {
-    if (e.key === 'Escape') {
-        e.preventDefault();
-    }
-}
-
-async function handlePasswordVerify(e) {
-    e.preventDefault();
-
-    const password = document.getElementById('verifyPassword').value;
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-
-    try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = '확인 중...';
-
-        // 사용자 이메일 가져오기
-        const email = getCurrentUserEmail();
-        if (!email) {
-            throw new Error('사용자 정보를 찾을 수 없습니다.');
-        }
-
-        // 백엔드에 비밀번호 확인 요청
-        const response = await apiClient.verifyPassword({ email, password });
-
-        if (response.success) {
-            isPasswordVerified = true;
-            hidePasswordVerifyModal();
-            await loadUserInfo();
-            showToast('비밀번호가 확인되었습니다.', 'success');
-        } else {
-            throw new Error(response.message || '비밀번호가 일치하지 않습니다.');
-        }
-
-    } catch (error) {
-        console.error('비밀번호 확인 실패:', error);
-
-        let errorMessage = '비밀번호 확인에 실패했습니다.';
-        if (error.message) {
-            errorMessage = error.message;
-        } else if (error.data && error.data.message) {
-            errorMessage = error.data.message;
-        }
-
-        showToast(errorMessage, 'error');
-        document.getElementById('verifyPassword').value = '';
-        document.getElementById('verifyPassword').focus();
-
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-    }
-}
-
-function hidePasswordVerifyModal() {
-    const modal = document.getElementById('passwordVerifyModal');
-    const mypageContent = document.getElementById('mypageContent');
-
-    modal.style.display = 'none';
-    mypageContent.style.display = 'block';
-
-    // ESC 키 이벤트 제거
-    document.removeEventListener('keydown', preventEscape);
-}
-*/
 
 // ==================== 사용자 정보 로드 ====================
 async function loadUserInfo() {
@@ -135,18 +67,39 @@ function displayUserInfo(user) {
     document.getElementById('userBirth').textContent = user.birth || '-';
     document.getElementById('userAddress').textContent = user.address || '-';
 
-    // 아바타 초기 설정
-    const initial = (user.username || user.email || 'U').charAt(0).toUpperCase();
-    document.getElementById('userInitial').textContent = initial;
+    // 아바타 설정
+    const avatarCircle = document.getElementById('userAvatar');
+    const userInitial = document.getElementById('userInitial');
 
-    // 사용자 색상 표시
+    if (user.profileImg && user.profileImg.trim()) {
+        // SVG 아바타가 있는 경우 - sanitize 후 삽입 (XSS 방지)
+        const safeSVG = sanitizeSVG(user.profileImg);
+        if (safeSVG) {
+            avatarCircle.innerHTML = safeSVG;
+        }
+
+        // SVG 스타일 조정 (아바타 영역에 맞게)
+        const svgElement = avatarCircle.querySelector('svg');
+        if (svgElement) {
+            svgElement.style.width = '100%';
+            svgElement.style.height = '100%';
+            svgElement.style.borderRadius = '50%';
+        }
+    } else {
+        // SVG가 없는 경우 - 초기 문자 표시
+        const initial = (user.username || user.email || 'U').charAt(0).toUpperCase();
+        userInitial.textContent = initial;
+
+        // 사용자 색상을 배경으로 적용
+        if (user.color) {
+            avatarCircle.style.background = user.color;
+        }
+    }
+
+    // 사용자 색상 표시 (색상 인디케이터)
     if (user.color) {
         const colorIndicator = document.getElementById('userColor');
         colorIndicator.style.backgroundColor = user.color;
-
-        // 아바타 배경도 사용자 색상으로 변경
-        const avatarCircle = document.getElementById('userAvatar');
-        avatarCircle.style.background = user.color;
     }
 
     // 활동 내역 표시 (백엔드에서 제공하는 경우)
@@ -156,31 +109,128 @@ function displayUserInfo(user) {
         document.getElementById('avgRating').textContent = (user.stats.avgRating || 0).toFixed(1);
         document.getElementById('programsJoined').textContent = user.stats.programsJoined || 0;
     }
+}
 
-    // 구독 정보 표시 (백엔드에서 제공하는 경우)
-    if (user.subscription) {
-        displaySubscriptionInfo(user.subscription);
+// ==================== 구독 정보 로드 ====================
+async function loadSubscriptionInfo() {
+    try {
+        // 모든 구독 정보 로드 (여러 플랜 구독 지원)
+        const response = await apiClient.getSubscriptions();
+        console.log('전체 구독 API 응답:', response);
+
+        if (response.success && response.data && response.data.length > 0) {
+            // ACTIVE 상태인 구독만 필터링
+            const activeSubscriptions = response.data.filter(sub => sub.status === 'ACTIVE');
+            console.log('활성 구독 목록:', activeSubscriptions);
+
+            currentSubscriptions = activeSubscriptions;
+            displaySubscriptionInfo(activeSubscriptions);
+        } else {
+            // 활성 구독 없음
+            currentSubscriptions = [];
+            displaySubscriptionInfo([]);
+        }
+    } catch (error) {
+        console.log('구독 정보 로드 실패:', error);
+        currentSubscriptions = [];
+        displaySubscriptionInfo([]);
     }
 }
 
-function displaySubscriptionInfo(subscription) {
+function displaySubscriptionInfo(subscriptions) {
     const statusBadge = document.getElementById('subscriptionStatus');
     const details = document.getElementById('subscriptionDetails');
+    const subscribeBtn = document.querySelector('.subscription-section .btn-subscribe');
 
-    if (subscription.isActive) {
-        statusBadge.textContent = '구독 중';
+    // 배열이 아닌 경우 배열로 변환 (하위 호환성)
+    const subArray = Array.isArray(subscriptions) ? subscriptions : (subscriptions ? [subscriptions] : []);
+
+    if (subArray.length > 0) {
+        // 구독 중인 플랜 개수에 따라 상태 표시
+        statusBadge.textContent = subArray.length > 1 ? `${subArray.length}개 구독 중` : '구독 중';
         statusBadge.classList.add('active');
 
-        details.innerHTML = `
-            <p><strong>플랜:</strong> ${subscription.planName}</p>
-            <p><strong>시작일:</strong> ${subscription.startDate}</p>
-            <p><strong>종료일:</strong> ${subscription.endDate}</p>
-        `;
+        // 각 구독 정보를 HTML로 생성
+        let detailsHtml = '';
+
+        subArray.forEach((subscription, index) => {
+            // 플랜 정보 가져오기 (planId 또는 planType으로 조회)
+            const plan = SUBSCRIPTION_PLANS[subscription.planId] || SUBSCRIPTION_PLANS[subscription.planType] || {};
+            const planName = plan.name || subscription.planName || '구독 플랜';
+
+            // 날짜 포맷
+            const startDate = formatSubscriptionDate(subscription.startDate);
+            const endDate = formatSubscriptionDate(subscription.endDate);
+
+            // 자동 갱신 상태에 따른 텍스트 및 버튼
+            const autoRenew = subscription.autoRenew;
+            let autoRenewText = autoRenew ? '자동 갱신' : '갱신 안함 (취소 예정)';
+            let cancelButtonHtml = '';
+
+            if (autoRenew) {
+                // 자동 갱신 중 -> 취소 신청 버튼 표시
+                cancelButtonHtml = `
+                    <button class="btn-cancel-subscription" onclick="openCancelSubscriptionModal(${subscription.subscriptionId}, '${planName.replace(/'/g, "\\'")}')">
+                        취소 신청
+                    </button>
+                `;
+            } else {
+                // 취소 예정 -> 취소 철회 버튼 표시
+                autoRenewText = `<span class="cancel-scheduled">갱신 안함 (취소 예정)</span>`;
+                cancelButtonHtml = `
+                    <button class="btn-withdraw-cancel" onclick="withdrawCancellationRequest(${subscription.subscriptionId}, '${planName.replace(/'/g, "\\'")}')">
+                        취소 철회
+                    </button>
+                `;
+            }
+
+            // 여러 구독 시 구분선 추가
+            if (index > 0) {
+                detailsHtml += '<hr class="subscription-divider">';
+            }
+
+            detailsHtml += `
+                <div class="subscription-item" data-subscription-id="${subscription.subscriptionId}">
+                    <div class="subscription-info-content">
+                        <p><strong>플랜:</strong> ${planName}</p>
+                        <p><strong>구독 기간:</strong> ${startDate} ~ ${endDate}</p>
+                        <p><strong>갱신 설정:</strong> ${autoRenewText}</p>
+                        <p><strong>월 구독료:</strong> ${(plan.price || 0).toLocaleString()}원</p>
+                    </div>
+                    <div class="subscription-actions">
+                        ${cancelButtonHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        details.innerHTML = detailsHtml;
+
+        // 버튼 텍스트 변경
+        if (subscribeBtn) {
+            subscribeBtn.textContent = '플랜 추가';
+        }
     } else {
         statusBadge.textContent = '미구독';
         statusBadge.classList.remove('active');
         details.innerHTML = '<p>현재 구독 중인 플랜이 없습니다.</p>';
+
+        if (subscribeBtn) {
+            subscribeBtn.textContent = '구독 플랜 보기';
+        }
     }
+}
+
+// ==================== 구독 날짜 포맷 ====================
+function formatSubscriptionDate(dateString) {
+    if (!dateString) return '-';
+
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}.${month}.${day}`;
 }
 
 // ==================== 현재 사용자 이메일 가져오기 ====================
@@ -204,6 +254,7 @@ function getCurrentUserEmail() {
 
 // ==================== 프로필 수정 ====================
 let selectedColor = '#20B2AA'; // 기본 색상
+let selectedUserAvatar = ''; // 사용자 아바타
 
 function editProfile() {
     // 프로필 수정 모달 표시
@@ -213,6 +264,7 @@ function editProfile() {
     // 현재 사용자 정보 저장
     if (userInfo) {
         selectedColor = userInfo.color || '#20B2AA';
+        selectedUserAvatar = userInfo.profileImg || '';
     }
 
     // 폼 제출 이벤트 등록 (기존 이벤트 리스너 제거 후 재등록)
@@ -249,7 +301,26 @@ function editProfile() {
 
         document.getElementById('editAddress').value = baseAddress;
         document.getElementById('editDetailAddress').value = detailAddress;
+
+        // 아바타 미리보기 설정
+        const userAvatarImg = document.getElementById('userAvatarImg');
+
+        if (selectedUserAvatar && selectedUserAvatar.trim()) {
+            // SVG 문자열을 Blob으로 변환하여 이미지로 표시
+            const blob = new Blob([selectedUserAvatar], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            userAvatarImg.src = url;
+        } else {
+            // 기본 아바타 생성
+            const defaultAvatar = generateDefaultAvatar(userInfo.username || userInfo.email || 'User');
+            userAvatarImg.src = defaultAvatar;
+            selectedUserAvatar = ''; // SVG 문자열이 아닌 URL이므로 비워둠
+        }
     }
+
+    // 아바타 그리드와 새로고침 버튼은 숨김
+    document.getElementById('userAvatarGrid').style.display = 'none';
+    document.getElementById('userAvatarRefreshContainer').style.display = 'none';
 
     // 프로필 수정 모달 이벤트 리스너 등록
     initEditProfileModal();
@@ -329,10 +400,111 @@ function updateColorPreview() {
 
 function closeEditModal() {
     const modal = document.getElementById('editProfileModal');
+    const avatarGrid = document.getElementById('userAvatarGrid');
+    const refreshContainer = document.getElementById('userAvatarRefreshContainer');
+
     modal.style.display = 'none';
+    avatarGrid.style.display = 'none';
+    refreshContainer.style.display = 'none';
 
     // 폼 초기화
     document.getElementById('editProfileForm').reset();
+}
+
+// 사용자 아바타 선택 UI 표시/숨김
+function showUserAvatarSelection() {
+    const avatarGrid = document.getElementById('userAvatarGrid');
+    const refreshContainer = document.getElementById('userAvatarRefreshContainer');
+
+    if (avatarGrid.style.display === 'none' || !avatarGrid.style.display) {
+        // 아바타 그리드 생성
+        generateUserAvatarGrid();
+        avatarGrid.style.display = 'grid';
+        refreshContainer.style.display = 'block';
+    } else {
+        avatarGrid.style.display = 'none';
+        refreshContainer.style.display = 'none';
+    }
+}
+
+// 사용자 아바타 그리드 생성
+function generateUserAvatarGrid() {
+    const avatarGrid = document.getElementById('userAvatarGrid');
+    avatarGrid.innerHTML = '';
+
+    // DiceBear 스타일들 (안정적인 무료 API)
+    const styles = ['avataaars', 'bottts', 'fun-emoji', 'lorelei', 'micah', 'pixel-art'];
+
+    // 랜덤 시드 생성 (고유한 아바타를 위해)
+    const randomSeeds = [];
+    for (let i = 0; i < 6; i++) {
+        randomSeeds.push(Math.random().toString(36).substring(2, 15));
+    }
+
+    // 6개의 아바타 생성
+    randomSeeds.forEach((seed, index) => {
+        const style = styles[index % styles.length];
+        const avatarUrl = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
+
+        const label = document.createElement('label');
+        label.className = 'avatar-option';
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'userAvatar';
+        input.value = avatarUrl;
+
+        input.addEventListener('change', async function() {
+            try {
+                // SVG 문자열 가져오기
+                const response = await fetch(this.value);
+                if (response.ok) {
+                    const svgText = await response.text();
+                    selectedUserAvatar = svgText;
+
+                    // 미리보기 업데이트
+                    const blob = new Blob([svgText], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
+                    document.getElementById('userAvatarImg').src = url;
+                } else {
+                    throw new Error('아바타 로드 실패');
+                }
+            } catch (error) {
+                console.error('아바타 가져오기 실패:', error);
+                showToast('아바타를 불러오는데 실패했습니다.', 'error');
+            }
+        });
+
+        const avatarBox = document.createElement('div');
+        avatarBox.className = 'avatar-box';
+
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = `아바타 ${index + 1}`;
+
+        // 이미지 로드 에러 처리
+        img.onerror = function() {
+            console.error('아바타 로드 실패:', avatarUrl);
+            // 폴백 이미지
+            this.src = generateDefaultAvatar('user-' + index);
+        };
+
+        const span = document.createElement('span');
+        span.className = 'avatar-label';
+        span.textContent = `스타일 ${index + 1}`;
+
+        avatarBox.appendChild(img);
+        avatarBox.appendChild(span);
+        label.appendChild(input);
+        label.appendChild(avatarBox);
+        avatarGrid.appendChild(label);
+    });
+}
+
+// 사용자 아바타 새로고침
+function refreshUserAvatars() {
+    generateUserAvatarGrid();
+    showToast('새로운 아바타를 불러왔습니다!', 'success');
 }
 
 async function handleProfileUpdate(e) {
@@ -360,7 +532,8 @@ async function handleProfileUpdate(e) {
             nickname: nickname || null,
             phone: phone || null,
             address: fullAddress || null,
-            color: selectedColor
+            color: selectedColor,
+            profileImg: selectedUserAvatar || null
         };
 
         const response = await apiClient.updateUserInfo(updateData);
@@ -452,100 +625,42 @@ function resetPassword() {
         }
     });
 
-    // 이벤트 리스너 등록
-    const newPassword = document.getElementById('newPassword');
-    const confirmNewPassword = document.getElementById('confirmNewPassword');
-
-    newPassword.removeEventListener('input', validateNewPassword);
-    confirmNewPassword.removeEventListener('input', checkNewPasswordMatch);
-
-    newPassword.addEventListener('input', validateNewPassword);
-    confirmNewPassword.addEventListener('input', checkNewPasswordMatch);
-
-    // 폼 제출 이벤트
-    const form = document.getElementById('resetPasswordForm');
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-
-    newForm.addEventListener('submit', handlePasswordReset);
+    // 계속 버튼 이벤트 리스너
+    const confirmBtn = document.getElementById('confirmResetPasswordBtn');
+    confirmBtn.onclick = handleResetPasswordRedirect;
 }
 
 // 비밀번호 재설정 모달 닫기
 function closeResetPasswordModal() {
     const modal = document.getElementById('resetPasswordModal');
     modal.style.display = 'none';
-
-    // 폼 초기화
-    document.getElementById('resetPasswordForm').reset();
-    document.getElementById('newPassword').classList.remove('valid', 'invalid');
-    document.getElementById('confirmNewPassword').classList.remove('valid', 'invalid');
-    document.getElementById('newPasswordError').style.display = 'none';
 }
 
-// 비밀번호 재설정 처리
-async function handlePasswordReset(e) {
-    e.preventDefault();
-
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-
-    // 비밀번호 유효성 검사
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-
-    if (!regex.test(newPassword)) {
-        showToast('비밀번호는 영어, 숫자, 특수문자(@$!%*#?&)를 포함한 8자리 이상이어야 합니다.', 'warning');
-        return;
-    }
-
-    if (newPassword !== confirmNewPassword) {
-        showToast('비밀번호가 일치하지 않습니다.', 'warning');
-        return;
-    }
-
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
+// 비밀번호 재설정 페이지로 이동 (로그아웃 후)
+async function handleResetPasswordRedirect() {
+    const confirmBtn = document.getElementById('confirmResetPasswordBtn');
 
     try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = '재설정 중...';
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = '처리 중...';
 
-        // 비밀번호 재설정 API 호출
-        const response = await apiClient.resetPassword({
-            email: userInfo.email,
-            username: userInfo.username,
-            newPassword: newPassword
-        });
+        // 로그아웃 처리
+        await apiClient.logout();
 
-        if (response.success) {
-            showToast('비밀번호가 성공적으로 재설정되었습니다.', 'success');
-            closeResetPasswordModal();
-        } else {
-            throw new Error(response.message || '비밀번호 재설정에 실패했습니다.');
-        }
+        // 비밀번호 재설정 페이지로 이동
+        window.location.href = '/resetpw.html';
 
     } catch (error) {
-        console.error('비밀번호 재설정 실패:', error);
-
-        let errorMessage = '비밀번호 재설정에 실패했습니다. 다시 시도해주세요.';
-
-        if (error.data && error.data.message) {
-            errorMessage = error.data.message;
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-
-        showToast(errorMessage, 'error');
-
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
+        console.error('로그아웃 실패:', error);
+        // 에러가 발생해도 토큰 정리 후 이동
+        apiClient.clearTokens();
+        window.location.href = '/resetpw.html';
     }
 }
 
 // ==================== 구독 플랜 보기 ====================
 function goToSubscription() {
-    // TODO: 구독 페이지로 이동
-    showToast('구독 플랜 페이지는 추후 구현 예정입니다.', 'info');
+    window.location.href = '/subscription.html';
 }
 
 // ==================== 로그아웃 ====================
@@ -1263,4 +1378,115 @@ function initChildrenManagement() {
 
     // 자녀 목록 로드
     loadChildren();
+}
+
+// ==================== 구독 취소 관리 ====================
+
+let cancelTargetSubscription = null;
+
+// 구독 취소 모달 열기
+function openCancelSubscriptionModal(subscriptionId, planName) {
+    cancelTargetSubscription = { subscriptionId, planName };
+
+    const modal = document.getElementById('cancelSubscriptionModal');
+    const planNameDisplay = document.getElementById('cancelPlanName');
+
+    planNameDisplay.textContent = planName;
+    modal.style.display = 'flex';
+
+    // 모달 외부 클릭 시 닫기
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            closeCancelSubscriptionModal();
+        }
+    };
+}
+
+// 구독 취소 모달 닫기
+function closeCancelSubscriptionModal() {
+    const modal = document.getElementById('cancelSubscriptionModal');
+    modal.style.display = 'none';
+    cancelTargetSubscription = null;
+}
+
+// 기간 종료 후 취소 (자동 갱신 해제)
+async function requestCancelSubscription() {
+    if (!cancelTargetSubscription) return;
+
+    const { subscriptionId, planName } = cancelTargetSubscription;
+
+    try {
+        showToast('취소 신청 처리 중...', 'info');
+
+        const response = await apiClient.updateAutoRenew(subscriptionId, false);
+
+        if (response.success) {
+            showToast(`${planName} 취소가 신청되었습니다. 구독 기간 종료 후 자동 해지됩니다.`, 'success');
+            closeCancelSubscriptionModal();
+            await loadSubscriptionInfo(); // 구독 정보 새로고침
+        } else {
+            throw new Error(response.message || '취소 신청에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('취소 신청 실패:', error);
+        showToast(error.message || '취소 신청 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// ==================== 취소 철회 모달 관리 ====================
+
+let withdrawTargetSubscription = null;
+
+// 취소 철회 모달 열기
+function openWithdrawCancelModal(subscriptionId, planName) {
+    withdrawTargetSubscription = { subscriptionId, planName };
+
+    const modal = document.getElementById('withdrawCancelModal');
+    const planNameDisplay = document.getElementById('withdrawPlanName');
+
+    planNameDisplay.textContent = planName;
+    modal.style.display = 'flex';
+
+    // 모달 외부 클릭 시 닫기
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            closeWithdrawCancelModal();
+        }
+    };
+}
+
+// 취소 철회 모달 닫기
+function closeWithdrawCancelModal() {
+    const modal = document.getElementById('withdrawCancelModal');
+    modal.style.display = 'none';
+    withdrawTargetSubscription = null;
+}
+
+// 취소 신청 철회 확인 (자동 갱신 다시 활성화)
+async function confirmWithdrawCancellation() {
+    if (!withdrawTargetSubscription) return;
+
+    const { subscriptionId, planName } = withdrawTargetSubscription;
+
+    try {
+        showToast('취소 철회 처리 중...', 'info');
+
+        const response = await apiClient.updateAutoRenew(subscriptionId, true);
+
+        if (response.success) {
+            showToast(`${planName} 취소 신청이 철회되었습니다. 자동 갱신이 다시 활성화됩니다.`, 'success');
+            closeWithdrawCancelModal();
+            await loadSubscriptionInfo(); // 구독 정보 새로고침
+        } else {
+            throw new Error(response.message || '취소 철회에 실패했습니다.');
+        }
+    } catch (error) {
+        console.error('취소 철회 실패:', error);
+        showToast(error.message || '취소 철회 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// 하위 호환성: 기존 함수명 유지
+function withdrawCancellationRequest(subscriptionId, planName) {
+    openWithdrawCancelModal(subscriptionId, planName);
 }

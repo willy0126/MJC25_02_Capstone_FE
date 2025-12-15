@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자유 게시판 - 책·이음</title>
+    <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/freeboard.css">
+    <link rel="stylesheet" href="css/toast.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <main class="freeboard-container">
+
+        <section class="freeboard-hero">
+            <h1>자유게시판</h1>
+            <p>자유롭게 이야기하는 공간</p>
+        </section>
+
+        <!-- Board Section -->
+        <section class="freeboard-board">
+
+            <!-- Controls -->
+            <div class="board-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="제목 또는 내용으로 검색">
+                    <button class="search-btn" id="searchBtn">🔍 검색</button>
+                </div>
+                <button class="write-btn" id="writeBtn">✏️ 글쓰기</button>
+            </div>
+
+            <!-- 게시글 리스트 (API에서 동적 로드) -->
+            <ul class="freeboard-list" id="freeboardList"></ul>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn" id="prevPageBtn">이전</button>
+                <span id="pageInfo"></span>
+                <button class="page-btn" id="nextPageBtn">다음</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 글쓰기/수정 모달 -->
+    <div class="modal" id="writeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">글쓰기</h2>
+                <button class="modal-close" id="writeModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label>
+                    글 제목:
+                    <input type="text" id="postTitleInput" placeholder="제목을 입력하세요">
+                </label>
+                <br><br>
+                <label>
+                    글 내용:
+                    <textarea id="postContentInput" rows="6" placeholder="내용을 입력하세요"></textarea>
+                </label>
+                <br><br>
+                <button id="savePostBtn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- 공용 JS -->
+    <script src="js/toast.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth.js"></script>
+
+    <!-- include.js: Navbar/Footer 동적 로드 -->
+    <script src="js/include.js" defer></script>
+
+    <!-- 커스텀 커서 & 게시판 JS -->
+    <script src="js/freeboard.js" defer></script>
+    <script src="js/cursor.js" defer></script>
+    
+
+</body>
+</html>

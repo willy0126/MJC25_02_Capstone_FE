@@ -1,7 +1,12 @@
 // ==================== 전역 변수 ====================
 let currentStep = 0;
-let isNicknameChecked = false; // 닉네임 중복 확인 여부
-let checkedNickname = ''; // 중복 확인된 닉네임
+let isEmailVerified = false;  // 이메일 인증 상태
+let verifiedEmail = '';       // 인증된 이메일
+
+// 인증 타이머 관련 변수
+let verificationTimerInterval = null;
+let remainingSeconds = 0;
+const VERIFICATION_TIMEOUT = 300; // 5분 = 300초
 
 // ==================== 1단계: 약관 동의 ====================
 
@@ -100,81 +105,81 @@ function checkPasswordMatch() {
     }
 }
 
+// ==================== 이메일 인증 ====================
+
 // 이메일 인증번호 발송
-/* function sendVerificationCode() {
-    const email = document.getElementById('email').value;
+async function sendVerificationCode() {
+    const emailInput = document.getElementById('email');
+    const email = emailInput.value.trim();
+    const sendBtn = document.getElementById('sendVerification');
+    const emailStatus = document.getElementById('emailStatus');
+
+    // 이메일 유효성 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
         showToast('이메일을 입력해주세요.', 'warning');
-        return;
-    }
-    // TODO: 실제 인증번호 발송 로직
-    showToast('인증번호가 발송되었습니다.', 'success');
-}
-
-// 인증번호 확인
-function verifyCode() {
-    const code = document.getElementById('verificationCode').value;
-    if (!code) {
-        showToast('인증번호를 입력해주세요.', 'warning');
-        return;
-    }
-    // TODO: 실제 인증번호 확인 로직
-    showToast('인증이 완료되었습니다.', 'success');
-} */
-
-// 닉네임 중복 확인 (API 미구현으로 비활성화)
-async function checkNickname() {
-    showToast('닉네임 중복 확인 기능은 현재 준비 중입니다.', 'info');
-    return;
-
-    /* // API 구현 후 활성화
-    const nickname = document.getElementById('nickname').value.trim();
-    const checkBtn = document.getElementById('checkNickname');
-
-    if (!nickname) {
-        showToast('닉네임을 입력해주세요.', 'warning');
+        emailInput.focus();
         return;
     }
 
-    // 닉네임 길이 검증 (2-20자)
-    if (nickname.length < 2 || nickname.length > 20) {
-        showToast('닉네임은 2-20자 사이여야 합니다.', 'warning');
+    if (!emailRegex.test(email)) {
+        showToast('올바른 이메일 형식을 입력해주세요.', 'warning');
+        emailInput.focus();
         return;
     }
+
+    const originalText = sendBtn.textContent;
 
     try {
-        // 버튼 비활성화
-        checkBtn.disabled = true;
-        checkBtn.textContent = '확인 중...';
+        sendBtn.disabled = true;
+        sendBtn.textContent = '발송 중...';
 
-        // API 호출
-        const response = await apiClient.checkNickname(nickname);
+        // API 호출: 인증 코드 발송
+        const response = await apiClient.sendSignupVerificationCode(email);
 
-        // 백엔드 응답 형식: {success, code, message, data: {available: true/false}}
-        if (response.success && response.data) {
-            if (response.data.available) {
-                showToast('사용 가능한 닉네임입니다.', 'success');
-                // 닉네임 입력란 테두리 초록색으로 표시
-                document.getElementById('nickname').style.borderColor = '#27ae60';
-                // 중복 확인 완료 표시
-                isNicknameChecked = true;
-                checkedNickname = nickname;
-            } else {
-                showToast('이미 사용 중인 닉네임입니다.', 'error');
-                // 닉네임 입력란 테두리 빨간색으로 표시
-                document.getElementById('nickname').style.borderColor = '#e74c3c';
-                // 중복 확인 실패
-                isNicknameChecked = false;
-                checkedNickname = '';
-            }
+        if (response.success) {
+            // 인증번호 입력 필드 표시
+            document.getElementById('verificationGroup').style.display = 'block';
+
+            // 이메일 입력 비활성화
+            emailInput.readOnly = true;
+            emailInput.style.backgroundColor = '#f5f5f5';
+
+            // 상태 메시지
+            emailStatus.textContent = '인증번호가 이메일로 발송되었습니다.';
+            emailStatus.style.color = '#27ae60';
+            emailStatus.style.display = 'block';
+
+            // 버튼 텍스트 변경
+            sendBtn.textContent = '재발송';
+            sendBtn.disabled = false;
+
+            // 이메일 인증 상태 초기화 (재발송 시)
+            isEmailVerified = false;
+            verifiedEmail = '';
+
+            // 인증번호 입력 필드 활성화 (재발송 시)
+            const codeInput = document.getElementById('verificationCode');
+            const verifyBtn = document.getElementById('verifyCode');
+            codeInput.disabled = false;
+            codeInput.value = '';
+            verifyBtn.disabled = false;
+
+            // 5분 타이머 시작
+            startVerificationTimer();
+
+            showToast('인증번호가 이메일로 발송되었습니다.', 'success');
+
+            // 인증번호 입력칸으로 포커스
+            codeInput.focus();
         } else {
-            throw new Error(response.message || '닉네임 확인에 실패했습니다.');
+            throw new Error(response.message || '인증번호 발송에 실패했습니다.');
         }
 
     } catch (error) {
-        console.error('닉네임 중복 확인 실패:', error);
+        console.error('인증번호 발송 실패:', error);
 
-        let errorMessage = '닉네임 확인에 실패했습니다. 다시 시도해주세요.';
+        let errorMessage = '인증번호 발송에 실패했습니다.';
 
         if (error.data && error.data.message) {
             errorMessage = error.data.message;
@@ -182,29 +187,186 @@ async function checkNickname() {
             errorMessage = error.message;
         }
 
-        showToast(errorMessage, 'error');
-        // 닉네임 입력란 테두리 초기화
-        document.getElementById('nickname').style.borderColor = '#ddd';
-        // 중복 확인 실패
-        isNicknameChecked = false;
-        checkedNickname = '';
+        // 이미 가입된 이메일 처리
+        if (error.data && error.data.code === 'USER002') {
+            errorMessage = '이미 가입된 이메일입니다.';
+        }
 
-    } finally {
-        // 버튼 복원
-        checkBtn.disabled = false;
-        checkBtn.textContent = '중복확인';
+        emailStatus.textContent = errorMessage;
+        emailStatus.style.color = '#e74c3c';
+        emailStatus.style.display = 'block';
+
+        showToast(errorMessage, 'error');
+        sendBtn.textContent = originalText;
+        sendBtn.disabled = false;
     }
-    */
 }
 
-// 닉네임 입력 시 중복 확인 상태 초기화
-function handleNicknameInput() {
-    const nickname = document.getElementById('nickname').value.trim();
+// 인증번호 확인
+async function verifyCode() {
+    const emailInput = document.getElementById('email');
+    const codeInput = document.getElementById('verificationCode');
+    const verifyBtn = document.getElementById('verifyCode');
+    const codeStatus = document.getElementById('codeStatus');
 
-    // 닉네임이 변경되면 중복 확인 상태 초기화
-    if (nickname !== checkedNickname) {
-        isNicknameChecked = false;
-        document.getElementById('nickname').style.borderColor = '#ddd';
+    const email = emailInput.value.trim();
+    const code = codeInput.value.trim();
+
+    if (!code) {
+        showToast('인증번호를 입력해주세요.', 'warning');
+        codeInput.focus();
+        return;
+    }
+
+    const originalText = verifyBtn.textContent;
+
+    try {
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = '확인 중...';
+
+        // API 호출: 인증 코드 검증
+        const response = await apiClient.verifySignupCode(email, code);
+
+        if (response.success) {
+            // 인증 성공
+            isEmailVerified = true;
+            verifiedEmail = email;
+
+            // 타이머 숨기기
+            hideVerificationTimer();
+
+            // UI 업데이트
+            codeInput.readOnly = true;
+            codeInput.style.backgroundColor = '#f5f5f5';
+            verifyBtn.style.display = 'none';
+            document.getElementById('sendVerification').style.display = 'none';
+
+            codeStatus.textContent = '이메일 인증이 완료되었습니다.';
+            codeStatus.style.color = '#27ae60';
+            codeStatus.style.display = 'block';
+
+            showToast('이메일 인증이 완료되었습니다.', 'success');
+
+            // 다음 입력 필드로 포커스
+            document.getElementById('name').focus();
+        } else {
+            throw new Error(response.message || '인증번호 확인에 실패했습니다.');
+        }
+
+    } catch (error) {
+        console.error('인증번호 확인 실패:', error);
+
+        let errorMessage = '인증번호가 올바르지 않습니다.';
+
+        if (error.data && error.data.message) {
+            errorMessage = error.data.message;
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
+        // 특정 에러 코드 처리
+        if (error.data) {
+            switch(error.data.code) {
+                case 'AUTH001':
+                    errorMessage = '인증번호가 만료되었습니다. 다시 발송해주세요.';
+                    break;
+                case 'AUTH002':
+                    errorMessage = '인증번호가 올바르지 않습니다.';
+                    break;
+            }
+        }
+
+        codeStatus.textContent = errorMessage;
+        codeStatus.style.color = '#e74c3c';
+        codeStatus.style.display = 'block';
+
+        showToast(errorMessage, 'error');
+        verifyBtn.textContent = originalText;
+        verifyBtn.disabled = false;
+        codeInput.value = '';
+        codeInput.focus();
+    }
+}
+
+// ==================== 인증 타이머 ====================
+
+// 타이머 시작
+function startVerificationTimer() {
+    // 기존 타이머가 있으면 정지
+    stopVerificationTimer();
+
+    remainingSeconds = VERIFICATION_TIMEOUT;
+
+    // 타이머 표시 요소 생성 또는 가져오기
+    let timerDisplay = document.getElementById('verificationTimer');
+    if (!timerDisplay) {
+        timerDisplay = document.createElement('div');
+        timerDisplay.id = 'verificationTimer';
+        timerDisplay.className = 'verification-timer';
+        timerDisplay.style.cssText = 'margin-top: 8px; font-size: 14px; color: #e67e22; text-align: center;';
+
+        const verificationGroup = document.getElementById('verificationGroup');
+        verificationGroup.appendChild(timerDisplay);
+    }
+
+    // 초기 표시
+    updateTimerDisplay();
+    timerDisplay.style.display = 'block';
+
+    // 1초마다 카운트다운
+    verificationTimerInterval = setInterval(() => {
+        remainingSeconds--;
+
+        if (remainingSeconds <= 0) {
+            // 타이머 만료
+            stopVerificationTimer();
+            timerDisplay.innerHTML = '<span style="color: #e74c3c;">인증 시간이 만료되었습니다. 인증번호를 다시 받아주세요.</span>';
+
+            // 인증번호 입력 비활성화
+            const codeInput = document.getElementById('verificationCode');
+            const verifyBtn = document.getElementById('verifyCode');
+            codeInput.disabled = true;
+            verifyBtn.disabled = true;
+        } else {
+            updateTimerDisplay();
+        }
+    }, 1000);
+}
+
+// 타이머 표시 업데이트
+function updateTimerDisplay() {
+    const timerDisplay = document.getElementById('verificationTimer');
+    if (!timerDisplay) return;
+
+    const minutes = Math.floor(remainingSeconds / 60);
+    const seconds = remainingSeconds % 60;
+    const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+    // 남은 시간에 따라 색상 변경
+    let color = '#e67e22'; // 기본 주황색
+    if (remainingSeconds <= 60) {
+        color = '#e74c3c'; // 1분 이하면 빨간색
+    } else if (remainingSeconds <= 120) {
+        color = '#f39c12'; // 2분 이하면 진한 주황색
+    }
+
+    timerDisplay.innerHTML = `<span style="color: ${color};">인증번호 유효시간: ${formattedTime}</span>`;
+}
+
+// 타이머 정지
+function stopVerificationTimer() {
+    if (verificationTimerInterval) {
+        clearInterval(verificationTimerInterval);
+        verificationTimerInterval = null;
+    }
+}
+
+// 타이머 숨기기
+function hideVerificationTimer() {
+    stopVerificationTimer();
+    const timerDisplay = document.getElementById('verificationTimer');
+    if (timerDisplay) {
+        timerDisplay.style.display = 'none';
     }
 }
 
@@ -310,7 +472,6 @@ function initializeStep2EventListeners() {
     const password = document.getElementById('password');
     const passwordConfirm = document.getElementById('passwordConfirm');
     const phone = document.getElementById('phone');
-    const nickname = document.getElementById('nickname');
 
     // 비밀번호 실시간 검증
     password.addEventListener('input', validatePassword);
@@ -320,13 +481,9 @@ function initializeStep2EventListeners() {
     // 전화번호 자동 포맷팅
     phone.addEventListener('input', formatPhoneNumber);
 
-    // 닉네임 입력 시 중복 확인 상태 초기화
-    nickname.addEventListener('input', handleNicknameInput);
-
     // 버튼 이벤트
-    // document.getElementById('sendVerification').addEventListener('click', sendVerificationCode);
-    // document.getElementById('verifyCode').addEventListener('click', verifyCode);
-    document.getElementById('checkNickname').addEventListener('click', checkNickname);
+    document.getElementById('sendVerification').addEventListener('click', sendVerificationCode);
+    document.getElementById('verifyCode').addEventListener('click', verifyCode);
     document.getElementById('findAddress').addEventListener('click', findAddress);
 }
 
@@ -541,6 +698,19 @@ async function handleSubmit(e) {
     const address = document.getElementById('address');
     const detailAddress = document.getElementById('detailAddress');
 
+    // 이메일 인증 확인
+    if (!isEmailVerified) {
+        showToast('이메일 인증을 완료해주세요.', 'warning');
+        document.getElementById('sendVerification').focus();
+        return;
+    }
+
+    // 인증된 이메일과 입력된 이메일이 다른 경우 체크
+    if (email.value.trim() !== verifiedEmail) {
+        showToast('인증된 이메일과 다릅니다. 다시 인증해주세요.', 'warning');
+        return;
+    }
+
     // 비밀번호 유효성 검사
     const passwordValue = password.value;
     const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
@@ -560,13 +730,6 @@ async function handleSubmit(e) {
         showToast('필수 입력 항목을 모두 입력해주세요.', 'warning');
         return;
     }
-
-    // 닉네임 중복 확인 검증 (API 미구현으로 비활성화)
-    /* if (!isNicknameChecked || nickname.value.trim() !== checkedNickname) {
-        showToast('닉네임 중복 확인을 먼저 진행해주세요.', 'warning');
-        nickname.focus();
-        return;
-    } */
 
     // 생년월일 가져오기 (백엔드 형식: YYYY-MM-DD)
     const birthValue = birth.value || null;

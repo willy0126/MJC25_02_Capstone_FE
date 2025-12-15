@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>고객 지원 - 책·이음</title>
     <link rel="icon" type="image/png" href="assets/logo/tplogo.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Paperlogy:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Paperlogy 폰트 (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/footer.css">
@@ -266,7 +265,7 @@
         <section class="faq-contact">
             <h2>원하는 답변을 찾지 못하셨나요?</h2>
             <p>고객센터를 통해 문의해주시면 빠르게 답변드리겠습니다.</p>
-            <a href="#" class="contact-button">문의하기</a>
+            <a href="#" class="contact-button" onclick="event.preventDefault(); showToast('현재 점검중입니다.', 'warning');">문의하기</a>
         </section>
     </main>
 

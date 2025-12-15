@@ -1,0 +1,478 @@
+/* ========================================
+   대회 상세 페이지 스타일
+======================================== */
+
+/* 페이지 전체 배경 */
+body {
+    background-color: #FFF7E6;
+}
+
+/* 컨테이너 */
+.detail-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 100px 20px 80px;
+}
+
+/* 뒤로가기 버튼 */
+.back-btn {
+    display: inline-block;
+    color: #666;
+    text-decoration: none;
+    font-size: 15px;
+    margin-bottom: 30px;
+    transition: color 0.3s ease;
+}
+
+.back-btn:hover {
+    color: #2c3e50;
+}
+
+/* ===== 상단 영역 ===== */
+.detail-header {
+    display: flex;
+    gap: 40px;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+/* 포스터 */
+.poster-wrapper {
+    flex-shrink: 0;
+    width: 300px;
+    height: 400px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.poster-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 기본 정보 */
+.basic-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.contest-status {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    width: fit-content;
+    margin-bottom: 16px;
+}
+
+.status-ongoing {
+    background-color: #e8f5e9;
+    color: #4CAF50;
+}
+
+.status-upcoming {
+    background-color: #e3f2fd;
+    color: #2196F3;
+}
+
+.status-completed {
+    background-color: #f5f5f5;
+    color: #9E9E9E;
+}
+
+.contest-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 12px;
+}
+
+.contest-date {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.info-divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 20px 0;
+}
+
+.info-item {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.info-label {
+    width: 100px;
+    font-weight: 600;
+    color: #888;
+    font-size: 14px;
+}
+
+.info-value {
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.participate-btn {
+    margin-top: auto;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.participate-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+}
+
+/* ===== 상세 내용 탭 ===== */
+.detail-content {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+}
+
+.tab-btn {
+    padding: 12px 24px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.tab-btn:hover {
+    color: #666;
+    background-color: #f5f5f5;
+}
+
+.tab-btn.active {
+    color: #4CAF50;
+    background-color: #e8f5e9;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content h2 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.tab-content p {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.8;
+}
+
+/* 참가 방법 스텝 */
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.step-content h3 {
+    font-size: 16px;
+    color: #2c3e50;
+    margin-bottom: 6px;
+}
+
+.step-content p {
+    font-size: 14px;
+    color: #666;
+}
+
+/* 시상 내역 */
+.prize-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.prize-item {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px;
+    border-radius: 12px;
+    background-color: #fafafa;
+}
+
+.prize-item.gold {
+    background: linear-gradient(135deg, #fff9e6, #fff3cd);
+    border: 1px solid #ffd700;
+}
+
+.prize-item.silver {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 1px solid #c0c0c0;
+}
+
+.prize-item.bronze {
+    background: linear-gradient(135deg, #fff5f0, #ffe8db);
+    border: 1px solid #cd7f32;
+}
+
+.prize-item.special {
+    background: linear-gradient(135deg, #f0f8ff, #e6f2ff);
+    border: 1px solid #87CEEB;
+}
+
+.prize-rank {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c3e50;
+    width: 140px;
+}
+
+.prize-reward {
+    flex: 1;
+    font-size: 16px;
+    color: #555;
+}
+
+.prize-count {
+    font-size: 14px;
+    color: #888;
+    background-color: rgba(0,0,0,0.05);
+    padding: 6px 14px;
+    border-radius: 20px;
+}
+
+/* ===== 차수 선택 모달 ===== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content.stage-modal {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content.stage-modal h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.modal-description {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.stage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.stage-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stage-btn:hover:not(.waiting) {
+    border-color: #4CAF50;
+    background-color: #f1f8f4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+/* 종료된 차수 - 클릭 가능 */
+.stage-btn.ended {
+    border-color: #ffe0b2;
+    background-color: #fff8e1;
+}
+
+.stage-btn.ended:hover {
+    border-color: #ff9800;
+    background-color: #fff3e0;
+}
+
+/* 대기 중 - 클릭 불가 */
+.stage-btn.waiting {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.stage-btn.locked {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.stage-number {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.stage-btn.locked .stage-number {
+    color: #999;
+}
+
+.stage-status {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-available {
+    background-color: #e8f5e9;
+    color: #4CAF50;
+}
+
+.status-ended {
+    background-color: #fff3e0;
+    color: #ff9800;
+}
+
+.status-waiting {
+    background-color: #f5f5f5;
+    color: #9e9e9e;
+}
+
+.status-locked {
+    background-color: #ffebee;
+    color: #f44336;
+}
+
+.modal-close-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    color: #666;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-close-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* ===== 반응형 ===== */
+@media (max-width: 768px) {
+    .detail-header {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .poster-wrapper {
+        width: 100%;
+        max-width: 300px;
+        height: 350px;
+    }
+
+    .basic-info {
+        text-align: center;
+        align-items: center;
+    }
+
+    .info-item {
+        justify-content: center;
+    }
+
+    .tab-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .prize-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .prize-rank {
+        width: auto;
+    }
+
+    .modal-content.stage-modal {
+        padding: 30px 20px;
+    }
+}
